@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        .apply-layout {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .job-details {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .apply-btn {
+            margin-top: 1.5rem;
+            width: 100%;
+        }
+
+        .right-ads {
+            position: sticky;
+            top: 100px;
+        }
+        .container{
+            max-width:1100px;
+            margin:auto;
+            padding:30px 20px;
+        }
+
+        .apply-layout{
+            display:grid;
+            grid-template-columns:3fr 1fr;
+            gap:30px;
+            margin-top:30px;
+        }
+
+        .job-details{
+            background:white;
+            border-radius:14px;
+            padding:30px;
+            border:1px solid var(--gray-200);
+        }
+
+        .job-details h2{
+            font-size:32px;
+            margin-bottom:25px;
+        }
+
+        .detail-box{
+            border-left:5px solid var(--primary);
+            padding:20px;
+            margin-bottom:20px;
+            background:#f9fafb;
+            border-radius:8px;
+        }
+
+        .detail-box h4{
+            font-size:14px;
+            letter-spacing:1px;
+            color:#555;
+            margin-bottom:10px;
+        }
+
+        .detail-box p{
+            font-size:16px;
+        }
+
+        .apply-btn{
+            margin-top:30px;
+            width:100%;
+            font-size:18px;
+            padding:16px;
+        }
+
+        .right-ads{
+            position:sticky;
+            top:100px;
+        }
+
+        .ad-block{
+            margin-bottom:25px;
+        }
+        @media (max-width:900px){
+
+        .apply-layout{
+        grid-template-columns:1fr;
+        }
+
+        .right-ads{
+        position:relative;
+        }
+
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+<div class="container">
+<div class="nav-content">
+
+<div class="nav-brand">
+📚 Interview Hub
+</div>
+
+<div class="nav-buttons">
+<a href="index.html">
+<button class="btn-secondary">Home</button>
+</a>
+</div>
+
+</div>
+</div>
+</nav>
+
+
+<div class="header">
+<h1>Job Application</h1>
+<p>Apply for your dream company</p>
+</div>
+
+
+<div class="container">
+
+<div class="ad-block">
+<p>💰 Google AdSense</p>
+<p>Top Advertisement</p>
+</div>
+
+
+<div class="apply-layout">
+
+<div class="job-details">
+
+<h2 id="companyName">Loading...</h2>
+
+<div class="detail-box">
+<h4>Position</h4>
+<p id="position"></p>
+</div>
+
+<div class="detail-box">
+<h4>Location</h4>
+<p id="location"></p>
+</div>
+<div class="detail-box">
+<h4>Last Date</h4>
+<p id="date"></p>
+</div>
+<div class="detail-box">
+<h4>Salary Range</h4>
+<p id="salary"></p>
+</div>
+
+<div class="detail-box">
+<h4>Description</h4>
+<p id="description"></p>
+</div>
+
+<button class="btn-primary apply-btn" id="applyBtn">
+Apply on Official Website
+</button>
+
+</div>
+
+
+<div class="right-ads">
+
+<div class="ad-block">
+<p>💰 Google AdSense</p>
+<p>Sidebar Ad</p>
+</div>
+
+<div class="ad-block">
+<p>💰 Google AdSense</p>
+<p>Sponsored Jobs</p>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="ad-block">
+<p>💰 Google AdSense</p>
+<p>Bottom Advertisement</p>
+</div>
+
+</div>
+
+
+<footer style="background:#1f2937;color:white;padding:2rem;text-align:center;margin-top:3rem;">
+<p>© 2026 Interview Experiences Hub</p>
+</footer>
+<a href="https://wa.me/919500206518" 
+   class="whatsapp-float" 
+   target="_blank">
+
+    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" 
+         alt="WhatsApp Chat">
+
+</a>
+<script type="module">
+
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const SUPABASE_URL = 'https://rshctgrgzjimfmdaxjnz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJzaGN0Z3JnemppbWZtZGF4am56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMjk4NTIsImV4cCI6MjA4ODkwNTg1Mn0.xDY0kreOeu9d1LeH9ytWDEqI5I--cnt00GSoFuBlFQY';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+async function loadInterview() {
+
+    const { data, error } = await supabase
+        .from("interviews")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    document.getElementById("companyName").innerText = data.company_name;
+    document.getElementById("position").innerText = data.position;
+    document.getElementById("location").innerText = data.location;
+    document.getElementById("date").innerText =
+        new Date(data.interview_date).toLocaleDateString();
+    document.getElementById("salary").innerText = data.salary_range;
+    document.getElementById("description").innerText = data.description;
+
+    const applyBtn = document.getElementById("applyBtn");
+
+    applyBtn.addEventListener("click", () => {
+
+        if (data.apply_link && data.apply_link.trim() !== "") {
+
+            window.open(data.apply_link, "_blank");
+
+        } else {
+
+            alert("Application link not available");
+
+        }
+
+    });
+
+}
+
+loadInterview();
+
+</script>
+
+</body>
+</html>
