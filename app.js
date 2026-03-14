@@ -473,7 +473,6 @@ Google AdSense Footer Banner
 
 </div>
 
-
 <footer style="background:#1f2937;color:white;padding:2rem;text-align:center;margin-top:3rem;">
 
     <div class="footer-links">
@@ -487,7 +486,6 @@ Google AdSense Footer Banner
     <p>© 2026 Interview Experiences Hub</p>
 
 </footer>
-
 
 `;
 }
