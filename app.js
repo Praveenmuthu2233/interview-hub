@@ -811,11 +811,8 @@ async function handleSaveInterview(e, id = null) {
         position: document.getElementById('formPosition').value,
         location: document.getElementById('formLocation').value,
         interview_date: document.getElementById('formDate').value,
-        result: document.getElementById('formResult').value,
-        description: document.getElementById('formDescription').value,
-        topics_covered: document.getElementById('formTopics').value,
         salary_range: document.getElementById('formSalary').value,
-        tips: document.getElementById('formTips').value,
+        description: document.getElementById('formDescription').value,
         apply_link: document.getElementById('formApplyLink').value
     };
 
