@@ -1,40 +1,414 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Disclaimer</title>
-<link rel="stylesheet" href="styles.css">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disclaimer | Interview Hub</title>
+
+    <style>
+
+        html{
+            scroll-behavior: smooth;
+        }
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+            background:#f9fafb;
+            color:#111827;
+            line-height:1.6;
+        }
+
+        .container{
+            max-width:1200px;
+            margin:auto;
+            padding:20px;
+        }
+
+        /* NAVBAR */
+
+        nav{
+            background:white;
+            box-shadow:0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .nav-content{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:15px 0;
+        }
+
+        .nav-brand{
+            font-size:22px;
+            font-weight:bold;
+            color:#10b981;
+        }
+
+        .nav-links a{
+            margin-left:20px;
+            text-decoration:none;
+            color:#374151;
+            font-weight:500;
+        }
+
+        .nav-links a:hover{
+            color:#10b981;
+        }
+
+        /* PAGE HEADER */
+
+        .page-header{
+            text-align:center;
+            padding:50px 20px;
+        }
+
+        .page-header h1{
+            font-size:36px;
+            margin-bottom:10px;
+        }
+
+        .page-header p{
+            color:#6b7280;
+        }
+
+        /* LAYOUT */
+
+        .disclaimer-layout{
+            display:grid;
+            grid-template-columns:260px 1fr;
+            gap:40px;
+            margin-top:40px;
+        }
+
+        /* SIDEBAR MENU */
+
+        .disclaimer-menu{
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.05);
+            position:sticky;
+            top:80px;
+        }
+
+        .disclaimer-menu h3{
+            margin-bottom:15px;
+        }
+
+        .disclaimer-menu ul{
+            list-style:none;
+        }
+
+        .disclaimer-menu li{
+            margin-bottom:10px;
+        }
+
+        .disclaimer-menu a{
+            text-decoration:none;
+            color:#374151;
+            font-size:14px;
+        }
+
+        .disclaimer-menu a:hover{
+            color:#10b981;
+        }
+
+        /* CONTENT */
+
+        .disclaimer-content{
+            background:white;
+            padding:35px;
+            border-radius:10px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .disclaimer-content h2{
+            margin-top:25px;
+            margin-bottom:10px;
+        }
+
+        .disclaimer-content p{
+            margin-bottom:15px;
+            color:#374151;
+        }
+
+        .disclaimer-content ul{
+            margin-left:20px;
+            margin-bottom:20px;
+        }
+
+        .disclaimer-content li{
+            margin-bottom:8px;
+        }
+
+        /* FOOTER */
+
+        footer{
+            background:#1f2937;
+            color:white;
+            text-align:center;
+            padding:25px;
+            margin-top:40px;
+        }
+
+        footer a{
+            color:#10b981;
+            text-decoration:none;
+        }
+
+
+        @media (max-width: 1024px){
+
+            .container{
+                padding:20px 25px;
+            }
+
+            .disclaimer-layout{
+                grid-template-columns:220px 1fr;
+                gap:30px;
+            }
+
+        }
+
+
+        /* Mobile */
+
+        @media (max-width: 768px){
+
+            /* NAVBAR */
+
+            .nav-content{
+                flex-direction:column;
+                gap:10px;
+                text-align:center;
+            }
+
+            .nav-links{
+                display:flex;
+                justify-content:center;
+                flex-wrap:wrap;
+                gap:15px;
+            }
+
+            .nav-links a{
+                margin-left:0;
+                font-size:14px;
+            }
+
+            /* PAGE HEADER */
+
+            .page-header h1{
+                font-size:28px;
+            }
+
+            .page-header p{
+                font-size:14px;
+            }
+
+            /* MAIN LAYOUT */
+
+            .disclaimer-layout{
+                grid-template-columns:1fr;
+                gap:25px;
+            }
+
+            /* SIDEBAR */
+
+            .disclaimer-menu{
+                position:relative;
+                width:100%;
+            }
+
+            .disclaimer-menu ul{
+                display:grid;
+                grid-template-columns:1fr 1fr;
+                gap:8px;
+            }
+
+            .disclaimer-menu li{
+                margin-bottom:5px;
+            }
+
+            /* CONTENT */
+
+            .disclaimer-content{
+                padding:25px;
+            }
+
+        }
+
+
+        /* Small Mobile */
+
+        @media (max-width: 480px){
+
+            .container{
+                padding:15px;
+            }
+
+            .page-header{
+                padding:30px 15px;
+            }
+
+            .page-header h1{
+                font-size:24px;
+            }
+
+            .disclaimer-menu ul{
+                grid-template-columns:1fr;
+            }
+
+            .disclaimer-content{
+                padding:20px;
+            }
+
+        }
+
+    </style>
+
 </head>
 
 <body>
 
-<div class="header">
-<h1>Disclaimer</h1>
-</div>
+    <!-- NAVBAR -->
 
-<div class="container">
+    <nav>
 
-<div class="card">
+        <div class="container nav-content">
 
-<p>
-Interview Experiences Hub shares interview experiences submitted by users.
-We do not guarantee the accuracy of the information provided.
-</p>
+            <div class="nav-brand">
+                📚 Interview Hub
+            </div>
 
-<p>
-Company interview processes may change over time.
-The content is intended only for preparation and educational purposes.
-</p>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </div>
 
-<p>
-We are not affiliated with any company mentioned on this website.
-</p>
+        </div>
 
-</div>
+    </nav>
 
-</div>
+
+    <!-- PAGE HEADER -->
+
+    <section class="page-header">
+
+        <h1>Disclaimer</h1>
+
+        <p>
+            The information provided on Interview Hub is for general informational purposes only.
+        </p>
+
+    </section>
+
+
+    <!-- DISCLAIMER CONTENT -->
+
+    <section class="container">
+
+        <div class="disclaimer-layout">
+
+            <!-- SIDEBAR -->
+
+            <div class="disclaimer-menu">
+
+                <h3>Contents</h3>
+
+                <ul>
+                    <li><a href="#general">General Disclaimer</a></li>
+                    <li><a href="#accuracy">Information Accuracy</a></li>
+                    <li><a href="#external">External Links</a></li>
+                    <li><a href="#ads">Advertisements</a></li>
+                    <li><a href="#consent">User Consent</a></li>
+                    <li><a href="#update">Updates</a></li>
+                </ul>
+
+            </div>
+
+
+            <!-- MAIN CONTENT -->
+
+            <div class="disclaimer-content">
+
+                <h2 id="general">General Disclaimer</h2>
+
+                <p>
+                    All information on the Interview Hub website is published in good faith
+                    and for general informational purposes only. We do not make any warranties
+                    about the completeness, reliability, or accuracy of this information.
+                </p>
+
+
+                <h2 id="accuracy">Information Accuracy</h2>
+
+                <p>
+                    Interview experiences and job updates shared on this website are based on
+                    user submissions or publicly available sources. While we try to ensure
+                    accuracy, Interview Hub cannot guarantee that all information is always
+                    correct or up to date.
+                </p>
+
+
+                <h2 id="external">External Links Disclaimer</h2>
+
+                <p>
+                    Our website may contain links to external websites. While we strive to
+                    provide quality links, we have no control over the content and nature
+                    of those sites.
+                </p>
+
+
+                <h2 id="ads">Advertisements</h2>
+
+                <p>
+                    This website may display advertisements through services such as
+                    Google AdSense. These advertisements may use cookies to display
+                    relevant ads based on user interests.
+                </p>
+
+
+                <h2 id="consent">User Consent</h2>
+
+                <p>
+                    By using our website, you hereby consent to our disclaimer and agree
+                    to its terms.
+                </p>
+
+
+                <h2 id="update">Updates</h2>
+
+                <p>
+                    We may update or change this disclaimer at any time. Any updates
+                    will be posted on this page.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            © 2026 Interview Hub. All Rights Reserved.
+        </p>
+
+    </footer>
 
 </body>
+
 </html>

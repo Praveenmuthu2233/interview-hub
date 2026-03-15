@@ -396,21 +396,41 @@ window.applyJob = applyJob;
 //         </footer>
 //     `;
 // }
+
+// <div class="nav-buttons">
+// <button class="btn-primary" onclick="showAdminModal()">🔐 Admin</button>
+// </div>
+
 function renderPublicPage() {
 
 return `
 
 <nav>
-<div class="container">
-<div class="nav-content">
-<div class="nav-brand">📚 Interview Hub</div>
+  <div class="container">
+    <div class="nav-content">
 
-<div class="nav-buttons">
-<button class="btn-primary" onclick="showAdminModal()">🔐 Admin</button>
-</div>
+      <!-- Logo -->
+      <div class="nav-brand">
+        📚 Interview Hub
+      </div>
 
-</div>
-</div>
+      <!-- Navigation Buttons -->
+      <div class="nav-buttons">
+        <a href="index.html">
+          <button class="btn-secondary btn-small">Home</button>
+        </a>
+
+        <a href="about.html">
+          <button class="btn-secondary btn-small">About</button>
+        </a>
+
+        <a href="contact.html">
+          <button class="btn-secondary btn-small">Contact</button>
+        </a>
+      </div>
+
+    </div>
+  </div>
 </nav>
 
 
@@ -481,8 +501,8 @@ Google AdSense Footer Banner
     <a href="privacy.html">Privacy</a>
     <a href="terms.html">Terms</a>
     <a href="disclaimer.html">Disclaimer</a>
+    <a href="#"onclick="showAdminModal()">Admin</a>
     </div>
-
     <p>© 2026 Interview Experiences Hub</p>
 
 </footer>

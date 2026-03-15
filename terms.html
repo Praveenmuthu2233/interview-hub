@@ -1,51 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Terms & Conditions</title>
-<link rel="stylesheet" href="styles.css">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions | Interview Hub</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        /* NAVBAR */
+
+        nav {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .nav-brand {
+            font-size: 22px;
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .nav-links a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #10b981;
+        }
+
+        /* PAGE HEADER */
+
+        .page-header {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .page-header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+        }
+
+        /* LAYOUT */
+
+        .terms-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        /* LEFT MENU */
+
+        .terms-menu {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 80px;
+        }
+
+        .terms-menu h3 {
+            margin-bottom: 15px;
+        }
+
+        .terms-menu ul {
+            list-style: none;
+        }
+
+        .terms-menu li {
+            margin-bottom: 10px;
+        }
+
+        .terms-menu a {
+            text-decoration: none;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .terms-menu a:hover {
+            color: #10b981;
+        }
+
+        /* CONTENT */
+
+        .terms-content {
+            background: white;
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .terms-content h2 {
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .terms-content p {
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .terms-content ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .terms-content li {
+            margin-bottom: 8px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            background: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: #10b981;
+            text-decoration: none;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 900px) {
+
+            .terms-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .terms-menu {
+                position: relative;
+            }
+
+        }
+
+    </style>
+
 </head>
 
 <body>
 
-<div class="header">
-<h1>Terms & Conditions</h1>
-</div>
+    <!-- NAVBAR -->
 
-<div class="container">
+    <nav>
 
-<div class="card">
+        <div class="container nav-content">
 
-<p>
-By using Interview Experiences Hub, you agree to follow the rules and guidelines
-of this platform.
-</p>
+            <div class="nav-brand">
+                📚 Interview Hub
+            </div>
 
-<h3>User Responsibilities</h3>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </div>
 
-<ul>
-<li>Provide accurate information</li>
-<li>Do not post misleading interview experiences</li>
-<li>Respect other users</li>
-</ul>
+        </div>
 
-<h3>Content</h3>
+    </nav>
 
-<p>
-All content is shared for educational purposes only.
-</p>
 
-<h3>Changes</h3>
+    <!-- PAGE HEADER -->
 
-<p>
-We may update these terms at any time without prior notice.
-</p>
+    <section class="page-header">
 
-</div>
+        <h1>Terms & Conditions</h1>
 
-</div>
+        <p>
+            Please read these Terms and Conditions carefully before using the Interview Hub website.
+        </p>
+
+    </section>
+
+
+    <!-- TERMS SECTION -->
+
+    <section class="container">
+
+        <div class="terms-layout">
+
+            <!-- LEFT MENU -->
+
+            <div class="terms-menu">
+
+                <h3>Contents</h3>
+
+                <ul>
+
+                    <li><a href="#use">Use of Website</a></li>
+                    <li><a href="#content">Content Disclaimer</a></li>
+                    <li><a href="#user">User Responsibilities</a></li>
+                    <li><a href="#links">External Links</a></li>
+                    <li><a href="#changes">Changes to Terms</a></li>
+                    <li><a href="#contact">Contact Information</a></li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- CONTENT -->
+
+            <div class="terms-content">
+
+                <h2 id="use">Use of Website</h2>
+
+                <p>
+                    Interview Hub provides interview experiences, career resources,
+                    and job updates to help users prepare for interviews and stay
+                    informed about job opportunities.
+                </p>
+
+                <p>
+                    By using this website, you agree to use it only for lawful
+                    purposes and in accordance with these Terms and Conditions.
+                </p>
+
+
+                <h2 id="content">Content Disclaimer</h2>
+
+                <p>
+                    The information published on Interview Hub is intended for
+                    general informational purposes only.
+                </p>
+
+                <p>
+                    While we strive to ensure the accuracy of the information,
+                    we do not guarantee the completeness or reliability of
+                    interview experiences or job updates.
+                </p>
+
+
+                <h2 id="user">User Responsibilities</h2>
+
+                <p>
+                    Users of the website agree not to:
+                </p>
+
+                <ul>
+
+                    <li>Use the website for illegal activities</li>
+                    <li>Submit false or misleading information</li>
+                    <li>Attempt to disrupt the website functionality</li>
+                    <li>Copy or redistribute website content without permission</li>
+
+                </ul>
+
+
+                <h2 id="links">External Links</h2>
+
+                <p>
+                    Interview Hub may contain links to external websites.
+                    We are not responsible for the content, privacy policies,
+                    or practices of third-party websites.
+                </p>
+
+
+                <h2 id="changes">Changes to Terms</h2>
+
+                <p>
+                    We may update these Terms and Conditions at any time.
+                    Changes will be posted on this page and will become
+                    effective immediately after publication.
+                </p>
+
+
+                <h2 id="contact">Contact Information</h2>
+
+                <p>
+                    If you have any questions regarding these Terms and
+                    Conditions, please contact us through the contact page.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            © 2026 Interview Hub. All Rights Reserved.
+        </p>
+
+    </footer>
 
 </body>
+
 </html>

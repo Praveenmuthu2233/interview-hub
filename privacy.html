@@ -3,133 +3,338 @@
 
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Interview Hub</title>
 
-<title>Privacy Policy | Interview Experiences Hub</title>
+    <style>
 
-<meta name="description" content="Privacy Policy for Interview Experiences Hub explaining how we collect and use user information.">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html{
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+        }
 
-<link rel="stylesheet" href="pages.css">
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        /* NAVBAR */
+
+        nav {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .nav-brand {
+            font-size: 22px;
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .nav-links a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #10b981;
+        }
+
+        /* PAGE HEADER */
+
+        .page-header {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .page-header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+        }
+
+        /* LAYOUT */
+
+        .privacy-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        /* LEFT MENU */
+
+        .privacy-menu {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 80px;
+        }
+
+        .privacy-menu h3 {
+            margin-bottom: 15px;
+        }
+
+        .privacy-menu ul {
+            list-style: none;
+        }
+
+        .privacy-menu li {
+            margin-bottom: 10px;
+        }
+
+        .privacy-menu a {
+            text-decoration: none;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .privacy-menu a:hover {
+            color: #10b981;
+        }
+
+        /* CONTENT */
+
+        .privacy-content {
+            background: white;
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .privacy-content h2 {
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .privacy-content p {
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .privacy-content ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .privacy-content li {
+            margin-bottom: 8px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            background: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: #10b981;
+            text-decoration: none;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 900px) {
+
+            .privacy-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .privacy-menu {
+                position: relative;
+            }
+
+        }
+
+    </style>
 
 </head>
 
 <body>
 
-<div class="page-header">
-<h1>Privacy Policy</h1>
-<p>Your privacy is important to us.</p>
-</div>
+    <!-- NAVBAR -->
 
-<div class="privacy-wrapper">
+    <nav>
 
-<div class="privacy-layout">
+        <div class="container nav-content">
 
-<!-- LEFT SECTION MENU -->
+            <div class="nav-brand">
+                📚 Interview Hub
+            </div>
 
-<div class="privacy-menu">
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </div>
 
-<h3>Sections</h3>
+        </div>
 
-<ul>
-<li><a href="#info">Information We Collect</a></li>
-<li><a href="#use">How We Use Information</a></li>
-<li><a href="#cookies">Cookies</a></li>
-<li><a href="#third">Third Party Services</a></li>
-<li><a href="#security">Data Security</a></li>
-<li><a href="#consent">User Consent</a></li>
-<li><a href="#changes">Policy Updates</a></li>
-</ul>
+    </nav>
 
-</div>
 
-<!-- RIGHT CONTENT -->
+    <!-- PAGE HEADER -->
 
-<div class="privacy-content">
+    <section class="page-header">
 
-<h2 id="info">Information We Collect</h2>
+        <h1>Privacy Policy</h1>
 
-<p>
-Interview Experiences Hub may collect limited information from users to
-improve website functionality and user experience.
-</p>
+        <p>
+            Your privacy is important to us. This Privacy Policy explains how
+            Interview Hub collects, uses, and protects your information.
+        </p>
 
-<ul>
-<li>Basic website usage data</li>
-<li>User submitted interview experiences</li>
-<li>Contact form information such as name and email</li>
-</ul>
+    </section>
 
-<h2 id="use">How We Use Information</h2>
 
-<p>
-The collected information helps us improve our platform and provide
-better interview preparation resources.
-</p>
+    <!-- PRIVACY SECTION -->
 
-<ul>
-<li>Improve website performance</li>
-<li>Provide better interview preparation content</li>
-<li>Respond to user inquiries</li>
-<li>Enhance platform functionality</li>
-</ul>
+    <section class="container">
 
-<h2 id="cookies">Cookies Policy</h2>
+        <div class="privacy-layout">
 
-<p>
-Our website may use cookies to enhance user experience and analyze
-traffic patterns. Cookies help us understand how users interact
-with the platform.
-</p>
+            <!-- LEFT MENU -->
 
-<h2 id="third">Third Party Services</h2>
+            <div class="privacy-menu">
 
-<p>
-We may use third-party services such as Google Analytics and
-Google AdSense to improve website performance and display
-relevant advertisements.
-</p>
+                <h3>Contents</h3>
 
-<h2 id="security">Data Security</h2>
+                <ul>
 
-<p>
-We take reasonable steps to protect user information from
-unauthorized access or misuse.
-</p>
+                    <li><a href="#info">Information We Collect</a></li>
+                    <li><a href="#use">How We Use Information</a></li>
+                    <li><a href="#cookies">Cookies</a></li>
+                    <li><a href="#ads">Advertising</a></li>
+                    <li><a href="#security">Data Security</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
 
-<h2 id="consent">User Consent</h2>
+                </ul>
 
-<p>
-By using our website, you consent to our privacy policy and
-agree to its terms.
-</p>
+            </div>
 
-<h2 id="changes">Changes to This Policy</h2>
 
-<p>
-We may update this privacy policy periodically. Changes will
-be posted on this page.
-</p>
+            <!-- CONTENT -->
 
-</div>
+            <div class="privacy-content">
 
-</div>
+                <h2 id="info">Information We Collect</h2>
 
-</div>
+                <p>
+                    We may collect personal information such as your name,
+                    email address, and any information you submit through
+                    our contact forms or other features on the website.
+                </p>
 
-<footer>
+                <p>
+                    We may also collect non-personal information such as
+                    browser type, device information, and website usage
+                    statistics.
+                </p>
 
-<div class="footer-links">
-<a href="about.html">About</a>
-<a href="contact.html">Contact</a>
-<a href="privacy.html">Privacy</a>
-<a href="terms.html">Terms</a>
-<a href="disclaimer.html">Disclaimer</a>
-</div>
 
-<p>© 2026 Interview Experiences Hub</p>
+                <h2 id="use">How We Use Information</h2>
 
-</footer>
+                <p>
+                    We use the information we collect to:
+                </p>
+
+                <ul>
+
+                    <li>Improve the content and functionality of the website</li>
+                    <li>Respond to user inquiries</li>
+                    <li>Provide relevant interview updates and resources</li>
+                    <li>Analyze website traffic and user behavior</li>
+
+                </ul>
+
+
+                <h2 id="cookies">Cookies</h2>
+
+                <p>
+                    Interview Hub may use cookies to improve the user experience.
+                    Cookies help us understand how users interact with our site
+                    and allow us to improve our services.
+                </p>
+
+
+                <h2 id="ads">Advertising</h2>
+
+                <p>
+                    We may use third-party advertising services such as
+                    Google AdSense to display ads. These services may use
+                    cookies or web beacons to show relevant advertisements
+                    to users.
+                </p>
+
+                <p>
+                    Google may use the DoubleClick cookie to show ads
+                    based on your visits to this and other websites.
+                </p>
+
+
+                <h2 id="security">Data Security</h2>
+
+                <p>
+                    We take appropriate measures to protect your personal
+                    information. However, no method of transmission over
+                    the internet is 100% secure.
+                </p>
+
+
+                <h2 id="contact">Contact Us</h2>
+
+                <p>
+                    If you have any questions about this Privacy Policy,
+                    please contact us through our contact page.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            © 2026 Interview Hub. All Rights Reserved.
+        </p>
+
+    </footer>
 
 </body>
+
 </html>

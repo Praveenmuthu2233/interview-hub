@@ -1,152 +1,404 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Interview Hub</title>
 
-<title>About Us | Interview Experiences Hub</title>
+    <style>
 
-<meta name="description" content="Learn about Interview Experiences Hub and our mission to help job seekers prepare for interviews.">
+        html{
+            scroll-behavior:smooth;
+        }
 
-<link rel="stylesheet" href="pages.css">
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:Arial, Helvetica, sans-serif;
+            background:#f9fafb;
+            color:#111827;
+            line-height:1.6;
+        }
+
+        .container{
+            max-width:1200px;
+            margin:auto;
+            padding:20px;
+        }
+
+        /* NAVBAR */
+
+        nav{
+            background:white;
+            box-shadow:0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .nav-content{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:15px 0;
+        }
+
+        .nav-brand{
+            font-size:22px;
+            font-weight:bold;
+            color:#10b981;
+        }
+
+        .nav-links a{
+            margin-left:20px;
+            text-decoration:none;
+            color:#374151;
+            font-weight:500;
+        }
+
+        .nav-links a:hover{
+            color:#10b981;
+        }
+
+        /* PAGE HEADER */
+
+        .page-header{
+            text-align:center;
+            padding:60px 20px;
+        }
+
+        .page-header h1{
+            font-size:36px;
+            margin-bottom:10px;
+        }
+
+        .page-header p{
+            color:#6b7280;
+            max-width:700px;
+            margin:auto;
+        }
+
+        /* ABOUT GRID */
+
+        .about-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+            gap:25px;
+            margin-top:40px;
+        }
+
+        .about-card{
+            background:white;
+            padding:25px;
+            border-radius:12px;
+            text-align:center;
+            box-shadow:0 5px 15px rgba(0,0,0,0.05);
+            transition:0.3s;
+        }
+
+        .about-card:hover{
+            transform:translateY(-6px);
+            box-shadow:0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .about-icon{
+            font-size:40px;
+            margin-bottom:12px;
+            color:#10b981;
+        }
+
+        .about-card h3{
+            margin-bottom:10px;
+        }
+
+        .about-card p{
+            font-size:14px;
+            color:#6b7280;
+        }
+
+        /* MISSION */
+
+        .mission-section{
+            margin-top:60px;
+        }
+
+        .mission-box{
+            background:#ecfdf5;
+            border-left:5px solid #10b981;
+            padding:30px;
+            border-radius:10px;
+        }
+
+        .mission-box h2{
+            margin-bottom:10px;
+        }
+
+        /* TEAM */
+
+        .team-section{
+            margin-top:60px;
+        }
+
+        .team-section h2{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        .team-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:20px;
+        }
+
+        .team-card{
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            text-align:center;
+            box-shadow:0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .team-card img{
+            width:80px;
+            height:80px;
+            border-radius:50%;
+            margin-bottom:10px;
+        }
+
+        .team-card h4{
+            margin-bottom:5px;
+        }
+
+        .team-card p{
+            font-size:14px;
+            color:#6b7280;
+        }
+
+        /* FOOTER */
+
+        footer{
+            background:#1f2937;
+            color:white;
+            text-align:center;
+            padding:25px;
+            margin-top:60px;
+        }
+
+        footer a{
+            color:#10b981;
+            text-decoration:none;
+        }
+
+        /* RESPONSIVE DESIGN */
+
+        @media(max-width:900px){
+
+            .nav-content{
+                flex-direction:column;
+                gap:10px;
+            }
+
+            .nav-links{
+                display:flex;
+                gap:15px;
+                flex-wrap:wrap;
+                justify-content:center;
+            }
+
+            .nav-links a{
+                margin-left:0;
+            }
+
+            .page-header h1{
+                font-size:28px;
+            }
+
+        }
+
+        @media(max-width:500px){
+
+            .page-header{
+                padding:40px 15px;
+            }
+
+            .page-header h1{
+                font-size:24px;
+            }
+
+            .about-card{
+                padding:20px;
+            }
+
+        }
+
+    </style>
 
 </head>
 
 <body>
 
-<div class="page-header">
-<h1>About Interview Experiences Hub</h1>
-<p>Helping job seekers prepare for interviews with real experiences</p>
-</div>
+    <!-- NAVBAR -->
 
-<div class="container">
+    <nav>
 
-<div class="content-box">
+        <div class="container nav-content">
 
-<h2>About Interview Experiences Hub</h2>
+            <div class="nav-brand">
+                📚 Interview Hub
+            </div>
 
-<p>
-Interview Experiences Hub is a platform designed to help students, fresh graduates,
-and job seekers prepare better for interviews by learning from real interview
-experiences shared by candidates. Preparing for interviews can be challenging,
-especially when candidates are unsure about what to expect during technical
-or HR interview rounds.
-</p>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </div>
 
-<p>
-Our platform solves this problem by collecting and publishing real interview
-stories from candidates who have attended interviews at various companies.
-These insights help others understand the interview process, common questions,
-technical topics, and preparation strategies.
-</p>
+        </div>
 
-</div>
+    </nav>
 
-<!-- FEATURE CARDS -->
 
-<div class="about-grid">
+    <!-- PAGE HEADER -->
 
-<div class="about-card">
-<div class="about-icon">📚</div>
-<h3>Real Interview Experiences</h3>
-<p>
-Learn from real interview stories shared by candidates who have attended
-interviews in top companies. These experiences provide valuable insights
-into interview patterns and expectations.
-</p>
-</div>
+    <section class="page-header">
 
-<div class="about-card">
-<div class="about-icon">💼</div>
-<h3>Company Interview Process</h3>
-<p>
-Understand how different companies conduct their interview rounds,
-including technical tests, coding interviews, and HR discussions.
-</p>
-</div>
+        <h1>About Interview Hub</h1>
 
-<div class="about-card">
-<div class="about-icon">🚀</div>
-<h3>Career Preparation</h3>
-<p>
-Get tips and preparation strategies from successful candidates
-to improve your confidence and performance in interviews.
-</p>
-</div>
+        <p>
+            Interview Hub helps job seekers learn from real interview experiences,
+            discover job opportunities, and prepare better for their careers.
+        </p>
 
-<div class="about-card">
-<div class="about-icon">🌍</div>
-<h3>Community Learning</h3>
-<p>
-Our platform encourages knowledge sharing where candidates
-help each other by sharing interview experiences and advice.
-</p>
-</div>
+    </section>
 
-</div>
 
-<!-- MISSION SECTION -->
+    <!-- ABOUT FEATURES -->
 
-<div class="mission-section">
+    <section class="container">
 
-<div class="mission-box">
+        <div class="about-grid">
 
-<h2>Our Mission</h2>
+            <div class="about-card">
 
-<p>
-Our mission is to create a helpful and reliable platform where job seekers
-can access real interview experiences and preparation resources. By sharing
-knowledge and learning from others, candidates can better understand
-the hiring process and increase their chances of success.
-</p>
+                <div class="about-icon">💼</div>
 
-<p>
-We believe that preparation and knowledge are the keys to success in
-interviews. Our platform aims to empower candidates by providing
-valuable insights into interview questions, company expectations,
-and candidate experiences.
-</p>
+                <h3>Interview Experiences</h3>
 
-</div>
+                <p>
+                    Explore real interview experiences shared by candidates
+                    from different companies and industries.
+                </p>
 
-</div>
+            </div>
 
-<!-- TEAM SECTION -->
 
-<div class="content-box">
+            <div class="about-card">
 
-<h2>Our Vision</h2>
+                <div class="about-icon">📢</div>
 
-<p>
-We aim to build one of the most trusted platforms for interview preparation
-where candidates can access high-quality interview insights, preparation
-resources, and career guidance.
-</p>
+                <h3>Job Updates</h3>
 
-<p>
-In the future, we plan to expand our platform by adding company-wise
-interview questions, technical preparation guides, coding practice
-resources, and career advice from industry professionals.
-</p>
+                <p>
+                    Stay updated with the latest job openings and hiring
+                    announcements.
+                </p>
 
-</div>
+            </div>
 
-</div>
 
-<footer>
+            <div class="about-card">
 
-<div class="footer-links">
-<a href="about.html">About</a>
-<a href="contact.html">Contact</a>
-<a href="privacy.html">Privacy</a>
-<a href="terms.html">Terms</a>
-<a href="disclaimer.html">Disclaimer</a>
-</div>
+                <div class="about-icon">🚀</div>
 
-<p>© 2026 Interview Experiences Hub</p>
+                <h3>Career Growth</h3>
 
-</footer>
+                <p>
+                    Improve your interview preparation and boost your career
+                    opportunities.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MISSION -->
+
+    <section class="container mission-section">
+
+        <div class="mission-box">
+
+            <h2>Our Mission</h2>
+
+            <p>
+                Our mission is to help job seekers prepare for interviews by
+                sharing real experiences and career resources. We believe that
+                knowledge sharing can help candidates succeed in their careers.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- TEAM -->
+
+    <section class="container team-section">
+
+        <h2>Our Team</h2>
+
+        <div class="team-grid">
+
+            <div class="team-card">
+
+                <img src="https://i.pravatar.cc/100?img=1">
+
+                <h4>Praveen</h4>
+
+                <p>Founder & Developer</p>
+
+            </div>
+
+
+            <div class="team-card">
+
+                <img src="https://i.pravatar.cc/100?img=5">
+
+                <h4>Team Member</h4>
+
+                <p>Content Manager</p>
+
+            </div>
+
+
+            <div class="team-card">
+
+                <img src="https://i.pravatar.cc/100?img=7">
+
+                <h4>Team Member</h4>
+
+                <p>Community Support</p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>© 2026 Interview Hub. All Rights Reserved.</p>
+
+    </footer>
 
 </body>
+
 </html>
