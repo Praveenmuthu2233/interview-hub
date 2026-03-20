@@ -212,7 +212,6 @@ tr:hover td{background:rgba(255,255,255,.012);}
 let db;
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("CONFIG:", window.FIREBASE_CONFIG); // debug
 
   if (!firebase.apps.length) {
     firebase.initializeApp(window.FIREBASE_CONFIG);
@@ -239,10 +238,8 @@ async function checkAuth() {
   const input = document.getElementById('pwInput').value;
   const hashedInput = await hashPassword(input);
 
-  console.log(hashedInput); // debug
-
   if (hashedInput === HASHED_PASS) {
-  localStorage.setItem('isAdminAuth', 'true'); // save login
+  //localStorage.setItem('isAdminAuth', 'true'); // save login
   document.getElementById('authOverlay').style.display = 'none';
   init();
   } else {
@@ -265,10 +262,10 @@ document.addEventListener("DOMContentLoaded", () => {
   btn.addEventListener('click', checkAuth);
 
   // Auto login
-  if (localStorage.getItem('isAdminAuth') === 'true') {
-    document.getElementById('authOverlay').style.display = 'none';
-    init();
-  }
+  // if (localStorage.getItem('isAdminAuth') === 'true') {
+  //   document.getElementById('authOverlay').style.display = 'none';
+  //   init();
+  // }
 });
 let isInitialized = false;
 
