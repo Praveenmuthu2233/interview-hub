@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>InterviewEdge – Latest Interview Updates</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0e1a;--surface:#111827;--card:#161d2e;--border:#1e2d45;--accent:#f59e0b;--accent2:#3b82f6;--text:#e2e8f0;--muted:#64748b;--tag-bg:#1e3a5f;--tag-text:#93c5fd;--green:#10b981;--red:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;background-image:radial-gradient(ellipse at 20% 0%,rgba(59,130,246,.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(245,158,11,.06) 0%,transparent 60%);}
+header{border-bottom:1px solid var(--border);background:rgba(10,14,26,.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;padding:0 1.5rem;}
+.header-inner{max-width:1280px;margin:auto;display:flex;align-items:center;justify-content:space-between;height:62px;gap:.75rem;}
+.logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--text);text-decoration:none;flex-shrink:0;}.logo span{color:var(--accent);}
+.nav-menu{display:flex;align-items:center;gap:1.2rem;}.nav-menu a{color:var(--muted);text-decoration:none;font-size:.82rem;font-weight:500;transition:color .2s;white-space:nowrap;}.nav-menu a:hover{color:var(--accent);}
+.header-right{display:flex;align-items:center;gap:.6rem;}
+.search-bar{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.38rem .75rem;gap:.4rem;}
+.search-bar input{background:none;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.83rem;width:150px;}.search-bar input::placeholder{color:var(--muted);}
+.admin-link{background:var(--accent);color:#000;padding:.38rem .85rem;border-radius:6px;font-weight:700;font-size:.77rem;text-decoration:none;white-space:nowrap;}
+.ticker-wrap{background:var(--accent);overflow:hidden;height:33px;display:flex;align-items:center;}
+.ticker-label{background:#000;color:var(--accent);padding:0 .9rem;font-weight:700;font-size:.7rem;letter-spacing:.1em;white-space:nowrap;height:100%;display:flex;align-items:center;text-transform:uppercase;flex-shrink:0;}
+.ticker-track{display:flex;animation:ticker 35s linear infinite;white-space:nowrap;}.ticker-track span{padding:0 3rem;font-size:.77rem;font-weight:600;color:#000;}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.page-wrap{max-width:1280px;margin:auto;padding:2rem 1.5rem;display:grid;grid-template-columns:1fr 295px;gap:2rem;}
+.ad-banner{background:var(--surface);border:1px dashed var(--border);border-radius:10px;text-align:center;padding:1.2rem;color:var(--muted);font-size:.7rem;margin-bottom:1.75rem;min-height:75px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;}
+.ad-label{letter-spacing:.1em;text-transform:uppercase;font-size:.6rem;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:.6rem;}
+.section-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;}
+.filter-pills{display:flex;gap:.35rem;flex-wrap:wrap;}
+.pill{padding:.28rem .8rem;border-radius:20px;font-size:.76rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all .2s;user-select:none;}
+.pill:hover,.pill.active{background:var(--accent);color:#000;border-color:var(--accent);}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem;display:flex;flex-direction:column;gap:.65rem;transition:transform .2s,border-color .2s,box-shadow .2s;cursor:pointer;position:relative;overflow:hidden;animation:fadeUp .35s ease both;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity .2s;}
+.card:hover{transform:translateY(-4px);border-color:#2a3f5f;box-shadow:0 12px 32px rgba(0,0,0,.4);}.card:hover::before{opacity:1;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.card-meta{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;}
+.badge{padding:.16rem .52rem;border-radius:4px;font-size:.67rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.badge-company{background:var(--tag-bg);color:var(--tag-text);}
+.badge-type-online{background:rgba(16,185,129,.15);color:var(--green);}
+.badge-type-offline{background:rgba(239,68,68,.15);color:var(--red);}
+.badge-type-walkin{background:rgba(245,158,11,.15);color:var(--accent);}
+.card-date{font-size:.69rem;color:var(--muted);margin-left:auto;}
+.card-title{font-size:.96rem;font-weight:600;line-height:1.4;}
+.card-desc{font-size:.81rem;color:var(--muted);line-height:1.65;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.55rem;border-top:1px solid var(--border);margin-top:auto;gap:.4rem;}
+.card-tags{display:flex;gap:.3rem;flex-wrap:wrap;}
+.tag{background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.66rem;padding:.1rem .42rem;border-radius:4px;}
+.card-link{font-size:.77rem;font-weight:700;color:#000;text-decoration:none;white-space:nowrap;background:var(--accent);padding:.3rem .8rem;border-radius:5px;transition:opacity .2s;flex-shrink:0;}
+.card-link:hover{opacity:.85;}
+.pagination{display:flex;align-items:center;justify-content:center;gap:.35rem;margin-top:1.75rem;flex-wrap:wrap;}
+.pg-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:.42rem .8rem;border-radius:7px;cursor:pointer;font-size:.8rem;font-family:'DM Sans',sans-serif;transition:all .2s;min-width:36px;}
+.pg-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+.pg-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
+.pg-btn:disabled{opacity:.3;cursor:not-allowed;}
+.pg-info{font-size:.77rem;color:var(--muted);padding:0 .4rem;}
+.empty-state{grid-column:1/-1;text-align:center;padding:3.5rem 2rem;color:var(--muted);}
+.loading-state{grid-column:1/-1;text-align:center;padding:3.5rem 2rem;color:var(--muted);}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 1rem;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sidebar{display:flex;flex-direction:column;gap:1.4rem;}
+.sidebar-widget{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.widget-header{padding:.75rem 1.15rem;border-bottom:1px solid var(--border);font-weight:600;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+.widget-body{padding:.85rem 1.15rem;}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:.42rem 0;border-bottom:1px solid var(--border);font-size:.82rem;}
+.stat-row:last-child{border-bottom:none;}.stat-val{font-weight:700;color:var(--accent);}
+.company-item{display:flex;justify-content:space-between;align-items:center;padding:.42rem 0;font-size:.81rem;cursor:pointer;border-bottom:1px solid var(--border);transition:color .2s;}
+.company-item:last-child{border-bottom:none;}.company-item:hover{color:var(--accent);}
+.company-count{background:var(--tag-bg);color:var(--tag-text);font-size:.67rem;padding:.1rem .42rem;border-radius:4px;}
+footer{background:var(--surface);border-top:1px solid var(--border);padding:2.5rem 1.5rem 1.25rem;margin-top:1rem;}
+.footer-inner{max-width:1280px;margin:auto;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem;}
+.footer-brand .logo{font-size:1.25rem;display:inline-block;margin-bottom:.7rem;}
+.footer-desc{font-size:.81rem;color:var(--muted);line-height:1.7;margin-bottom:.9rem;}
+.contact-item{display:flex;align-items:center;gap:.45rem;font-size:.81rem;color:var(--muted);margin-bottom:.45rem;text-decoration:none;transition:color .2s;}
+.contact-item:hover{color:var(--accent);}.contact-item svg{flex-shrink:0;color:var(--accent);}
+.footer-col h4{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.9rem;}
+.footer-links{display:flex;flex-direction:column;gap:.5rem;}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:.81rem;transition:color .2s;}.footer-links a:hover{color:var(--accent);}
+.footer-bottom{border-top:1px solid var(--border);padding-top:1.1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;}
+.footer-copy{font-size:.77rem;color:var(--muted);}.footer-copy a{color:var(--accent2);text-decoration:none;}
+.wa-float{position:fixed;bottom:1.4rem;right:1.4rem;z-index:200;background:#25D366;color:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(37,211,102,.5);text-decoration:none;transition:transform .2s;}
+.wa-float:hover{transform:scale(1.1);}
+
+@media(max-width:1024px){.footer-grid{grid-template-columns:1fr 1fr;gap:1.5rem;}}
+@media(max-width:900px){.page-wrap{grid-template-columns:1fr;}.sidebar{order:-1;display:grid;grid-template-columns:1fr 1fr;gap:1rem;}.footer-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:700px){.nav-menu{display:none;}}
+@media(max-width:600px){.search-bar{display:none;}.cards-grid{grid-template-columns:1fr;}.sidebar{grid-template-columns:1fr;}.footer-grid{grid-template-columns:1fr;}.footer-bottom{flex-direction:column;}.logo{font-size:1.2rem;}}
+@media(max-width:400px){.filter-pills{gap:.25rem;}.pill{font-size:.7rem;padding:.24rem .65rem;}}
+</style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2328429365429845" crossorigin="anonymous"></script>
+<!-- ✅ Firebase SDK (v9 compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">Interview<span>Edge</span></a>
+    <nav class="nav-menu">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a href="disclaimer.html">Disclaimer</a>
+    </nav>
+    <div class="header-right">
+      <div class="search-bar">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Search company, role…"/>
+      </div>
+      <a href="admin.html" class="admin-link">⚙ Admin</a>
+    </div>
+  </div>
+</header>
+
+<div class="ticker-wrap">
+  <div class="ticker-label">🔴 Live</div>
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<div class="page-wrap">
+  <main>
+    <div class="ad-banner">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8556272397" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+    <div class="section-header">
+      <div class="section-title">Latest Interviews</div>
+      <div class="filter-pills" id="filterPills">
+        <div class="pill active" data-filter="all">All</div>
+        <div class="pill" data-filter="online">🌐 Online</div>
+        <div class="pill" data-filter="offline">🏢 Offline</div>
+        <div class="pill" data-filter="walkin">🚶 Walk-in</div>
+      </div>
+    </div>
+    <div class="cards-grid" id="cardsGrid">
+      <div class="loading-state"><div class="loading-spinner"></div><p>Loading listings…</p></div>
+    </div>
+    <div class="pagination" id="pagination"></div>
+    <div class="ad-banner" style="margin-top:2rem;">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8221230477" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  </main>
+  <aside class="sidebar">
+    <div class="ad-banner">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8061448376" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+    <div class="sidebar-widget">
+      <div class="widget-header">📊 Quick Stats</div>
+      <div class="widget-body">
+        <div class="stat-row"><span>Total Listings</span><span class="stat-val" id="statTotal">–</span></div>
+        <div class="stat-row"><span>🌐 Online</span><span class="stat-val" id="statOnline">–</span></div>
+        <div class="stat-row"><span>🏢 Offline</span><span class="stat-val" id="statOffline">–</span></div>
+        <div class="stat-row"><span>🚶 Walk-in</span><span class="stat-val" id="statWalkin">–</span></div>
+        <div class="stat-row"><span>Added Today</span><span class="stat-val" id="statToday">–</span></div>
+      </div>
+    </div>
+    <div class="sidebar-widget">
+      <div class="widget-header">🏢 Top Companies</div>
+      <div class="widget-body"><div id="companyList"></div></div>
+    </div>
+    <div class="ad-banner">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2328429365429845" data-ad-slot="2429847741" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">Interview<span>Edge</span></a>
+        <p class="footer-desc">Your go-to source for the latest interview drives, walk-ins, and job openings. Updated daily with verified listings from top companies across India.</p>
+        <a class="contact-item" href="https://wa.me/919500206518" target="_blank">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          +91 9500206518
+        </a>
+        <a class="contact-item" href="mailto:praveenmuthu9500@gmail.com">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+          praveenmuthu9500@gmail.com
+        </a>
+        <span class="contact-item">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          Chennai, Tamil Nadu, India
+        </span>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="about.html">About Us</a>
+          <a href="contact.html">Contact Us</a>
+          <a href="admin.html">Admin Panel</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Categories</h4>
+        <div class="footer-links">
+          <a href="#" onclick="setFilter('online');return false;">Online Interviews</a>
+          <a href="#" onclick="setFilter('offline');return false;">Offline Drives</a>
+          <a href="#" onclick="setFilter('walkin');return false;">Walk-in Drives</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <div class="footer-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+          <a href="disclaimer.html">Disclaimer</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 InterviewEdge. All rights reserved. Built with ❤️ in Chennai, Tamil Nadu.</div>
+      <div class="footer-copy"><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="disclaimer.html">Disclaimer</a></div>
+    </div>
+  </div>
+</footer>
+
+<a href="https://wa.me/919500206518" class="wa-float" target="_blank" title="Chat on WhatsApp">
+  <svg width="25" height="25" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script>
+// ── Firebase init ──────────────────────────────────────────────
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const db = firebase.firestore();
+const COL = 'interviews'; // Firestore collection name
+
+// ── State ──────────────────────────────────────────────────────
+const PER_PAGE = 8;
+let allData = [];        // full cache from Firestore
+let currentFilter = 'all';
+let searchQuery = '';
+let currentPage = 1;
+
+// ── Helpers ────────────────────────────────────────────────────
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function fd(s){
+  if(!s) return '';
+
+  // Firestore Timestamp support
+  if (typeof s === 'object' && s.seconds) {
+    return new Date(s.seconds * 1000).toLocaleDateString('en-IN',{
+      day:'numeric',month:'short',year:'numeric'
+    });
+  }
+
+  // String date support
+  return new Date(s).toLocaleDateString('en-IN',{
+    day:'numeric',month:'short',year:'numeric'
+  });
+}
+function tl(t){return t==='walkin'?'Walk-in':t.charAt(0).toUpperCase()+t.slice(1);}
+
+// ── Load data from Firestore (real-time listener) ──────────────
+function loadData() {
+  db.collection(COL)
+    .orderBy('createdAt', 'desc')
+    .onSnapshot(snap => {
+      allData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderCards();
+      renderStats();
+      renderTicker();
+    }, err => {
+      document.getElementById('cardsGrid').innerHTML =
+        '<div class="empty-state">⚠️ Failed to load listings. Please try again later.</div>';
+      console.error('Firestore error:', err);
+    });
+}
+
+// ── Filtering ──────────────────────────────────────────────────
+function getFiltered() {
+  return allData.filter(d => {
+    const mf = currentFilter === 'all' || d.type === currentFilter;
+    const q = searchQuery.toLowerCase();
+    const ms = !q ||
+      (d.company||'').toLowerCase().includes(q) ||
+      (d.role||'').toLowerCase().includes(q) ||
+      (d.skills||[]).join(' ').toLowerCase().includes(q) ||
+      (d.description||'').toLowerCase().includes(q);
+    return mf && ms;
+  });
+}
+
+// ── Render cards ───────────────────────────────────────────────
+function renderCards() {
+  const filtered = getFiltered();
+  const grid = document.getElementById('cardsGrid');
+  const total = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  if (currentPage > total) currentPage = 1;
+  const start = (currentPage - 1) * PER_PAGE;
+  const items = filtered.slice(start, start + PER_PAGE);
+  if (!items.length) {
+    grid.innerHTML = '<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:.5rem">🔍</div><p>No interviews found.</p></div>';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+  grid.innerHTML = items.map((d, i) => `
+    <div class="card" style="animation-delay:${i*.04}s" onclick="location.href='detail.html?id=${d.id}'">
+      <div class="card-meta">
+        <span class="badge badge-company">${esc(d.company)}</span>
+        <span class="badge badge-type-${d.type}">${tl(d.type)}</span>
+        <span class="card-date">${fd(d.date)}</span>
+      </div>
+      <div class="card-title">${esc(d.role)}</div>
+      <div class="card-desc">${esc(d.description||'No description available.')}</div>
+      <div class="card-footer">
+        <div class="card-tags">${(d.skills||[]).slice(0,3).map(s=>`<span class="tag">${esc(s)}</span>`).join('')}</div>
+        <a class="card-link" href="detail.html?id=${d.id}" onclick="event.stopPropagation()">View & Apply →</a>
+      </div>
+    </div>`).join('');
+  renderPg(total, filtered.length);
+}
+
+function renderPg(total, count) {
+  const pg = document.getElementById('pagination');
+  if (total <= 1) { pg.innerHTML = `<span class="pg-info">${count} listing${count!==1?'s':''}</span>`; return; }
+  let h = `<span class="pg-info">${count} results</span>`;
+  h += `<button class="pg-btn" onclick="goPg(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Prev</button>`;
+  for (let i=1; i<=total; i++) {
+    if (total>7 && i>2 && i<total-1 && Math.abs(i-currentPage)>1) { if(i===3||i===total-2)h+=`<span class="pg-info">…</span>`; continue; }
+    h += `<button class="pg-btn${i===currentPage?' active':''}" onclick="goPg(${i})">${i}</button>`;
+  }
+  h += `<button class="pg-btn" onclick="goPg(${currentPage+1})" ${currentPage===total?'disabled':''}>Next ›</button>`;
+  pg.innerHTML = h;
+}
+
+function goPg(p) {
+  const t = Math.ceil(getFiltered().length / PER_PAGE);
+  if (p < 1 || p > t) return;
+  currentPage = p; renderCards(); window.scrollTo({top:280,behavior:'smooth'});
+}
+
+// ── Stats & sidebar ────────────────────────────────────────────
+function renderStats() {
+  const data = allData;
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('statTotal').textContent  = data.length;
+  document.getElementById('statOnline').textContent  = data.filter(d=>d.type==='online').length;
+  document.getElementById('statOffline').textContent = data.filter(d=>d.type==='offline').length;
+  document.getElementById('statWalkin').textContent  = data.filter(d=>d.type==='walkin').length;
+  document.getElementById('statToday').textContent   = data.filter(d=>d.date===today).length;
+  const c = {};
+  data.forEach(d => c[d.company] = (c[d.company]||0) + 1);
+  document.getElementById('companyList').innerHTML =
+    Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,6)
+      .map(([co,n]) => `<div class="company-item" onclick="filterByCompany('${esc(co)}')"><span>${esc(co)}</span><span class="company-count">${n}</span></div>`).join('');
+}
+
+function renderTicker() {
+  if (!allData.length) return;
+  const items = [...allData].slice(0,15).map(d=>`🔔 ${d.company} – ${d.role} (${tl(d.type)})`).join('   •   ');
+  document.getElementById('tickerTrack').innerHTML = `<span>${items}</span><span>${items}</span>`;
+}
+
+// ── Filters & search ───────────────────────────────────────────
+function filterByCompany(co) {
+  document.getElementById('searchInput').value = co;
+  searchQuery = co.toLowerCase(); currentPage = 1; renderCards();
+  window.scrollTo({top:280,behavior:'smooth'});
+}
+function setFilter(f) {
+  currentFilter = f; currentPage = 1;
+  document.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.dataset.filter===f));
+  renderCards(); window.scrollTo({top:280,behavior:'smooth'});
+}
+
+document.getElementById('filterPills').onclick = e => {
+  const p = e.target.closest('.pill'); if (!p) return;
+  document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active'); currentFilter = p.dataset.filter; currentPage = 1; renderCards();
+};
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.toLowerCase(); currentPage = 1; renderCards();
+});
+
+// ── Boot ───────────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>

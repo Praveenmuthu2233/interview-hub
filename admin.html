@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Panel – InterviewEdge</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0e1a;--surface:#111827;--card:#161d2e;--border:#1e2d45;--accent:#f59e0b;--accent2:#3b82f6;--text:#e2e8f0;--muted:#64748b;--green:#10b981;--red:#ef4444;--red-bg:rgba(239,68,68,.12);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;background-image:radial-gradient(ellipse at 80% 20%,rgba(59,130,246,.07) 0%,transparent 50%);}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;position:sticky;top:0;z-index:50;}
+.header-inner{max-width:1150px;margin:auto;display:flex;align-items:center;justify-content:space-between;height:58px;gap:1rem;}
+.logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;}.logo span{color:var(--accent);}
+.badge-admin{background:rgba(245,158,11,.15);color:var(--accent);font-size:.7rem;padding:.22rem .65rem;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.back-link{color:var(--accent2);text-decoration:none;font-size:.83rem;font-weight:500;transition:opacity .2s;white-space:nowrap;}.back-link:hover{opacity:.75;}
+.admin-wrap{max-width:1150px;margin:auto;padding:1.5rem;display:grid;grid-template-columns:380px 1fr;gap:1.75rem;align-items:start;}
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;position:sticky;top:74px;}
+.form-card-header{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);}
+.form-card-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;}
+.form-card-sub{color:var(--muted);font-size:.75rem;margin-top:.15rem;}
+.form-body{padding:1.25rem;display:flex;flex-direction:column;gap:.9rem;max-height:calc(100vh - 160px);overflow-y:auto;}
+.form-group{display:flex;flex-direction:column;gap:.35rem;}
+.form-group label{font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.form-control{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.855rem;padding:.52rem .8rem;border-radius:8px;outline:none;transition:border-color .2s;width:100%;}
+.form-control:focus{border-color:var(--accent2);}
+.form-control::placeholder{color:var(--muted);}
+textarea.form-control{resize:vertical;min-height:110px;line-height:1.6;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
+.tags-input-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.4rem .65rem;display:flex;flex-wrap:wrap;gap:.35rem;cursor:text;transition:border-color .2s;min-height:40px;align-items:center;}
+.tags-input-wrap:focus-within{border-color:var(--accent2);}
+.tag-item{background:#1e3a5f;color:#93c5fd;font-size:.72rem;padding:.18rem .48rem;border-radius:4px;display:flex;align-items:center;gap:.25rem;}
+.tag-item button{background:none;border:none;color:inherit;cursor:pointer;font-size:.8rem;line-height:1;padding:0;}
+.tag-input-field{background:none;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.855rem;min-width:70px;flex:1;}
+.tag-input-field::placeholder{color:var(--muted);}
+.btn-primary{background:var(--accent);color:#000;border:none;border-radius:8px;padding:.62rem 1.1rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;width:100%;transition:opacity .2s,transform .1s;}
+.btn-primary:hover{opacity:.88;}.btn-primary:active{transform:scale(.98);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.btn-secondary{background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.52rem .9rem;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;cursor:pointer;transition:all .2s;}
+.btn-secondary:hover{color:var(--text);border-color:#2a3f5f;}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin-bottom:1.4rem;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.9rem 1.1rem;}
+.stat-card-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.2rem;}
+.stat-card-val{font-size:1.5rem;font-weight:700;font-family:'Playfair Display',serif;}
+.stat-card-val.accent{color:var(--accent);}.stat-card-val.green{color:var(--green);}.stat-card-val.blue{color:var(--accent2);}.stat-card-val.red{color:var(--red);}
+.table-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.table-header{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.table-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;}
+.entry-count{background:#1e3a5f;color:#93c5fd;font-size:.7rem;padding:.18rem .55rem;border-radius:12px;}
+.table-search{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:.32rem .65rem;gap:.35rem;}
+.table-search input{background:none;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;width:130px;}
+.table-search input::placeholder{color:var(--muted);}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--surface);}
+th{padding:.7rem .9rem;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;white-space:nowrap;}
+td{padding:.82rem .9rem;border-top:1px solid var(--border);font-size:.82rem;vertical-align:middle;}
+tr:hover td{background:rgba(255,255,255,.012);}
+.td-role{font-weight:500;}.td-company{color:var(--accent2);font-weight:600;}
+.type-badge{display:inline-block;padding:.13rem .52rem;border-radius:4px;font-size:.67rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.type-online{background:rgba(16,185,129,.12);color:var(--green);}.type-offline{background:var(--red-bg);color:var(--red);}.type-walkin{background:rgba(245,158,11,.12);color:var(--accent);}
+.action-btns{display:flex;gap:.35rem;}
+.btn-edit{background:rgba(59,130,246,.12);color:var(--accent2);border:none;border-radius:5px;padding:.28rem .65rem;font-size:.73rem;cursor:pointer;font-weight:500;transition:background .2s;}
+.btn-edit:hover{background:rgba(59,130,246,.22);}
+.btn-delete{background:var(--red-bg);color:var(--red);border:none;border-radius:5px;padding:.28rem .65rem;font-size:.73rem;cursor:pointer;font-weight:500;transition:background .2s;}
+.btn-delete:hover{background:rgba(239,68,68,.22);}
+.empty-row td{text-align:center;color:var(--muted);padding:2.5rem;}
+.toast{position:fixed;bottom:1.75rem;right:1.75rem;padding:.7rem 1.2rem;border-radius:8px;font-size:.84rem;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.3);}
+.toast.show.ok{background:var(--green);color:#fff;transform:translateY(0);opacity:1;}
+.toast.show.err{background:var(--red);color:#fff;transform:translateY(0);opacity:1;}
+.auth-overlay{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:1rem;}
+.auth-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2.25rem;max-width:360px;width:100%;text-align:center;}
+.auth-logo{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:900;margin-bottom:.4rem;}
+.auth-sub{color:var(--muted);font-size:.84rem;margin-bottom:1.75rem;}
+.auth-box input{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;padding:.62rem .9rem;border-radius:8px;outline:none;width:100%;margin-bottom:.9rem;transition:border-color .2s;}
+.auth-box input:focus{border-color:var(--accent);}
+.auth-hint{font-size:.7rem;color:var(--muted);margin-top:.7rem;}
+.fb-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:var(--accent2);font-size:.7rem;padding:.2rem .6rem;border-radius:20px;margin-left:.5rem;}
+@media(max-width:960px){.admin-wrap{grid-template-columns:1fr;}.form-card{position:static;}.stats-bar{grid-template-columns:1fr 1fr;}}
+@media(max-width:500px){.stats-bar{grid-template-columns:1fr 1fr;}.admin-wrap{padding:1rem;}.form-row{grid-template-columns:1fr;}}
+</style>
+<!-- ✅ Firebase SDK (v9 compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+</head>
+<body>
+
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-logo">Interview<span style="color:var(--accent)">Edge</span></div>
+    <div class="auth-sub">Enter the admin password to continue</div>
+    <input type="password" id="pwInput" placeholder="Admin password"/>
+    <button class="btn-primary">🔓 Login</button>
+    <div class="auth-hint">☁️ Data is stored in Firebase Firestore</div>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <div class="logo">Interview<span>Edge</span></div>
+      <span class="badge-admin">Admin</span>
+      <span class="fb-badge">☁️ Firebase</span>
+    </div>
+    <a href="index.html" class="back-link">← View Public Site</a>
+  </div>
+</header>
+
+<div class="admin-wrap">
+  <div>
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-title" id="formTitle">➕ Add Interview Listing</div>
+        <div class="form-card-sub" id="formSub">Fill in all the details below</div>
+      </div>
+      <div class="form-body">
+        <input type="hidden" id="editId"/>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Company Name *</label>
+            <input class="form-control" id="fCompany" placeholder="e.g. Infosys"/>
+          </div>
+          <div class="form-group">
+            <label>Interview Type *</label>
+            <select class="form-control" id="fType">
+              <option value="online">Online</option>
+              <option value="offline">Offline</option>
+              <option value="walkin">Walk-in</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Job Role / Position *</label>
+          <input class="form-control" id="fRole" placeholder="e.g. Software Engineer"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Interview Date *</label>
+            <input class="form-control" type="date" id="fDate"/>
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <input class="form-control" id="fLocation" placeholder="e.g. Chennai / Remote"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Experience</label>
+            <input class="form-control" id="fExperience" placeholder="e.g. 0-2 years"/>
+          </div>
+          <div class="form-group">
+            <label>Salary / Package</label>
+            <input class="form-control" id="fSalary" placeholder="e.g. ₹4 LPA"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Skills (press Enter or comma)</label>
+          <div class="tags-input-wrap" id="tagsWrap" onclick="document.getElementById('tagField').focus()">
+            <input id="tagField" class="tag-input-field" placeholder="e.g. Java, Python…"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Apply Link (URL)</label>
+          <input class="form-control" id="fLink" placeholder="https://company.com/careers"/>
+        </div>
+        <div class="form-group">
+          <label>Description * (full details, eligibility, process)</label>
+          <textarea class="form-control" id="fDesc" placeholder="Describe the interview process, eligibility criteria, documents needed, venue details, deadlines…"></textarea>
+        </div>
+        <div style="display:flex;gap:.5rem;">
+          <button class="btn-primary" id="saveBtn" onclick="saveEntry()">💾 Save Listing</button>
+          <button class="btn-secondary" onclick="resetForm()">✕ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-card"><div class="stat-card-label">Total</div><div class="stat-card-val accent">–</div></div>
+      <div class="stat-card"><div class="stat-card-label">Online</div><div class="stat-card-val green">–</div></div>
+      <div class="stat-card"><div class="stat-card-label">Walk-in</div><div class="stat-card-val blue">–</div></div>
+      <div class="stat-card"><div class="stat-card-label">Today</div><div class="stat-card-val red">–</div></div>
+    </div>
+    <div class="table-card">
+      <div class="table-header">
+        <div style="display:flex;align-items:center;gap:.65rem;">
+          <div class="table-title">All Listings</div>
+          <span class="entry-count" id="entryCount">0</span>
+        </div>
+        <div class="table-search">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="adminSearch" placeholder="Search…" oninput="renderTable()"/>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Company</th><th>Role</th><th>Type</th><th>Date</th><th>Location</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="tableBody"><tr class="empty-row"><td colspan="6">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Firebase init ──────────────────────────────────────────────
+let db;
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("CONFIG:", window.FIREBASE_CONFIG); // debug
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(window.FIREBASE_CONFIG);
+  }
+
+  db = firebase.firestore();
+});
+const COL = 'interviews';
+
+// 🔐 SHA-256 Hash Function
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// 🔑 MUST BE ABOVE
+const HASHED_PASS = "c56bbd618022c38ded2ea1e6ae5ba24b34d3406df970193c9e5a762d10cff1da";
+
+// ✅ Now safe to use
+async function checkAuth() {
+  const input = document.getElementById('pwInput').value;
+  const hashedInput = await hashPassword(input);
+
+  console.log(hashedInput); // debug
+
+  if (hashedInput === HASHED_PASS) {
+  localStorage.setItem('isAdminAuth', 'true'); // save login
+  document.getElementById('authOverlay').style.display = 'none';
+  init();
+  } else {
+    showToast('Wrong password!', false);
+    document.getElementById('pwInput').value = '';
+  }
+}
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById('pwInput');
+  const btn = document.querySelector('.btn-primary');
+
+  input.focus();
+
+  // Enter key
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkAuth();
+  });
+
+  // Button click
+  btn.addEventListener('click', checkAuth);
+
+  // Auto login
+  if (localStorage.getItem('isAdminAuth') === 'true') {
+    document.getElementById('authOverlay').style.display = 'none';
+    init();
+  }
+});
+let isInitialized = false;
+
+function init() {
+  if (isInitialized) return; // prevent duplicate listeners
+  isInitialized = true;
+
+  resetForm();
+
+  db.collection(COL)
+    .orderBy('date','desc')
+    .onSnapshot(snap => {
+      cachedData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderTable();
+      renderStats();
+    }, err => {
+      showToast('❌ Firestore error: ' + err.message, false);
+      console.error(err);
+    });
+}
+
+// ── Local cache ────────────────────────────────────────────────
+let cachedData = [];
+
+// ── Tags UI ────────────────────────────────────────────────────
+let skills = [];
+const tagField = document.getElementById('tagField');
+const tagsWrap = document.getElementById('tagsWrap');
+function renderTags() {
+  tagsWrap.querySelectorAll('.tag-item').forEach(e=>e.remove());
+  skills.forEach((s,i) => {
+    const el = document.createElement('span'); el.className = 'tag-item';
+    el.innerHTML = `${s}<button onclick="removeTag(${i})">×</button>`;
+    tagsWrap.insertBefore(el, tagField);
+  });
+}
+function removeTag(i){ skills.splice(i,1); renderTags(); }
+tagField.addEventListener('keydown', e => {
+  if (e.key==='Enter'||e.key===',') {
+    e.preventDefault(); const v = tagField.value.trim().replace(/,$/,'');
+    if (v && !skills.includes(v)) { skills.push(v); renderTags(); } tagField.value='';
+  }
+  if (e.key==='Backspace' && !tagField.value && skills.length) { skills.pop(); renderTags(); }
+});
+
+// ── Form ───────────────────────────────────────────────────────
+function resetForm() {
+  document.getElementById('editId').value = '';
+  ['fCompany','fRole','fDate','fLocation','fExperience','fSalary','fLink','fDesc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fType').value = 'online';
+  skills = []; renderTags();
+  document.getElementById('formTitle').textContent = '➕ Add Interview Listing';
+  document.getElementById('formSub').textContent = 'Fill in all the details below';
+  document.getElementById('fDate').value = new Date().toISOString().slice(0,10);
+}
+
+async function saveEntry() {
+  const company     = document.getElementById('fCompany').value.trim();
+  const role        = document.getElementById('fRole').value.trim();
+  const date        = document.getElementById('fDate').value;
+  const description = document.getElementById('fDesc').value.trim();
+  if (!company||!role||!date||!description) { showToast('Please fill all required fields (*)', false); return; }
+
+  const entry = {
+    company, role, date, description,
+    type:        document.getElementById('fType').value,
+    location:    document.getElementById('fLocation').value.trim(),
+    experience:  document.getElementById('fExperience').value.trim(),
+    salary:      document.getElementById('fSalary').value.trim(),
+    applyLink:   document.getElementById('fLink').value.trim(),
+    skills:      [...skills],
+    updatedAt:   firebase.firestore.FieldValue.serverTimestamp(),
+  };
+
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.disabled = true; saveBtn.textContent = '⏳ Saving…';
+
+  try {
+    const editId = document.getElementById('editId').value;
+    if (editId) {
+      await db.collection(COL).doc(editId).update(entry);
+      showToast('✅ Listing updated!');
+    } else {
+      entry.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection(COL).add(entry);
+      showToast('✅ Listing added!');
+    }
+    resetForm();
+  } catch (err) {
+    showToast('❌ Save failed: ' + err.message, false);
+    console.error(err);
+  } finally {
+    saveBtn.disabled = false; saveBtn.textContent = '💾 Save Listing';
+  }
+}
+
+function editEntry(id) {
+  const d = cachedData.find(x=>x.id===id); if (!d) return;
+  document.getElementById('editId').value     = d.id;
+  document.getElementById('fCompany').value   = d.company||'';
+  document.getElementById('fRole').value      = d.role||'';
+  document.getElementById('fType').value      = d.type||'online';
+  document.getElementById('fDate').value      = d.date||'';
+  document.getElementById('fLocation').value  = d.location||'';
+  document.getElementById('fExperience').value= d.experience||'';
+  document.getElementById('fSalary').value    = d.salary||'';
+  document.getElementById('fLink').value      = d.applyLink||'';
+  document.getElementById('fDesc').value      = d.description||'';
+  skills = [...(d.skills||[])]; renderTags();
+  document.getElementById('formTitle').textContent = '✏️ Edit Listing';
+  document.getElementById('formSub').textContent   = `Editing: ${d.role} @ ${d.company}`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function deleteEntry(id) {
+  if (!confirm('Delete this listing from Firebase? This cannot be undone.')) return;
+  try {
+    await db.collection(COL).doc(id).delete();
+    showToast('🗑️ Deleted!');
+  } catch(err) {
+    showToast('❌ Delete failed: ' + err.message, false);
+  }
+}
+
+// ── Table ──────────────────────────────────────────────────────
+function renderTable() {
+  const q = document.getElementById('adminSearch').value.toLowerCase();
+  const f = cachedData.filter(d => !q||
+    (d.company||'').toLowerCase().includes(q)||
+    (d.role||'').toLowerCase().includes(q)||
+    (d.type||'').includes(q)
+  ).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('entryCount').textContent = cachedData.length;
+  const tbody = document.getElementById('tableBody');
+  if (!f.length) { tbody.innerHTML=`<tr class="empty-row"><td colspan="6">No listings found.</td></tr>`; return; }
+  tbody.innerHTML = f.map(d=>`
+    <tr>
+      <td class="td-company">${d.company}</td>
+      <td class="td-role">${d.role}</td>
+      <td><span class="type-badge type-${d.type}">${d.type==='walkin'?'Walk-in':d.type}</span></td>
+      <td style="color:var(--muted);white-space:nowrap;">${fd(d.date)}</td>
+      <td style="color:var(--muted);">${d.location||'—'}</td>
+      <td><div class="action-btns">
+        <button class="btn-edit" onclick="editEntry('${d.id}')">✏️ Edit</button>
+        <button class="btn-delete" onclick="deleteEntry('${d.id}')">🗑️ Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function renderStats() {
+  const data = cachedData, today = new Date().toISOString().slice(0,10);
+  document.getElementById('statsBar').innerHTML=`
+    <div class="stat-card"><div class="stat-card-label">Total</div><div class="stat-card-val accent">${data.length}</div></div>
+    <div class="stat-card"><div class="stat-card-label">Online</div><div class="stat-card-val green">${data.filter(d=>d.type==='online').length}</div></div>
+    <div class="stat-card"><div class="stat-card-label">Walk-in</div><div class="stat-card-val blue">${data.filter(d=>d.type==='walkin').length}</div></div>
+    <div class="stat-card"><div class="stat-card-label">Today</div><div class="stat-card-val red">${data.filter(d=>d.date===today).length}</div></div>`;
+}
+
+function fd(s){if(!s)return'—';return new Date(s).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+
+function showToast(msg, ok=true) {
+  const t=document.getElementById('toast'); t.textContent=msg;
+  t.className=`toast show ${ok?'ok':'err'}`; setTimeout(()=>t.className='toast',2800);
+}
+
+// ── Real-time listener ─────────────────────────────────────────
+
+</script>
+
+</body>
+</html>
