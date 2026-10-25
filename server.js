@@ -131,7 +131,7 @@ function requireAdmin(request, response, next) {
       issuer: JWT_ISSUER,
       audience: JWT_AUDIENCE
     });
-    if (payload.sub !== ADMIN_USERNAME) {
+    if (!payload.sub || payload.role !== "admin") {
       response.status(401).json({ error: "Authentication required." });
       return;
     }
@@ -152,7 +152,7 @@ function requireAdminPage(request, response, next) {
       issuer: JWT_ISSUER,
       audience: JWT_AUDIENCE
     });
-    if (payload.sub !== ADMIN_USERNAME) throw new Error("Invalid subject");
+    if (!payload.sub || payload.role !== "admin") throw new Error("Invalid subject");
     next();
   } catch {
     response.clearCookie(COOKIE_NAME, cookieOptions());
@@ -340,15 +340,38 @@ app.post("/api/admin/login", checkSameOrigin, loginLimiter, async (request, resp
     return;
   }
   try {
-    const [passwordMatches, usernameMatches] = await Promise.all([
-      bcrypt.compare(password, ADMIN_PASSWORD_HASH),
-      Promise.resolve(safeEqual(username, ADMIN_USERNAME))
-    ]);
-    if (!usernameMatches || !passwordMatches) {
+    let matched = false;
+    let authUser = username;
+
+    try {
+      const [dbRows] = await pool.execute(
+        "SELECT id, username, password_hash FROM admins WHERE username = ? LIMIT 1",
+        [username]
+      );
+      if (dbRows.length > 0) {
+        matched = await bcrypt.compare(password, dbRows[0].password_hash);
+        if (matched) authUser = dbRows[0].username;
+      }
+    } catch (dbErr) {
+      console.warn("Database admin check error, falling back to env:", dbErr.message);
+    }
+
+    if (!matched) {
+      const [passwordMatches, usernameMatches] = await Promise.all([
+        bcrypt.compare(password, ADMIN_PASSWORD_HASH),
+        Promise.resolve(safeEqual(username, ADMIN_USERNAME))
+      ]);
+      if (passwordMatches && usernameMatches) {
+        matched = true;
+        authUser = ADMIN_USERNAME;
+      }
+    }
+
+    if (!matched) {
       response.status(401).json({ error: "Invalid admin ID or password." });
       return;
     }
-    const token = jwt.sign({ sub: ADMIN_USERNAME, role: "admin" }, JWT_SECRET, {
+    const token = jwt.sign({ sub: authUser, role: "admin" }, JWT_SECRET, {
       algorithm: "HS256",
       expiresIn: JWT_TTL_SECONDS,
       issuer: JWT_ISSUER,
