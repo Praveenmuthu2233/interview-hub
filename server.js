@@ -719,12 +719,12 @@ app.delete("/api/admin/categories/:id", checkSameOrigin, requireAdmin, async (re
   }
 });
 
-app.get(["/admin", "/admin.html"], requireAdminPage, (request, response) => {
+app.get(["/admin", "/admin.html", "/admin.php"], requireAdminPage, (request, response) => {
   response.set("Cache-Control", "no-store");
   response.sendFile(path.join(ROOT, "admin.html"));
 });
 
-app.get("/admin-login", (request, response) => {
+app.get(["/admin-login", "/admin-login.html", "/admin-login.php"], (request, response) => {
   response.sendFile(path.join(ROOT, "admin-login.html"));
 });
 
@@ -744,7 +744,7 @@ app.use((request, response, next) => {
   if (
     segments.some(segment => segment === ".git" || segment === "node_modules" || segment === "scripts" || segment === "sql" || segment === "test")
     || BLOCKED_STATIC_PATHS.has(path.basename(pathname))
-    || segments.some(segment => segment.startsWith(".env"))
+    || segments.some(segment => segment.startsWith(".env")) || pathname.endsWith(".php")
   ) {
     response.sendStatus(404);
     return;
