@@ -7,7 +7,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "db:init": "node scripts/init-db.js",
-    "hash-admin-password": "node scripts/$2b$12$HjQ18Iy2cXw3Li/jC9MaOeiylO7bQhOOBrzkl.IDst2nrtd2Ry696",
+    "hash-admin-password": "node scripts/hash-admin-password.js",
     "test": "node --test"
   },
   "dependencies": {

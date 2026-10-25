@@ -23,6 +23,13 @@ const database = {
   timezone: "Z"
 };
 
+if (process.env.DB_SSL === "true" || process.env.DB_SSL === "1") {
+  database.ssl = {
+    minVersion: "TLSv1.2",
+    rejectUnauthorized: true
+  };
+}
+
 if (process.env.INSTANCE_CONNECTION_NAME) {
   database.socketPath = `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`;
   delete database.host;
