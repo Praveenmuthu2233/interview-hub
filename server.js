@@ -99,9 +99,15 @@ function checkSameOrigin(request, response, next) {
   }
   try {
     const originUrl = new URL(origin);
-    const allowed = PUBLIC_ORIGINS.length
-      ? PUBLIC_ORIGINS.some(value => new URL(value).origin === originUrl.origin)
-      : originUrl.origin === `${request.protocol}://${request.get("host")}`;
+    const isSameHost = originUrl.host === request.get("host");
+    const isAllowedOrigin = PUBLIC_ORIGINS.some(value => {
+      try {
+        return new URL(value).origin === originUrl.origin;
+      } catch {
+        return false;
+      }
+    });
+    const allowed = isSameHost || isAllowedOrigin;
     if (!allowed) {
       response.status(403).json({ error: "Cross-origin request rejected." });
       return;
