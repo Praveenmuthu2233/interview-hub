@@ -168,3 +168,8 @@ Use the resulting Hosting domain (or attach a custom domain) for the website. Si
 ## Cutover notes
 
 The previous Firebase/Firestore data is not deleted, but this code no longer reads or writes it. Per the selected schema-only scope, no Firestore export/import has been performed. Before public cutover, initialize Cloud SQL, create the admin bcrypt hash and secrets, deploy the Cloud Run service, configure the Hosting rewrite, and add/restore the required listings through an authorized import or the admin panel. Test the login, admin CRUD, public list/detail endpoints, and question/category API before directing production traffic.
+
+
+##Note 
+
+This Branch is Created by Ram
