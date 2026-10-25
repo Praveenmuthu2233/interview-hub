@@ -1,0 +1,39 @@
+# InterviewEdge - Apache Configuration for XAMPP
+DirectoryIndex index.php index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Route /healthz to health check API
+    RewriteRule ^healthz/?$ api/healthz.php [L,QSA]
+
+    # Route any /api/* request to the Master API Router
+    RewriteRule ^api/(.*)$ api/index.php [L,QSA]
+
+    # Clean URL routing for admin and detail pages
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^detail/?$ detail.php [L,QSA]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^admin/?$ admin.php [L,QSA]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^admin-login/?$ admin-login.php [L,QSA]
+</IfModule>
+
+# Security: Block sensitive system files
+<FilesMatch "^\.env|\.git|composer\.|package(-lock)?\.json">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

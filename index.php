@@ -1,0 +1,325 @@
+<?php
+/**
+ * InterviewEdge - Main Home Page (PHP + MySQL + Apache)
+ */
+require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/config/helpers.php';
+
+$pdo = getDB();
+
+// Fetch live statistics directly from MySQL
+$today = date('Y-m-d');
+$qp = getListingQueryParts($pdo);
+
+try {
+    $statTotal = (int)$pdo->query("SELECT COUNT(*) FROM `interviews`")->fetchColumn();
+    $statOnline = (int)$pdo->query("SELECT COUNT(*) FROM `interviews` WHERE {$qp['typeCol']} = 'online'")->fetchColumn();
+    $statOffline = (int)$pdo->query("SELECT COUNT(*) FROM `interviews` WHERE {$qp['typeCol']} = 'offline'")->fetchColumn();
+    $statWalkin = (int)$pdo->query("SELECT COUNT(*) FROM `interviews` WHERE {$qp['typeCol']} = 'walkin'")->fetchColumn();
+    
+    $todayStmt = $pdo->prepare("SELECT COUNT(*) FROM `interviews` WHERE DATE({$qp['dateCol']}) = ?");
+    $todayStmt->execute([$today]);
+    $statToday = (int)$todayStmt->fetchColumn();
+
+    // Top companies
+    $coStmt = $pdo->query("
+        SELECT company, COUNT(*) as cnt 
+        FROM `interviews` 
+        GROUP BY company 
+        ORDER BY cnt DESC, company ASC 
+        LIMIT 7
+    ");
+    $topCompanies = $coStmt->fetchAll();
+
+    // Initial listings for immediate fast render
+    $listStmt = $pdo->query("
+        {$qp['select']}
+        {$qp['from']}
+        ORDER BY {$qp['createdCol']} DESC 
+        LIMIT 9
+    ");
+    $initialListings = $listStmt->fetchAll();
+} catch (Exception $e) {
+    $statTotal = $statOnline = $statOffline = $statWalkin = $statToday = 0;
+    $topCompanies = [];
+    $initialListings = [];
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="light-theme.css"/>
+<link rel="stylesheet" href="index.css"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>InterviewEdge – Latest Interview Drives & Jobs India 2026</title>
+<meta name="description" content="Find latest interview drives, walk-in jobs, fresher openings, and off-campus hiring across India. Updated daily with verified listings from TCS, Infosys, Wipro and more."/>
+<meta name="keywords" content="latest interview drives India, walk-in jobs India, fresher jobs 2026, off campus drives India, TCS interview drive, Infosys hiring freshers, Wipro walk-in drive, IT jobs Chennai 2026"/>
+<meta name="author" content="InterviewEdge"/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="http://localhost/"/>
+<meta property="og:title" content="InterviewEdge – Latest Interview Drives & Jobs India"/>
+<meta property="og:description" content="Daily updated job interviews, walk-ins and fresher hiring alerts across India."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="http://localhost/"/>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2328429365429845" crossorigin="anonymous"></script>
+<script src="ads.js" defer></script>
+<script src="index.js" defer></script>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<!-- ── HEADER ─────────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <a href="index.php" class="logo">Interview<em>Edge</em></a>
+    <button class="nav-toggle" id="navToggle" type="button" aria-controls="mainNav" aria-expanded="false" aria-label="Open navigation">Menu</button>
+    <nav class="nav" id="mainNav">
+      <a href="index.php" class="active">Home</a>
+      <a href="blog.php">Blog</a>
+      <a href="about.html">About</a>
+      <a href="contact.php">Contact</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="disclaimer.html">Disclaimer</a>
+    </nav>
+    <div class="header-actions">
+      <div class="search-wrap">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Search company, role…" aria-label="Search jobs by company, role, skills, or description"/>
+      </div>
+      <a href="admin.php" class="btn-admin">⚙ Admin</a>
+    </div>
+  </div>
+</header>
+
+<!-- ── TICKER ─────────────────────────────────────────── -->
+<div class="ticker">
+  <div class="ticker-label">🔴 LIVE</div>
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- ── HERO ───────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Updated Daily from MySQL DB</div>
+    <h1>India's #1 Source for<br/><em>Interview Drives</em></h1>
+    <p class="hero-desc">Verified walk-in drives, online tests, and fresher hiring from TCS, Infosys, Wipro, HCL, Accenture and hundreds more — curated and connected directly via PHP &amp; MySQL.</p>
+    <div class="hero-ctas">
+      <a href="#listings" class="btn-primary">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Browse Listings
+      </a>
+      <a href="blog.php" class="btn-secondary">
+        📝 Interview Tips
+      </a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat">
+      <div class="hstat-val" id="statTotal"><?= $statTotal ?></div>
+      <div class="hstat-label">Total Listings</div>
+    </div>
+    <div class="hstat blue">
+      <div class="hstat-val" id="statOnline"><?= $statOnline ?></div>
+      <div class="hstat-label">Online Drives</div>
+    </div>
+    <div class="hstat green">
+      <div class="hstat-val" id="statWalkin"><?= $statWalkin ?></div>
+      <div class="hstat-label">Walk-ins</div>
+    </div>
+    <div class="hstat red">
+      <div class="hstat-val" id="statToday"><?= $statToday ?></div>
+      <div class="hstat-label">Added Today</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAIN ────────────────────────────────────────────── -->
+<div class="page-wrap" id="listings">
+  <main>
+    <div class="ad-banner">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8556272397" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Latest Interviews</div>
+      <div class="filter-pills" id="filterPills">
+        <div class="pill active" data-filter="all">All</div>
+        <div class="pill" data-filter="online">🌐 Online</div>
+        <div class="pill" data-filter="offline">🏢 Offline</div>
+        <div class="pill" data-filter="walkin">🚶 Walk-in</div>
+      </div>
+    </div>
+
+    <div class="cards-grid" id="cardsGrid">
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading listings from database…</p>
+      </div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+
+    <div class="ad-banner ad-banner-spaced">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8221230477" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    </div>
+
+    <!-- Blog Strip -->
+    <div class="blog-strip">
+      <div class="section-header">
+        <div class="section-title">📝 Interview Tips &amp; Guides</div>
+        <a href="blog.php" class="blog-all-link">View All →</a>
+      </div>
+      <div class="blog-cards">
+        <a href="blog-hr-interview-questions.html" class="blog-card">
+          <span class="blog-tag">HR Interview</span>
+          <div class="blog-title">Top 50 HR Interview Questions &amp; Best Answers (2026)</div>
+          <div class="blog-meta">📅 May 2026 · ⏱ 12 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+        <a href="blog-crack-technical-interview.html" class="blog-card">
+          <span class="blog-tag">Technical</span>
+          <div class="blog-title">How to Crack Technical Interviews at TCS, Infosys &amp; Wipro</div>
+          <div class="blog-meta">📅 Apr 2026 · ⏱ 10 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+        <a href="blog-java-interview-questions.html" class="blog-card">
+          <span class="blog-tag">Java</span>
+          <div class="blog-title">Top 60 Java Interview Questions &amp; Answers (2026)</div>
+          <div class="blog-meta">📅 Mar 2026 · ⏱ 14 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+        <a href="blog-fresher-resume-tips.html" class="blog-card">
+          <span class="blog-tag">Resume</span>
+          <div class="blog-title">How to Write a Fresher Resume That Gets Shortlisted</div>
+          <div class="blog-meta">📅 Apr 2026 · ⏱ 8 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+        <a href="blog-walk-in-interview-tips.html" class="blog-card">
+          <span class="blog-tag">Walk-in Prep</span>
+          <div class="blog-title">Walk-In Interview Tips: Complete Preparation Checklist</div>
+          <div class="blog-meta">📅 Mar 2026 · ⏱ 7 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+        <a href="blog-aptitude-test-tips.html" class="blog-card">
+          <span class="blog-tag">Aptitude</span>
+          <div class="blog-title">How to Clear Aptitude Tests for IT Companies</div>
+          <div class="blog-meta">📅 Feb 2026 · ⏱ 9 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── SIDEBAR ──────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="ad-banner">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8061448376" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    </div>
+
+    <div class="widget">
+      <div class="widget-hd">📊 Quick Stats</div>
+      <div class="widget-bd">
+        <div class="stat-row"><span>Total Listings</span><span class="stat-val" id="sw-total"><?= $statTotal ?></span></div>
+        <div class="stat-row"><span>🌐 Online</span><span class="stat-val" id="sw-online"><?= $statOnline ?></span></div>
+        <div class="stat-row"><span>🏢 Offline</span><span class="stat-val" id="sw-offline"><?= $statOffline ?></span></div>
+        <div class="stat-row"><span>🚶 Walk-in</span><span class="stat-val" id="sw-walkin"><?= $statWalkin ?></span></div>
+        <div class="stat-row"><span>Added Today</span><span class="stat-val" id="sw-today"><?= $statToday ?></span></div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-hd">🏢 Top Companies</div>
+      <div class="widget-bd" id="companyList">
+        <?php foreach ($topCompanies as $tc): ?>
+          <div class="company-item" data-company="<?= htmlspecialchars(urlencode($tc['company'])) ?>" role="button" tabindex="0">
+            <span><?= htmlspecialchars($tc['company']) ?></span>
+            <span class="co-count"><?= $tc['cnt'] ?></span>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-hd">💡 Quick Tip</div>
+      <div class="widget-bd">
+        <p class="quick-tip">✅ Apply within 24 hours of a listing — competition grows fast.</p>
+        <p class="quick-tip">✅ Always verify details on the official company website.</p>
+        <p class="quick-tip">✅ Carry 3–4 resume copies to every walk-in interview.</p>
+      </div>
+    </div>
+
+    <div class="ad-banner">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="2429847741" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    </div>
+  </aside>
+</div>
+
+<!-- ── FOOTER ─────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.php" class="logo">Interview<em>Edge</em></a>
+        <p class="footer-desc">Your go-to source for the latest interview drives, walk-ins, and job openings. Updated daily with verified listings from top companies across India.</p>
+        <a class="contact-link" href="https://wa.me/919500206518" target="_blank">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          +91 9500206518
+        </a>
+        <a class="contact-link" href="mailto:praveenmuthu9500@gmail.com">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+          praveenmuthu9500@gmail.com
+        </a>
+        <span class="contact-link contact-static">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          Chennai, Tamil Nadu, India
+        </span>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <div class="footer-links">
+          <a href="index.php">Home</a>
+          <a href="blog.php">Blog &amp; Guides</a>
+          <a href="about.html">About Us</a>
+          <a href="contact.php">Contact Us</a>
+          <a href="admin.php">Admin Panel</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Categories</h4>
+        <div class="footer-links">
+          <a href="#listings" class="filter-link" data-filter="online">Online Drives</a>
+          <a href="#listings" class="filter-link" data-filter="offline">Offline Drives</a>
+          <a href="#listings" class="filter-link" data-filter="walkin">Walk-in Drives</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <div class="footer-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+          <a href="disclaimer.html">Disclaimer</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 InterviewEdge. All rights reserved. Powered by PHP &amp; MySQL. Built with ❤️ in Chennai.</div>
+      <div class="footer-copy"><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="disclaimer.html">Disclaimer</a></div>
+    </div>
+  </div>
+</footer>
+
+<!-- WA Float -->
+<a href="https://wa.me/919500206518" class="wa-float" target="_blank" title="Chat on WhatsApp">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+</body>
+</html>

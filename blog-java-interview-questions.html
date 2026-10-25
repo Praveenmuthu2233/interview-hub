@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Top 60 Java Interview Questions & Answers (2026) – InterviewEdge</title>
+<meta name="description" content="Complete Java interview Q&A for freshers and experienced professionals. Covers OOP, Collections, Exception Handling, Multithreading, Java 8 features, and Spring Boot basics."/>
+<meta name="keywords" content="Java interview questions 2026, Java OOP questions answers, Java collections interview, Java multithreading interview, Spring Boot interview questions India, Java fresher interview"/>
+<meta name="author" content="InterviewEdge"/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://interviewhub360.netlify.app/blog-java-interview-questions.html"/>
+<meta property="og:title" content="Top 60 Java Interview Questions & Answers (2026) – InterviewEdge"/>
+<meta property="og:description" content="Complete Java interview Q&A covering OOP, Collections, Multithreading, Spring Boot and output-based questions asked at MNC interviews in India."/>
+<meta property="og:type" content="article"/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"Top 60 Java Interview Questions & Answers for Freshers & Experienced (2026)","author":{"@type":"Organization","name":"InterviewEdge"},"publisher":{"@type":"Organization","name":"InterviewEdge","url":"https://interviewhub360.netlify.app"},"datePublished":"2026-03-20","description":"Complete Java interview Q&A covering OOP, Collections, Multithreading, Spring Boot and output-based questions."}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2328429365429845" crossorigin="anonymous"></script>
+<script src="ads.js" defer></script>
+<link rel="stylesheet" href="blog-article.css"/>
+<link rel="stylesheet" href="light-theme.css"/>
+</head>
+<body class="java-article">
+<header><div class="header-inner">
+  <a href="index.html" class="logo">Interview<span>Edge</span></a>
+  <nav class="nav-menu">
+    <a href="index.html">Home</a>
+    <a href="blog.html" class="active">Blog</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+<article>
+  <a href="blog.html" class="back-to-blog">← Back to Blog</a>
+  <div class="breadcrumb"><a href="index.html">Home</a><span>›</span><a href="blog.html">Blog</a><span>›</span>Technical</div>
+  <div class="cat-badge">Technical · Java</div>
+
+  <h1>Top 60 Java Interview Questions &amp; Answers <span>for Freshers &amp; Experienced</span> (2026)</h1>
+  <div class="article-meta">
+    <span class="meta-item">📅 March 2026</span>
+    <span class="meta-item">⏱ 14 min read</span>
+    <span class="meta-item">👤 InterviewEdge Team</span>
+    <span class="meta-item">🏷️ Java · OOP · Spring Boot</span>
+  </div>
+
+  <div class="intro">
+    <p>Java remains one of the most widely used programming languages across Indian IT companies — TCS, Infosys, Wipro, Cognizant, HCL, and every BFSI organisation. Whether you are a fresher attending your first campus drive or an experienced developer switching companies, Java questions are almost certain to appear in your technical interview. This comprehensive guide covers 60 of the most important Java interview questions organised by topic — with clear, interview-ready answers you can study and adapt.</p>
+  </div>
+
+  <!-- Table of Contents -->
+  <div class="toc">
+    <h3>📋 Contents</h3>
+    <ol>
+      <li><a href="#s1">Core Java & OOP Concepts (Q1–Q10)</a></li>
+      <li><a href="#s2">String Handling (Q11–Q16)</a></li>
+      <li><a href="#s3">Collections Framework (Q17–Q24)</a></li>
+      <li><a href="#s4">Exception Handling (Q25–Q30)</a></li>
+      <li><a href="#s5">Multithreading & Concurrency (Q31–Q38)</a></li>
+      <li><a href="#s6">Java 8+ Features (Q39–Q46)</a></li>
+      <li><a href="#s7">Spring Boot Basics (Q47–Q53)</a></li>
+      <li><a href="#s8">Output-Based & Tricky Questions (Q54–Q60)</a></li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <h2 id="s1"><span class="section-num">S1</span> Core Java &amp; OOP Concepts</h2>
+
+  <div class="qa">
+    <div class="qa-q">Q1. What are the four pillars of Object-Oriented Programming?</div>
+    <div class="qa-a"><strong>Encapsulation:</strong> Bundling data (fields) and methods that operate on that data within a single class, while restricting direct access using access modifiers (private, protected). Fields are exposed via public getters/setters. <br><br><strong>Inheritance:</strong> A child class acquires the properties and behaviours of a parent class using the <code>extends</code> keyword, enabling code reuse and hierarchical relationships.<br><br><strong>Polymorphism:</strong> One interface, many implementations. Achieved via method overloading (compile-time / static polymorphism) and method overriding (runtime / dynamic polymorphism).<br><br><strong>Abstraction:</strong> Hiding implementation complexity and exposing only essential functionality. Implemented using abstract classes and interfaces.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q2. What is the difference between an abstract class and an interface?</div>
+    <div class="qa-a">
+      <strong>Abstract class:</strong> Can have abstract and concrete methods. Can have instance variables, constructors, and non-public members. A class can extend only one abstract class.<br><br>
+      <strong>Interface:</strong> Since Java 8, can have abstract methods, default methods, and static methods. All fields are implicitly <code>public static final</code>. A class can implement multiple interfaces.<br><br>
+      <strong>When to use:</strong> Use an abstract class when related classes share common code. Use an interface to define a contract for unrelated classes (e.g., <code>Comparable</code>, <code>Serializable</code>).
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q3. What is the difference between == and .equals() in Java?</div>
+    <div class="qa-a">
+      <code>==</code> compares <strong>references</strong> (memory addresses) for objects — checks if both variables point to the exact same object in heap memory. For primitives, it compares values.<br><br>
+      <code>.equals()</code> compares <strong>content/value</strong>. The default <code>Object.equals()</code> is the same as <code>==</code>, but classes like <code>String</code>, <code>Integer</code> override it to compare actual values.<br><br>
+      <strong>Example:</strong><br>
+      <code>String a = new String("hello");</code><br>
+      <code>String b = new String("hello");</code><br>
+      <code>a == b</code> → <code>false</code> (different objects in heap)<br>
+      <code>a.equals(b)</code> → <code>true</code> (same character content)
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q4. What is the difference between method overloading and method overriding?</div>
+    <div class="qa-a">
+      <strong>Overloading (Compile-time polymorphism):</strong> Multiple methods in the same class with the same name but different parameter lists (type, number, or order). Return type alone cannot differentiate overloaded methods.<br><br>
+      <strong>Overriding (Runtime polymorphism):</strong> A subclass provides its own implementation of a method already defined in the parent class — same name, same parameters, same return type. Requires inheritance. Use <code>@Override</code> annotation.<br><br>
+      <strong>Key rule:</strong> You cannot override static, final, or private methods.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q5. Can we have a constructor in an abstract class?</div>
+    <div class="qa-a">Yes. An abstract class can have a constructor, and it is called when a concrete subclass is instantiated via <code>super()</code>. However, you cannot create an instance of an abstract class directly using <code>new</code>. The constructor in the abstract class is used to initialise common fields shared across all subclasses.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q6. What is the difference between final, finally, and finalize?</div>
+    <div class="qa-a">
+      <code>final</code> — keyword: a final variable cannot be reassigned; a final method cannot be overridden; a final class cannot be subclassed.<br><br>
+      <code>finally</code> — block in try-catch-finally: always executes regardless of whether an exception occurs or is caught. Used for cleanup (closing DB connections, file handles).<br><br>
+      <code>finalize()</code> — method in <code>Object</code> class called by the Garbage Collector before destroying an object. Deprecated in Java 9 and removed in Java 18 — do not rely on it for resource cleanup.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q7. What is the difference between static and instance methods?</div>
+    <div class="qa-a">
+      <strong>Static methods</strong> belong to the class, not any specific instance. Called using the class name (<code>ClassName.method()</code>). Cannot access instance variables or instance methods directly. Common use: utility/helper methods, factory methods.<br><br>
+      <strong>Instance methods</strong> belong to an object. Called on an object reference. Can access both instance and static members. Most regular methods are instance methods.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q8. What is the difference between this and super keywords?</div>
+    <div class="qa-a">
+      <code>this</code> refers to the current class instance. Used to differentiate instance variables from local variables with the same name, and to call the current class's constructor via <code>this()</code>.<br><br>
+      <code>super</code> refers to the parent class. Used to call the parent class constructor via <code>super()</code> (must be the first statement in a subclass constructor), access parent class methods (<code>super.methodName()</code>), and access parent class fields.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q9. What is a static block and when is it executed?</div>
+    <div class="qa-a">A static block (also called a static initialiser) is a block of code declared with the <code>static</code> keyword inside a class. It executes <strong>once</strong> when the class is first loaded into the JVM — before any object is created or any static method is called. Static blocks are used to initialise static fields or perform one-time setup operations (e.g., loading a driver class).</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q10. What is the difference between a shallow copy and a deep copy?</div>
+    <div class="qa-a">
+      <strong>Shallow copy:</strong> Creates a new object but copies only the references of nested objects, not the nested objects themselves. Changes to nested objects in the copy affect the original.<br><br>
+      <strong>Deep copy:</strong> Creates a new object and recursively copies all nested objects. The copy is completely independent of the original. Implemented by overriding <code>clone()</code>, copy constructors, or serialisation.
+    </div>
+  </div>
+
+  <div class="ad-banner">
+    <div class="ad-label">Advertisement</div>
+    <ins class="adsbygoogle ad-slot" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8221230477" data-ad-format="auto" data-full-width-responsive="true"></ins>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <h2 id="s2"><span class="section-num">S2</span> String Handling</h2>
+
+  <div class="qa">
+    <div class="qa-q">Q11. Why is String immutable in Java?</div>
+    <div class="qa-a">String objects are immutable by design for three key reasons:<br><br>
+      <strong>1. Security:</strong> Strings are used to pass sensitive data (DB passwords, class names for loading). If they were mutable, another thread or code could modify them after validation.<br><br>
+      <strong>2. Thread safety:</strong> Immutable objects are inherently thread-safe — no synchronisation required when sharing String references across threads.<br><br>
+      <strong>3. String Pool efficiency:</strong> The JVM maintains a String pool in the heap. Multiple variables can safely reference the same literal. If Strings were mutable, changing one reference would corrupt all others pointing to the same literal.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q12. What is the String Pool (String Interning)?</div>
+    <div class="qa-a">The String Pool is a special memory area in the JVM heap (since Java 7, it moved from PermGen to the main heap) where String literals are stored. When you write <code>String s = "hello"</code>, the JVM checks if "hello" already exists in the pool. If yes, it returns the existing reference — no new object is created. If no, it creates a new object in the pool.<br><br>Using <code>new String("hello")</code> always creates a new object in the heap (outside the pool). The <code>intern()</code> method can be used to explicitly add a String to the pool.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q13. What is the difference between String, StringBuilder, and StringBuffer?</div>
+    <div class="qa-a">
+      <strong>String:</strong> Immutable. Every operation (concat, replace, etc.) creates a new object. Use for read-only strings or when few modifications are needed.<br><br>
+      <strong>StringBuilder:</strong> Mutable. Modifies the same object. <strong>Not thread-safe.</strong> Best for single-threaded string manipulation (e.g., building a string inside a loop). Faster than StringBuffer.<br><br>
+      <strong>StringBuffer:</strong> Mutable and <strong>thread-safe</strong> (all methods are synchronised). Slower than StringBuilder due to synchronisation overhead. Use only when string manipulation needs to be thread-safe.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q14. How does String.equals() differ from String.equalsIgnoreCase()?</div>
+    <div class="qa-a"><code>equals()</code> performs a case-sensitive comparison — "Hello" and "hello" are not equal. <code>equalsIgnoreCase()</code> ignores case differences — "Hello" and "hello" are considered equal. Both methods compare character content, not references.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q15. What does the intern() method do?</div>
+    <div class="qa-a"><code>intern()</code> returns a canonical representation of the String. If a String with the same value already exists in the String pool, it returns that reference. Otherwise, it adds the String to the pool and returns its reference. This allows strings created with <code>new String()</code> to participate in reference equality checks with pooled literals.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q16. How do you reverse a String in Java without using StringBuilder.reverse()?</div>
+    <div class="qa-a">
+      Convert to a char array, swap characters from both ends moving inward:<br>
+      <pre><code>public static String reverse(String s) {
+    char[] chars = s.toCharArray();
+    int left = 0, right = chars.length - 1;
+    while (left &lt; right) {
+        char temp = chars[left];
+        chars[left] = chars[right];
+        chars[right] = temp;
+        left++; right--;
+    }
+    return new String(chars);
+}</code></pre>
+      Time complexity: O(n). Space complexity: O(n) for the char array.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <h2 id="s3"><span class="section-num">S3</span> Collections Framework</h2>
+
+  <div class="qa">
+    <div class="qa-q">Q17. What is the Java Collections Framework?</div>
+    <div class="qa-a">The Java Collections Framework (JCF) is a unified architecture for storing and manipulating groups of objects. It includes interfaces (Collection, List, Set, Queue, Map), implementations (ArrayList, HashSet, HashMap, LinkedList, etc.), and algorithms (sorting, searching, shuffling) in the <code>java.util</code> package. It eliminates the need to write custom data structures for most common use cases.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q18. What is the difference between ArrayList and LinkedList?</div>
+    <div class="qa-a">
+      <strong>ArrayList:</strong> Backed by a resizable array. Random access by index is O(1). Insertion/deletion in the middle is O(n) due to element shifting. More cache-friendly (contiguous memory). Use when reads are frequent.<br><br>
+      <strong>LinkedList:</strong> Doubly-linked list. Random access is O(n). Insertion/deletion at head or tail is O(1). Implements both List and Deque. Use when frequent insertions/deletions at arbitrary positions are needed.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q19. What is the difference between HashMap and TreeMap?</div>
+    <div class="qa-a">
+      <strong>HashMap:</strong> Does not maintain insertion order. Keys can be null (one null key). O(1) average time for get/put. Backed by a hash table.<br><br>
+      <strong>TreeMap:</strong> Maintains keys in natural sorted order (or custom Comparator order). No null keys allowed. O(log n) for get/put. Backed by a Red-Black tree. Use when you need sorted key traversal.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q20. What is the difference between HashMap and HashTable?</div>
+    <div class="qa-a">
+      <strong>HashMap:</strong> Not synchronised (not thread-safe). Allows one null key and multiple null values. Faster. Introduced in Java 1.2 as part of the Collections Framework.<br><br>
+      <strong>Hashtable:</strong> Synchronised (thread-safe). No null keys or values. Slower due to overhead. Legacy class from Java 1.0. In modern code, prefer <code>ConcurrentHashMap</code> for thread-safe map operations — it is more efficient than Hashtable.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q21. What is the difference between HashSet, LinkedHashSet, and TreeSet?</div>
+    <div class="qa-a">
+      <strong>HashSet:</strong> Unordered, no duplicates, allows one null. O(1) for add/remove/contains. Best for general-purpose unique element storage.<br><br>
+      <strong>LinkedHashSet:</strong> Maintains <strong>insertion order</strong>. No duplicates. Slightly slower than HashSet. Use when order of insertion matters.<br><br>
+      <strong>TreeSet:</strong> Maintains <strong>natural sorted order</strong>. No null elements. O(log n) for operations. Use when sorted unique elements are needed.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q22. What is the difference between Iterator and ListIterator?</div>
+    <div class="qa-a">
+      <strong>Iterator:</strong> Available for all Collection types. Can only traverse forward. Supports <code>remove()</code> but not <code>add()</code> or <code>set()</code>.<br><br>
+      <strong>ListIterator:</strong> Available only for List implementations. Can traverse both forward (<code>next()</code>) and backward (<code>previous()</code>). Supports <code>add()</code>, <code>remove()</code>, and <code>set()</code> during iteration.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q23. What is ConcurrentModificationException and how do you avoid it?</div>
+    <div class="qa-a">This exception is thrown when you try to modify a collection (add, remove elements) while iterating over it using an Iterator or for-each loop. Avoidance strategies:<br>
+      1. Use <code>Iterator.remove()</code> instead of <code>collection.remove()</code> while iterating.<br>
+      2. Collect elements to remove in a separate list and remove them after the loop.<br>
+      3. Use <code>CopyOnWriteArrayList</code> or <code>ConcurrentHashMap</code> which allow concurrent modification.<br>
+      4. Use Java 8's <code>removeIf()</code> method which handles this internally.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q24. How does HashMap work internally in Java?</div>
+    <div class="qa-a">
+      HashMap uses an array of <strong>buckets</strong> (called <code>Node[] table</code>). When you call <code>put(key, value)</code>:<br>
+      1. <code>hashCode()</code> of the key is computed and compressed to a bucket index using a bitwise AND.<br>
+      2. If the bucket is empty, a new Node is placed there.<br>
+      3. If occupied (collision), Java checks equality using <code>equals()</code>. If keys are equal, the value is updated. If different, the new entry is added to a linked list (Java 7) or a balanced tree (Java 8+, when the list exceeds 8 entries — TREEIFY_THRESHOLD).<br>
+      When the load factor (default 0.75) is exceeded, the map <strong>rehashes</strong> — the table doubles in size and all entries are redistributed.
+    </div>
+  </div>
+
+  <div class="ad-banner">
+    <div class="ad-label">Advertisement</div>
+    <ins class="adsbygoogle ad-slot" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8556272397" data-ad-format="auto" data-full-width-responsive="true"></ins>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <h2 id="s4"><span class="section-num">S4</span> Exception Handling</h2>
+
+  <div class="qa">
+    <div class="qa-q">Q25. What is the difference between checked and unchecked exceptions?</div>
+    <div class="qa-a">
+      <strong>Checked exceptions:</strong> Checked at compile time. The compiler forces you to handle them with try-catch or declare them with <code>throws</code>. They represent recoverable conditions. Examples: <code>IOException</code>, <code>SQLException</code>, <code>FileNotFoundException</code>.<br><br>
+      <strong>Unchecked exceptions (RuntimeExceptions):</strong> Not checked at compile time. Represent programming bugs that should be fixed, not caught. Examples: <code>NullPointerException</code>, <code>ArrayIndexOutOfBoundsException</code>, <code>ClassCastException</code>, <code>IllegalArgumentException</code>.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q26. What is the difference between throw and throws?</div>
+    <div class="qa-a">
+      <code>throw</code> is used to explicitly throw an exception object from inside a method: <code>throw new IllegalArgumentException("Invalid input");</code><br><br>
+      <code>throws</code> is used in a method signature to declare that the method might throw certain checked exceptions, delegating handling to the caller: <code>public void readFile(String path) throws IOException {...}</code>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q27. Can we have multiple catch blocks? What is multi-catch syntax?</div>
+    <div class="qa-a">
+      Yes, a try block can have multiple catch blocks. They are evaluated top to bottom — more specific exception types must precede more general ones (otherwise a compile error occurs).<br><br>
+      Since Java 7, <strong>multi-catch</strong> allows handling multiple exceptions in one block:<br>
+      <code>catch (IOException | SQLException e) { ... }</code><br><br>
+      This reduces code duplication when the same handling logic applies to different exception types. The caught exception variable is implicitly final in multi-catch.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q28. What is the finally block? Is there a case where it does not execute?</div>
+    <div class="qa-a">The <code>finally</code> block always executes after the try-catch block — whether an exception occurred or not. Used to release resources (close streams, database connections).<br><br>
+      <strong>Cases where finally does NOT execute:</strong><br>
+      1. <code>System.exit()</code> is called — JVM terminates before finally runs.<br>
+      2. The JVM itself crashes (power failure, OutOfMemoryError killing the process).<br>
+      3. An infinite loop or deadlock in the try block.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q29. What is try-with-resources?</div>
+    <div class="qa-a">Introduced in Java 7, try-with-resources automatically closes resources that implement <code>AutoCloseable</code> (like streams, connections) after the try block ends — no explicit finally needed:<br>
+      <pre><code>try (BufferedReader br = new BufferedReader(new FileReader("file.txt"))) {
+    String line = br.readLine();
+} catch (IOException e) {
+    e.printStackTrace();
+}
+// br is automatically closed here</code></pre>
+      This eliminates resource leaks and is the recommended way to handle I/O in modern Java.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q30. What is a custom exception? How do you create one?</div>
+    <div class="qa-a">A custom exception is a user-defined exception class that extends <code>Exception</code> (for checked) or <code>RuntimeException</code> (for unchecked):<br>
+      <pre><code>public class InsufficientFundsException extends Exception {
+    private double amount;
+    public InsufficientFundsException(double amount) {
+        super("Insufficient funds: required " + amount);
+        this.amount = amount;
+    }
+    public double getAmount() { return amount; }
+}</code></pre>
+      Custom exceptions give meaningful names to domain-specific error conditions and allow callers to handle them specifically.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <h2 id="s5"><span class="section-num">S5</span> Multithreading &amp; Concurrency</h2>
+
+  <div class="qa">
+    <div class="qa-q">Q31. What are the ways to create a thread in Java?</div>
+    <div class="qa-a">
+      <strong>1. Extend Thread class:</strong> Override <code>run()</code> and call <code>start()</code>. Limitation: the class cannot extend any other class.<br><br>
+      <strong>2. Implement Runnable interface:</strong> Implement <code>run()</code>, pass to a Thread constructor. Preferred approach.<br><br>
+      <strong>3. Implement Callable interface:</strong> Like Runnable but returns a value and can throw checked exceptions. Used with <code>ExecutorService</code> and <code>Future&lt;T&gt;</code>.<br><br>
+      <strong>4. Using ExecutorService (modern approach):</strong> <code>ExecutorService executor = Executors.newFixedThreadPool(5); executor.submit(runnableTask);</code> — manages a thread pool for better resource management.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q32. What is the difference between start() and run() in Thread?</div>
+    <div class="qa-a">
+      <code>start()</code> creates a <strong>new thread</strong> and then calls <code>run()</code> in that new thread. This is the correct way to start a thread.<br><br>
+      Calling <code>run()</code> directly does NOT create a new thread — it executes <code>run()</code> in the current (calling) thread, like a normal method call. No multithreading happens.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q33. What is synchronization? What is the synchronized keyword?</div>
+    <div class="qa-a">Synchronization ensures that only one thread can access a shared resource (method or block) at a time, preventing race conditions. The <code>synchronized</code> keyword can be applied to:<br><br>
+      <strong>Instance method:</strong> Locks the current object instance.<br>
+      <strong>Static method:</strong> Locks the Class object (shared across all instances).<br>
+      <strong>Code block:</strong> <code>synchronized(lockObject) { ... }</code> — locks on a specific object, allowing finer-grained control than method-level synchronisation.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q34. What is a deadlock? How do you prevent it?</div>
+    <div class="qa-a">Deadlock occurs when two or more threads are each waiting for a lock held by the other, creating a circular dependency where no thread can proceed.<br><br>
+      <strong>Four conditions (all must hold):</strong> Mutual exclusion, hold and wait, no preemption, circular wait.<br><br>
+      <strong>Prevention strategies:</strong><br>
+      1. Always acquire locks in the same consistent order across all threads.<br>
+      2. Use <code>tryLock(timeout)</code> from <code>java.util.concurrent.locks.Lock</code>.<br>
+      3. Minimise the scope and duration of locks.<br>
+      4. Use higher-level concurrency utilities (<code>ConcurrentHashMap</code>, <code>BlockingQueue</code>) that manage locking internally.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q35. What is the volatile keyword?</div>
+    <div class="qa-a">The <code>volatile</code> keyword ensures that a variable's value is always read from and written to <strong>main memory</strong>, not from a thread's local CPU cache. This guarantees <strong>visibility</strong> — when one thread updates a volatile variable, all other threads immediately see the updated value.<br><br>
+      However, <code>volatile</code> does NOT guarantee atomicity for compound operations (like <code>i++</code>). For atomic operations, use <code>AtomicInteger</code>, <code>AtomicLong</code>, etc. from <code>java.util.concurrent.atomic</code>.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q36. What is the difference between wait(), notify(), and notifyAll()?</div>
+    <div class="qa-a">These methods are in <code>Object</code> class and must be called within a synchronised block/method:<br><br>
+      <code>wait()</code> — causes the current thread to release the lock and wait until another thread calls <code>notify()</code> or <code>notifyAll()</code> on the same object.<br><br>
+      <code>notify()</code> — wakes up one (arbitrary) thread waiting on that object's lock.<br><br>
+      <code>notifyAll()</code> — wakes up all threads waiting on that object's lock. All wake up but only one gets the lock at a time. Preferred in most cases to avoid missed signals.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q37. What is the difference between sleep() and wait()?</div>
+    <div class="qa-a">
+      <code>Thread.sleep(ms)</code> pauses the current thread for the specified duration. <strong>Does not release any locks held.</strong> Is a static method of the Thread class.<br><br>
+      <code>object.wait()</code> pauses the current thread AND <strong>releases the lock</strong> on the object. The thread waits until <code>notify()</code>/<code>notifyAll()</code> wakes it. Is an instance method of Object. Must be called inside a synchronised block.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q38. What is the Executor framework?</div>
+    <div class="qa-a">The Executor framework (<code>java.util.concurrent</code>) provides a higher-level abstraction for managing threads than creating threads manually. Key components:<br><br>
+      <code>ExecutorService</code> — manages a thread pool. Submit tasks with <code>submit()</code> or <code>execute()</code>.<br>
+      <code>Executors</code> — factory class: <code>newFixedThreadPool(n)</code>, <code>newCachedThreadPool()</code>, <code>newSingleThreadExecutor()</code>.<br>
+      <code>Future&lt;T&gt;</code> — represents the result of an asynchronous computation. Call <code>future.get()</code> to retrieve the result (blocking).<br>
+      <code>CompletableFuture</code> (Java 8+) — for non-blocking asynchronous programming with chaining.
+    </div>
+  </div>
+
+  <div class="ad-banner">
+    <div class="ad-label">Advertisement</div>
+    <ins class="adsbygoogle ad-slot" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8061448376" data-ad-format="auto" data-full-width-responsive="true"></ins>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <h2 id="s6"><span class="section-num">S6</span> Java 8+ Features</h2>
+
+  <div class="qa">
+    <div class="qa-q">Q39. What are lambda expressions? Give an example.</div>
+    <div class="qa-a">Lambda expressions are anonymous functions that implement <strong>functional interfaces</strong> (interfaces with exactly one abstract method). They enable functional programming style and make code more concise.<br><br>
+      <strong>Syntax:</strong> <code>(parameters) -&gt; expression</code> or <code>(parameters) -&gt; { statements; }</code><br><br>
+      <strong>Example — without lambda:</strong><br>
+      <code>Runnable r = new Runnable() { public void run() { System.out.println("Hello"); } };</code><br><br>
+      <strong>With lambda:</strong><br>
+      <code>Runnable r = () -&gt; System.out.println("Hello");</code><br><br>
+      <strong>With parameters:</strong><br>
+      <code>Comparator&lt;String&gt; c = (a, b) -&gt; a.compareTo(b);</code>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q40. What are functional interfaces? Name some built-in ones.</div>
+    <div class="qa-a">A functional interface has exactly one abstract method (SAM — Single Abstract Method). Annotated with <code>@FunctionalInterface</code> (optional but recommended).<br><br>
+      <strong>Built-in functional interfaces in java.util.function:</strong><br>
+      <code>Predicate&lt;T&gt;</code> — takes T, returns boolean: <code>test(T t)</code><br>
+      <code>Function&lt;T,R&gt;</code> — takes T, returns R: <code>apply(T t)</code><br>
+      <code>Consumer&lt;T&gt;</code> — takes T, returns void: <code>accept(T t)</code><br>
+      <code>Supplier&lt;T&gt;</code> — takes nothing, returns T: <code>get()</code><br>
+      <code>BiFunction&lt;T,U,R&gt;</code> — takes T and U, returns R
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q41. What is the Stream API? Explain with an example.</div>
+    <div class="qa-a">The Stream API processes sequences of elements in a functional, declarative style. Streams don't store data — they process it lazily. Operations are either <strong>intermediate</strong> (return a Stream: filter, map, sorted, distinct, limit) or <strong>terminal</strong> (return a result or side effect: collect, count, forEach, reduce, findFirst).<br><br>
+      <pre><code>List&lt;String&gt; names = Arrays.asList("Alice","Bob","Anita","Charlie");
+
+List&lt;String&gt; result = names.stream()
+    .filter(n -&gt; n.startsWith("A"))   // intermediate
+    .map(String::toUpperCase)          // intermediate
+    .sorted()                          // intermediate
+    .collect(Collectors.toList());     // terminal
+
+// result: ["ALICE", "ANITA"]</code></pre>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q42. What is the difference between map() and flatMap() in streams?</div>
+    <div class="qa-a">
+      <code>map()</code> transforms each element to another element (one-to-one mapping). Returns a Stream of the transformed values.<br><br>
+      <code>flatMap()</code> transforms each element to a stream of values and then flattens all those streams into a single stream (one-to-many mapping). Used when each element maps to multiple values.<br><br>
+      <strong>Example:</strong><br>
+      <code>List&lt;List&lt;Integer&gt;&gt; nested = Arrays.asList(Arrays.asList(1,2), Arrays.asList(3,4));</code><br>
+      <code>nested.stream().flatMap(Collection::stream).collect(...)</code> → <code>[1, 2, 3, 4]</code>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q43. What are method references in Java 8?</div>
+    <div class="qa-a">Method references are a shorthand for lambdas that simply call an existing method. Syntax: <code>ClassName::methodName</code><br><br>
+      <strong>Four types:</strong><br>
+      Static method: <code>Integer::parseInt</code> (same as <code>s -&gt; Integer.parseInt(s)</code>)<br>
+      Instance method of a specific object: <code>System.out::println</code><br>
+      Instance method of arbitrary object: <code>String::toUpperCase</code> (same as <code>s -&gt; s.toUpperCase()</code>)<br>
+      Constructor reference: <code>ArrayList::new</code> (same as <code>() -&gt; new ArrayList&lt;&gt;()</code>)
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q44. What is Optional in Java 8?</div>
+    <div class="qa-a"><code>Optional&lt;T&gt;</code> is a container that may or may not contain a non-null value. It was introduced to reduce NullPointerExceptions and make null-handling more explicit.<br><br>
+      <pre><code>Optional&lt;String&gt; opt = Optional.ofNullable(getName());
+
+// Safe retrieval
+String name = opt.orElse("Unknown");
+String upper = opt.map(String::toUpperCase).orElse("N/A");
+
+// Check presence
+if (opt.isPresent()) { ... }
+
+// Java 9+
+opt.ifPresentOrElse(
+    name -&gt; System.out.println("Hello, " + name),
+    () -&gt; System.out.println("No name found")
+);</code></pre>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q45. What are default methods in interfaces?</div>
+    <div class="qa-a">Introduced in Java 8, default methods allow interfaces to have concrete method implementations. This enables adding new methods to interfaces without breaking all existing implementations (backward compatibility).<br><br>
+      <pre><code>interface Vehicle {
+    void start();
+    default void honk() {
+        System.out.println("Beep beep!");
+    }
+}</code></pre>
+      If a class implements two interfaces that both define the same default method, the class must override the method to resolve the conflict.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q46. What is the difference between Comparable and Comparator?</div>
+    <div class="qa-a">
+      <strong>Comparable</strong> (<code>java.lang</code>): Used to define the <em>natural ordering</em> of a class. Implement <code>compareTo(T other)</code> inside the class itself. E.g., <code>String</code>, <code>Integer</code> implement Comparable.<br><br>
+      <strong>Comparator</strong> (<code>java.util</code>): External comparison logic. Implement <code>compare(T o1, T o2)</code> in a separate class or lambda. Useful when you need multiple sort orders or can't modify the class.<br><br>
+      <code>Collections.sort(list)</code> uses Comparable. <code>Collections.sort(list, comparator)</code> uses Comparator.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <h2 id="s7"><span class="section-num">S7</span> Spring Boot Basics</h2>
+
+  <div class="qa">
+    <div class="qa-q">Q47. What is Spring Boot? How is it different from Spring Framework?</div>
+    <div class="qa-a">
+      <strong>Spring Framework</strong> is a comprehensive enterprise Java framework for dependency injection, MVC, data access, security, etc. — but requires extensive XML/Java configuration.<br><br>
+      <strong>Spring Boot</strong> is an opinionated extension of Spring that eliminates most configuration boilerplate. Key features:<br>
+      <strong>Auto-configuration:</strong> Automatically configures beans based on classpath (if Spring MVC is on the classpath, a DispatcherServlet is auto-configured).<br>
+      <strong>Embedded server:</strong> Tomcat/Jetty/Undertow built-in — no WAR deployment needed.<br>
+      <strong>Starter POMs:</strong> <code>spring-boot-starter-web</code> pulls in Spring MVC, embedded Tomcat, Jackson, and validation in one dependency.<br>
+      <strong>Actuator:</strong> Production-ready monitoring endpoints (health, metrics, info) out of the box.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q48. What are the most commonly used Spring Boot annotations?</div>
+    <div class="qa-a">
+      <code>@SpringBootApplication</code> — main class annotation; combines @Configuration + @EnableAutoConfiguration + @ComponentScan<br>
+      <code>@RestController</code> — combines @Controller + @ResponseBody; every method returns JSON/XML directly<br>
+      <code>@GetMapping</code>, <code>@PostMapping</code>, <code>@PutMapping</code>, <code>@DeleteMapping</code> — HTTP method mappings<br>
+      <code>@RequestBody</code> — binds HTTP request body to a method parameter<br>
+      <code>@PathVariable</code> — extracts values from URI path: <code>/users/{id}</code><br>
+      <code>@RequestParam</code> — extracts query parameters: <code>/users?page=1</code><br>
+      <code>@Autowired</code> — injects dependencies automatically<br>
+      <code>@Service</code>, <code>@Repository</code>, <code>@Component</code> — stereotype annotations for auto-detection<br>
+      <code>@Entity</code>, <code>@Table</code>, <code>@Id</code>, <code>@GeneratedValue</code> — JPA entity mapping
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q49. What is Dependency Injection (DI) and Inversion of Control (IoC)?</div>
+    <div class="qa-a">
+      <strong>Inversion of Control (IoC):</strong> The control of object creation and lifecycle is inverted from the application code to the Spring container (IoC container). Instead of classes creating their own dependencies with <code>new</code>, the container creates and manages them.<br><br>
+      <strong>Dependency Injection (DI):</strong> The mechanism IoC uses to provide dependencies to an object. Spring supports three types:<br>
+      1. <strong>Constructor injection</strong> (recommended): Dependencies passed via constructor — immutable, testable.<br>
+      2. <strong>Setter injection</strong>: Dependencies set via setter methods — flexible for optional dependencies.<br>
+      3. <strong>Field injection</strong>: Using <code>@Autowired</code> directly on a field — convenient but harder to test.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q50. What is the difference between @Component, @Service, and @Repository?</div>
+    <div class="qa-a">All three are <strong>stereotype annotations</strong> that mark a class as a Spring-managed bean (component scanning picks them up automatically). Functionally they are identical — Spring treats them the same way for bean creation.<br><br>
+      The difference is <strong>semantic and tooling-related</strong>:<br>
+      <code>@Component</code> — generic Spring component<br>
+      <code>@Service</code> — marks business logic layer classes (service layer)<br>
+      <code>@Repository</code> — marks data access layer classes; additionally enables automatic exception translation (JPA exceptions → Spring DataAccessException)
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q51. What are Spring Bean Scopes?</div>
+    <div class="qa-a">
+      Bean scope defines how many instances of a bean the Spring container creates and manages:<br><br>
+      <code>singleton</code> (default) — one instance per Spring container. All requests for the bean return the same instance.<br>
+      <code>prototype</code> — new instance created every time the bean is requested.<br>
+      <code>request</code> — (web) one instance per HTTP request.<br>
+      <code>session</code> — (web) one instance per HTTP session.<br>
+      <code>application</code> — (web) one instance per ServletContext.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q52. How do you handle exceptions globally in Spring Boot?</div>
+    <div class="qa-a">Using <code>@ControllerAdvice</code> (or <code>@RestControllerAdvice</code>) with <code>@ExceptionHandler</code>:<br>
+      <pre><code>@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleNotFound(
+            ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleGeneral(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(new ErrorResponse("Something went wrong"));
+    }
+}</code></pre>
+      This centralises exception handling across all controllers.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q53. What is the difference between @RequestBody and @RequestParam?</div>
+    <div class="qa-a">
+      <code>@RequestBody</code> — binds the entire HTTP request body to a Java object. Used for POST/PUT requests where the client sends JSON/XML. Spring uses Jackson to deserialise the body automatically.<br><br>
+      <code>@RequestParam</code> — extracts a single query parameter from the URL. Example: for a GET request to <code>/search?keyword=java&page=1</code>, use <code>@RequestParam String keyword, @RequestParam int page</code>.<br><br>
+      <code>@PathVariable</code> extracts values from the URL path itself: <code>/users/{id}</code> → <code>@PathVariable Long id</code>.
+    </div>
+  </div>
+
+  <div class="ad-banner">
+    <div class="ad-label">Advertisement</div>
+    <ins class="adsbygoogle ad-slot" data-ad-client="ca-pub-2328429365429845" data-ad-slot="2429847741" data-ad-format="auto" data-full-width-responsive="true"></ins>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <h2 id="s8"><span class="section-num">S8</span> Output-Based &amp; Tricky Questions</h2>
+  <p>These questions are extremely common at TCS, Infosys, Wipro, and Cognizant technical interviews. The interviewer shows code and asks "what is the output?"</p>
+
+  <div class="qa">
+    <div class="qa-q">Q54. What is the output of the following code?
+String s1 = "Java"; String s2 = "Java"; System.out.println(s1 == s2);</div>
+    <div class="qa-a"><strong>Output: true</strong><br><br>Both <code>s1</code> and <code>s2</code> are string literals, so they both point to the same object in the String Pool. <code>==</code> compares references — they are the same reference, so the result is <code>true</code>. If either were <code>new String("Java")</code>, the result would be <code>false</code>.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q55. What is the output?
+Integer a = 127; Integer b = 127; System.out.println(a == b);
+Integer c = 128; Integer d = 128; System.out.println(c == d);</div>
+    <div class="qa-a"><strong>Output: true, then false</strong><br><br>Java caches Integer objects in the range <strong>-128 to 127</strong> (Integer Cache). So <code>a</code> and <code>b</code> both reference the same cached Integer(127) object → <code>true</code>.<br>128 is outside the cache range, so <code>c</code> and <code>d</code> are two different Integer objects in the heap → <code>false</code>. Always use <code>.equals()</code> to compare Integer values.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q56. What is the output?
+public static void main(String[] args) {
+  try { System.out.println("try"); return; }
+  finally { System.out.println("finally"); }
+}</div>
+    <div class="qa-a"><strong>Output: try, then finally</strong><br><br>Even though there is a <code>return</code> statement in the try block, the <code>finally</code> block executes before the method actually returns. The <code>return</code> in the try block is deferred until the finally block completes. Output: <code>try</code> then <code>finally</code>.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q57. What is the output?
+int i = 5;
+System.out.println(i++);
+System.out.println(++i);</div>
+    <div class="qa-a"><strong>Output: 5, then 7</strong><br><br><code>i++</code> (post-increment): returns the current value (5), then increments i to 6.<br><code>++i</code> (pre-increment): increments i to 7 first, then returns 7. So output is 5, then 7.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q58. What is the output? 
+class A { static { System.out.println("Static A"); } { System.out.println("Instance A"); } A() { System.out.println("Constructor A"); } }
+new A(); new A();</div>
+    <div class="qa-a"><strong>Output:</strong><br>Static A (once, when class is loaded)<br>Instance A (for first new A())<br>Constructor A<br>Instance A (for second new A())<br>Constructor A<br><br>Order of execution: static blocks run once when the class is first loaded. For each new object: instance initialiser block runs before the constructor body.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q59. What is the output?
+List&lt;Integer&gt; list = new ArrayList&lt;&gt;(Arrays.asList(1,2,3));
+for (Integer i : list) {
+    if (i == 2) list.remove(i);
+}</div>
+    <div class="qa-a"><strong>Output: ConcurrentModificationException</strong><br><br>Modifying a collection while iterating over it with a for-each loop (which uses an Iterator internally) triggers a <code>ConcurrentModificationException</code>. Fix: use <code>Iterator.remove()</code>, <code>list.removeIf(i -&gt; i == 2)</code>, or collect elements to remove separately and remove after the loop.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q">Q60. What will happen when you call an overridden method through a parent class reference?</div>
+    <div class="qa-a"><strong>Runtime polymorphism</strong> — the overridden method of the <em>actual object type</em> (not the reference type) is called. Example:<br>
+      <pre><code>class Animal { void sound() { System.out.println("Animal"); } }
+class Dog extends Animal { void sound() { System.out.println("Dog"); } }
+
+Animal a = new Dog();
+a.sound(); // Output: "Dog"</code></pre>
+      Even though the reference type is <code>Animal</code>, the JVM calls the <code>Dog</code> version of <code>sound()</code> because the actual object is a <code>Dog</code>. This is the essence of runtime polymorphism (dynamic dispatch).
+    </div>
+  </div>
+
+  <div class="tip">
+    <p>💡 <strong>Final Preparation Tip:</strong> For each question in this guide, close the page and try writing the answer from memory. For code questions, write the code on paper (not an IDE). Interviewers at TCS, Infosys, and Wipro often ask you to write code on a whiteboard or Google Docs without autocomplete. The ability to write correct syntax from memory demonstrates genuine understanding.</p>
+  </div>
+
+  <p>Java interviews in India are highly structured and predictable — the same 50–60 questions rotate across companies with slight variations. Master these thoroughly, understand the underlying concepts (not just the answers), and you will be well-prepared for any Java technical round.</p>
+
+  <div class="ad-banner">
+    <div class="ad-label">Advertisement</div>
+    <ins class="adsbygoogle ad-slot" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8556272397" data-ad-format="auto" data-full-width-responsive="true"></ins>
+  </div>
+</article>
+
+<aside class="sidebar">
+  <div class="toc-sticky widget">
+    <div class="widget-header">📋 Jump To Section</div>
+    <div class="widget-body">
+      <a href="#s1">S1 · Core Java & OOP (Q1–Q10)</a>
+      <a href="#s2">S2 · String Handling (Q11–Q16)</a>
+      <a href="#s3">S3 · Collections (Q17–Q24)</a>
+      <a href="#s4">S4 · Exception Handling (Q25–Q30)</a>
+      <a href="#s5">S5 · Multithreading (Q31–Q38)</a>
+      <a href="#s6">S6 · Java 8+ Features (Q39–Q46)</a>
+      <a href="#s7">S7 · Spring Boot (Q47–Q53)</a>
+      <a href="#s8">S8 · Output Questions (Q54–Q60)</a>
+    </div>
+  </div>
+  <div class="widget">
+    <div class="widget-header">📚 More Articles</div>
+    <div class="widget-body">
+      <a href="blog-hr-interview-questions.html" class="sa"><div class="sa-icon">🤝</div><div><div class="sa-title">Top 50 HR Interview Questions</div><div class="sa-sub">⏱ 12 min</div></div></a>
+      <a href="blog-crack-technical-interview.html" class="sa"><div class="sa-icon">💻</div><div><div class="sa-title">Crack Technical Interviews</div><div class="sa-sub">⏱ 10 min</div></div></a>
+      <a href="blog-fresher-resume-tips.html" class="sa"><div class="sa-icon">📄</div><div><div class="sa-title">Fresher Resume Guide 2026</div><div class="sa-sub">⏱ 8 min</div></div></a>
+      <a href="blog-walk-in-interview-tips.html" class="sa"><div class="sa-icon">🚶</div><div><div class="sa-title">Walk-in Interview Tips</div><div class="sa-sub">⏱ 7 min</div></div></a>
+      <a href="blog-aptitude-test-tips.html" class="sa"><div class="sa-icon">🧮</div><div><div class="sa-title">Clear Aptitude Tests</div><div class="sa-sub">⏱ 9 min</div></div></a>
+    </div>
+  </div>
+  <div class="widget">
+    <div class="widget-header">🔔 Stay Updated</div>
+    <div class="widget-body">
+      <p class="sidebar-promo">Get the latest interview drives and career tips on WhatsApp.</p>
+      <a href="https://wa.me/919500206518" target="_blank" class="whatsapp-link">💬 Join on WhatsApp</a>
+    </div>
+  </div>
+  <div class="ad-banner">
+    <div class="ad-label">Advertisement</div>
+    <ins class="adsbygoogle ad-slot" data-ad-client="ca-pub-2328429365429845" data-ad-slot="2429847741" data-ad-format="auto" data-full-width-responsive="true"></ins>
+  </div>
+</aside>
+</div>
+
+<footer><div class="fc">© 2025 InterviewEdge · <a href="index.html">Home</a> · <a href="blog.html">Blog</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="disclaimer.html">Disclaimer</a></div></footer>
+<a href="https://wa.me/919500206518" class="wa-float" target="_blank"><svg width="25" height="25" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+</body></html>

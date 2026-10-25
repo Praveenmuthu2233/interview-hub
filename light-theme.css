@@ -1,0 +1,225 @@
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap");
+
+:root {
+  --bg: #f8fafc !important;
+  --bg2: #f1f5f9 !important;
+  --surface: #ffffff !important;
+  --card: #ffffff !important;
+  --card-hover: #f8fafc !important;
+  --border: #e2e8f0 !important;
+  --border-hover: #fbbf24 !important;
+  --accent: #b45309 !important;
+  --accent-dim: #fff7ed !important;
+  --accent2: #1d4ed8 !important;
+  --accent2-dim: #eff6ff !important;
+  --green: #15803d !important;
+  --red: #b91c1c !important;
+  --text: #1e293b !important;
+  --text2: #475569 !important;
+  --text3: #64748b !important;
+  --muted: #64748b !important;
+  --tag-bg: #eff6ff !important;
+  --tag-text: #1e40af !important;
+  --font-sans: "Satoshi", "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, monospace;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --shadow-card: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+html {
+  color-scheme: light;
+}
+
+body,
+body *:not(code):not(pre) {
+  font-family: var(--font-sans) !important;
+}
+
+body {
+  background-color: var(--bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+}
+
+body::before,
+.blob {
+  display: none !important;
+}
+
+header {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-color: var(--border) !important;
+}
+
+footer {
+  background: var(--bg2) !important;
+  border-color: var(--border) !important;
+}
+
+.card,
+.widget,
+.sidebar-widget,
+.sidebar-widget,
+.sidebar-article,
+.article-card,
+.featured-card,
+.contact-card,
+.form-card,
+.info-card,
+.section,
+.team-card,
+.qa,
+.sidebar,
+.table-card,
+.stat-card,
+.auth-box {
+  border-color: var(--border) !important;
+}
+
+.card,
+.widget,
+.sidebar-widget,
+.article-card,
+.contact-card,
+.form-card,
+.info-card,
+.section,
+.team-card,
+.qa,
+.table-card,
+.stat-card,
+.auth-box {
+  background-color: var(--card) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+.card:hover,
+.article-card:hover,
+.featured-card:hover {
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08) !important;
+}
+
+.detail-hero,
+.intro,
+.tip,
+.info,
+.warn,
+.apply-box {
+  background-image: none !important;
+  background-color: #f8fafc !important;
+}
+
+.tag-item,
+.entry-count,
+.company-count,
+.co-count {
+  background: #eff6ff !important;
+  color: #1e40af !important;
+}
+
+.search-wrap,
+.search-bar,
+.table-search,
+.form-control,
+.form-group input,
+.form-group textarea,
+.form-group select,
+.auth-box input,
+.tags-input-wrap {
+  background-color: #ffffff !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+input,
+textarea,
+select,
+button {
+  color-scheme: light;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid rgba(29, 78, 216, 0.45);
+  outline-offset: 2px;
+}
+
+thead,
+.widget-header,
+.widget-hd,
+.form-card-header,
+.table-header {
+  background-color: #f8fafc !important;
+}
+
+tr:hover td {
+  background-color: #f8fafc !important;
+}
+
+.ticker-label {
+  background: #334155 !important;
+  color: #ffffff !important;
+}
+
+.ticker-track span {
+  color: #1e293b !important;
+}
+
+.pill,
+.pg-btn,
+.btn-secondary,
+.btn-share {
+  background-color: #ffffff !important;
+  color: #475569 !important;
+}
+
+.pill.active,
+.pg-btn.active,
+.topic-chip:hover {
+  background: var(--accent) !important;
+  color: #ffffff !important;
+}
+
+.btn-primary,
+.btn-admin,
+.admin-link,
+.card-link,
+.btn-send,
+.btn-apply,
+.back-home,
+.contact-cta,
+.featured-label {
+  color: #ffffff !important;
+}
+
+.ad-banner {
+  width: 100%;
+  max-width: 100%;
+  min-height: 90px;
+}
+
+.adsbygoogle {
+  display: block;
+  max-width: 100%;
+}
+
+pre,
+code {
+  font-family: var(--font-mono) !important;
+}
+
+@media (max-width: 700px) {
+  body {
+    overflow-x: hidden;
+  }
+}

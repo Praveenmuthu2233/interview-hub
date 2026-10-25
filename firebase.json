@@ -1,0 +1,45 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "**/package*.json",
+      "server.js",
+      "database.js",
+      "admin.html",
+      "Dockerfile",
+      ".dockerignore",
+      ".gcloudignore",
+      "README.md",
+      "sql/**",
+      "scripts/**",
+      "test/**",
+      ".vscode/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "interviewedge-api",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/admin.html",
+        "run": {
+          "serviceId": "interviewedge-api",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/admin",
+        "run": {
+          "serviceId": "interviewedge-api",
+          "region": "us-central1"
+        }
+      }
+    ]
+  }
+}

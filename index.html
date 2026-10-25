@@ -1,129 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
+<link rel="stylesheet" href="light-theme.css"/>
+<link rel="stylesheet" href="index.css"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>InterviewEdge – Latest Interview Drives & Jobs India 2026</title>
+<meta name="description" content="Find latest interview drives, walk-in jobs, fresher openings, and off-campus hiring across India. Updated daily with verified listings from TCS, Infosys, Wipro and more."/>
+<meta name="keywords" content="latest interview drives India, walk-in jobs India, fresher jobs 2026, off campus drives India, TCS interview drive, Infosys hiring freshers, Wipro walk-in drive, IT jobs Chennai 2026"/>
+<meta name="author" content="InterviewEdge"/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://interviewhub360.netlify.app/"/>
+<meta property="og:title" content="InterviewEdge – Latest Interview Drives & Jobs India"/>
+<meta property="og:description" content="Daily updated job interviews, walk-ins and fresher hiring alerts across India."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://interviewhub360.netlify.app/"/>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"InterviewEdge","url":"https://interviewhub360.netlify.app/"}</script>
 
-<!-- ✅ SEO Title -->
-<title>InterviewEdge – Latest Interview Updates</title>
-<link rel="stylesheet" href="style.css">
-<!-- ✅ SEO Meta -->
-<meta name="description" content="Find latest interview drives, walk-in jobs, fresher openings, and off-campus hiring across India. Updated daily with verified listings.">
-<meta name="keywords" content="
-latest interview drives India,
-walk-in jobs India,
-fresher jobs 2026,
-off campus drives India,
-software jobs India,
-
-interview drives Tamil Nadu,
-jobs in Chennai for freshers,
-walk-in interview Chennai today,
-IT jobs Chennai 2026,
-
-jobs in Bangalore for freshers,
-walk-in interview Bangalore today,
-software jobs Bangalore freshers,
-
-jobs in Hyderabad for freshers,
-walk-in interview Hyderabad today,
-IT jobs Hyderabad 2026,
-
-jobs in Coimbatore freshers,
-walk-in interview Coimbatore,
-jobs in Madurai freshers,
-jobs in Trichy freshers,
-
-TCS interview drive,
-Infosys hiring freshers,
-Wipro walk-in drive,
-HCL off campus drive,
-Accenture jobs India,
-
-latest IT jobs India,
-engineering jobs freshers India,
-BPO walk-in jobs India,
-startup jobs India
-">
-<meta name="author" content="InterviewEdge">
-<meta name="robots" content="index, follow">
-
-<!-- ✅ Canonical -->
-<link rel="canonical" href="https://interviewhub360.netlify.app/">
-
-<!-- ✅ Open Graph -->
-<meta property="og:title" content="Latest Interview Drives & Jobs – InterviewEdge">
-<meta property="og:description" content="Daily updated job interviews, walk-ins and fresher hiring alerts across India.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://interviewhub360.netlify.app/">
-<meta property="og:image" content="https://via.placeholder.com/1200x630.png?text=InterviewEdge">
-
-<!-- ✅ Twitter -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Latest Interview Jobs – InterviewEdge">
-<meta name="twitter:description" content="Explore latest job openings, walk-ins and fresher interviews in India.">
-
-<!-- ✅ Favicon -->
-<link rel="icon" href="favicon.ico">
-
-<!-- ✅ Fonts (ONLY ONCE) -->
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-
-<!-- ✅ Structured Data -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "InterviewEdge",
-  "url": "https://interviewhub360.netlify.app/"
-}
-</script>
-
-<!-- ✅ AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2328429365429845" crossorigin="anonymous"></script>
-
-<!-- ✅ Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
-
-<style>
-/* your CSS here (no change needed) */
-</style>
-
+<script src="ads.js" defer></script>
+<script src="index.js" defer></script>
 </head>
 <body>
 
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<!-- ── HEADER ─────────────────────────────────────────── -->
 <header>
   <div class="header-inner">
-    <a href="index.html" class="logo">Interview<span>Edge</span></a>
-    <nav class="nav-menu">
+    <a href="index.html" class="logo">Interview<em>Edge</em></a>
+    <button class="nav-toggle" id="navToggle" type="button" aria-controls="mainNav" aria-expanded="false" aria-label="Open navigation">Menu</button>
+    <nav class="nav" id="mainNav">
+      <a href="index.html" class="active">Home</a>
+      <a href="blog.html">Blog</a>
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
       <a href="privacy.html">Privacy</a>
-      <a href="terms.html">Terms</a>
       <a href="disclaimer.html">Disclaimer</a>
     </nav>
-    <div class="header-right">
-      <div class="search-bar">
+    <div class="header-actions">
+      <div class="search-wrap">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="searchInput" placeholder="Search company, role…"/>
+        <input type="text" id="searchInput" placeholder="Search company, role…" aria-label="Search jobs by company, role, skills, or description"/>
       </div>
-      <a href="admin.html" class="admin-link">⚙ Admin</a>
+      <a href="admin.php" class="btn-admin">⚙ Admin</a>
     </div>
   </div>
 </header>
 
-<div class="ticker-wrap">
-  <div class="ticker-label">🔴 Live</div>
+<!-- ── TICKER ─────────────────────────────────────────── -->
+<div class="ticker">
+  <div class="ticker-label">🔴 LIVE</div>
   <div class="ticker-track" id="tickerTrack"></div>
 </div>
 
-<div class="page-wrap">
+<!-- ── HERO ───────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Updated Daily</div>
+    <h1>India's #1 Source for<br/><em>Interview Drives</em></h1>
+    <p class="hero-desc">Verified walk-in drives, online tests, and fresher hiring from TCS, Infosys, Wipro, HCL, Accenture and hundreds more — curated every single day.</p>
+    <div class="hero-ctas">
+      <a href="#listings" class="btn-primary">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Browse Listings
+      </a>
+      <a href="blog.html" class="btn-secondary">
+        📝 Interview Tips
+      </a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat">
+      <div class="hstat-val" id="statTotal">0</div>
+      <div class="hstat-label">Total Listings</div>
+    </div>
+    <div class="hstat blue">
+      <div class="hstat-val" id="statOnline">0</div>
+      <div class="hstat-label">Online Drives</div>
+    </div>
+    <div class="hstat green">
+      <div class="hstat-val" id="statWalkin">0</div>
+      <div class="hstat-label">Walk-ins</div>
+    </div>
+    <div class="hstat red">
+      <div class="hstat-val" id="statToday">0</div>
+      <div class="hstat-label">Added Today</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAIN ────────────────────────────────────────────── -->
+<div class="page-wrap" id="listings">
   <main>
     <div class="ad-banner">
       <div class="ad-label">Advertisement</div>
-      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8556272397" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8556272397" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
+
     <div class="section-header">
       <div class="section-title">Latest Interviews</div>
       <div class="filter-pills" id="filterPills">
@@ -133,60 +108,124 @@ startup jobs India
         <div class="pill" data-filter="walkin">🚶 Walk-in</div>
       </div>
     </div>
+
     <div class="cards-grid" id="cardsGrid">
-      <div class="loading-state"><div class="loading-spinner"></div><p>Loading listings…</p></div>
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading listings…</p>
+      </div>
     </div>
+
     <div class="pagination" id="pagination"></div>
-    <div class="ad-banner" style="margin-top:2rem;">
+
+    <div class="ad-banner ad-banner-spaced">
       <div class="ad-label">Advertisement</div>
-      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8221230477" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8221230477" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    </div>
+
+    <!-- Blog Strip -->
+    <div class="blog-strip">
+      <div class="section-header">
+        <div class="section-title">📝 Interview Tips &amp; Guides</div>
+        <a href="blog.html" class="blog-all-link">View All →</a>
+      </div>
+      <div class="blog-cards">
+        <a href="blog-hr-interview-questions.html" class="blog-card">
+          <span class="blog-tag">HR Interview</span>
+          <div class="blog-title">Top 50 HR Interview Questions &amp; Best Answers (2026)</div>
+          <div class="blog-meta">📅 May 2026 · ⏱ 12 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+        <a href="blog-crack-technical-interview.html" class="blog-card">
+          <span class="blog-tag">Technical</span>
+          <div class="blog-title">How to Crack Technical Interviews at TCS, Infosys &amp; Wipro</div>
+          <div class="blog-meta">📅 Apr 2026 · ⏱ 10 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+        <a href="blog-java-interview-questions.html" class="blog-card">
+          <span class="blog-tag">Java</span>
+          <div class="blog-title">Top 60 Java Interview Questions &amp; Answers (2026)</div>
+          <div class="blog-meta">📅 Mar 2026 · ⏱ 14 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+        <a href="blog-fresher-resume-tips.html" class="blog-card">
+          <span class="blog-tag">Resume</span>
+          <div class="blog-title">How to Write a Fresher Resume That Gets Shortlisted</div>
+          <div class="blog-meta">📅 Apr 2026 · ⏱ 8 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+        <a href="blog-walk-in-interview-tips.html" class="blog-card">
+          <span class="blog-tag">Walk-in Prep</span>
+          <div class="blog-title">Walk-In Interview Tips: Complete Preparation Checklist</div>
+          <div class="blog-meta">📅 Mar 2026 · ⏱ 7 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+        <a href="blog-aptitude-test-tips.html" class="blog-card">
+          <span class="blog-tag">Aptitude</span>
+          <div class="blog-title">How to Clear Aptitude Tests for IT Companies</div>
+          <div class="blog-meta">📅 Feb 2026 · ⏱ 9 min read</div>
+          <div class="blog-arrow">Read Guide →</div>
+        </a>
+      </div>
     </div>
   </main>
+
+  <!-- ── SIDEBAR ──────────────────────────────────────── -->
   <aside class="sidebar">
     <div class="ad-banner">
       <div class="ad-label">Advertisement</div>
-      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8061448376" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8061448376" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
-    <div class="sidebar-widget">
-      <div class="widget-header">📊 Quick Stats</div>
-      <div class="widget-body">
-        <div class="stat-row"><span>Total Listings</span><span class="stat-val" id="statTotal">–</span></div>
-        <div class="stat-row"><span>🌐 Online</span><span class="stat-val" id="statOnline">–</span></div>
-        <div class="stat-row"><span>🏢 Offline</span><span class="stat-val" id="statOffline">–</span></div>
-        <div class="stat-row"><span>🚶 Walk-in</span><span class="stat-val" id="statWalkin">–</span></div>
-        <div class="stat-row"><span>Added Today</span><span class="stat-val" id="statToday">–</span></div>
+
+    <div class="widget">
+      <div class="widget-hd">📊 Quick Stats</div>
+      <div class="widget-bd">
+        <div class="stat-row"><span>Total Listings</span><span class="stat-val" id="sw-total">–</span></div>
+        <div class="stat-row"><span>🌐 Online</span><span class="stat-val" id="sw-online">–</span></div>
+        <div class="stat-row"><span>🏢 Offline</span><span class="stat-val" id="sw-offline">–</span></div>
+        <div class="stat-row"><span>🚶 Walk-in</span><span class="stat-val" id="sw-walkin">–</span></div>
+        <div class="stat-row"><span>Added Today</span><span class="stat-val" id="sw-today">–</span></div>
       </div>
     </div>
-    <div class="sidebar-widget">
-      <div class="widget-header">🏢 Top Companies</div>
-      <div class="widget-body"><div id="companyList"></div></div>
+
+    <div class="widget">
+      <div class="widget-hd">🏢 Top Companies</div>
+      <div class="widget-bd" id="companyList"></div>
     </div>
+
+    <div class="widget">
+      <div class="widget-hd">💡 Quick Tip</div>
+      <div class="widget-bd">
+        <p class="quick-tip">✅ Apply within 24 hours of a listing — competition grows fast.</p>
+        <p class="quick-tip">✅ Always verify details on the official company website.</p>
+        <p class="quick-tip">✅ Carry 3–4 resume copies to every walk-in interview.</p>
+      </div>
+    </div>
+
     <div class="ad-banner">
       <div class="ad-label">Advertisement</div>
-      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2328429365429845" data-ad-slot="2429847741" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="2429847741" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
   </aside>
 </div>
 
+<!-- ── FOOTER ─────────────────────────────────────────── -->
 <footer>
   <div class="footer-inner">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="index.html" class="logo">Interview<span>Edge</span></a>
+        <a href="index.html" class="logo">Interview<em>Edge</em></a>
         <p class="footer-desc">Your go-to source for the latest interview drives, walk-ins, and job openings. Updated daily with verified listings from top companies across India.</p>
-        <a class="contact-item" href="https://wa.me/919500206518" target="_blank">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        <a class="contact-link" href="https://wa.me/919500206518" target="_blank">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           +91 9500206518
         </a>
-        <a class="contact-item" href="mailto:praveenmuthu9500@gmail.com">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+        <a class="contact-link" href="mailto:praveenmuthu9500@gmail.com">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
           praveenmuthu9500@gmail.com
         </a>
-        <span class="contact-item">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        <span class="contact-link contact-static">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
           Chennai, Tamil Nadu, India
         </span>
       </div>
@@ -194,17 +233,18 @@ startup jobs India
         <h4>Quick Links</h4>
         <div class="footer-links">
           <a href="index.html">Home</a>
+          <a href="blog.html">Blog &amp; Guides</a>
           <a href="about.html">About Us</a>
           <a href="contact.html">Contact Us</a>
-          <a href="admin.html">Admin Panel</a>
+          <a href="admin.php">Admin Panel</a>
         </div>
       </div>
       <div class="footer-col">
         <h4>Categories</h4>
         <div class="footer-links">
-          <a href="#" onclick="setFilter('online');return false;">Online Interviews</a>
-          <a href="#" onclick="setFilter('offline');return false;">Offline Drives</a>
-          <a href="#" onclick="setFilter('walkin');return false;">Walk-in Drives</a>
+          <a href="#listings" class="filter-link" data-filter="online">Online Drives</a>
+          <a href="#listings" class="filter-link" data-filter="offline">Offline Drives</a>
+          <a href="#listings" class="filter-link" data-filter="walkin">Walk-in Drives</a>
         </div>
       </div>
       <div class="footer-col">
@@ -223,166 +263,10 @@ startup jobs India
   </div>
 </footer>
 
+<!-- WA Float -->
 <a href="https://wa.me/919500206518" class="wa-float" target="_blank" title="Chat on WhatsApp">
-  <svg width="25" height="25" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
 
-<script>
-// ── Firebase init ──────────────────────────────────────────────
-firebase.initializeApp(window.FIREBASE_CONFIG);
-const db = firebase.firestore();
-const COL = 'interviews'; // Firestore collection name
-
-// ── State ──────────────────────────────────────────────────────
-const PER_PAGE = 8;
-let allData = [];        // full cache from Firestore
-let currentFilter = 'all';
-let searchQuery = '';
-let currentPage = 1;
-
-// ── Helpers ────────────────────────────────────────────────────
-function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
-function fd(s){
-  if(!s) return '';
-
-  // Firestore Timestamp support
-  if (typeof s === 'object' && s.seconds) {
-    return new Date(s.seconds * 1000).toLocaleDateString('en-IN',{
-      day:'numeric',month:'short',year:'numeric'
-    });
-  }
-
-  // String date support
-  return new Date(s).toLocaleDateString('en-IN',{
-    day:'numeric',month:'short',year:'numeric'
-  });
-}
-function tl(t){return t==='walkin'?'Walk-in':t.charAt(0).toUpperCase()+t.slice(1);}
-
-// ── Load data from Firestore (real-time listener) ──────────────
-function loadData() {
-  db.collection(COL)
-    .orderBy('createdAt', 'desc')
-    .onSnapshot(snap => {
-      allData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      renderCards();
-      renderStats();
-      renderTicker();
-    }, err => {
-      document.getElementById('cardsGrid').innerHTML =
-        '<div class="empty-state">⚠️ Failed to load listings. Please try again later.</div>';
-      console.error('Firestore error:', err);
-    });
-}
-
-// ── Filtering ──────────────────────────────────────────────────
-function getFiltered() {
-  return allData.filter(d => {
-    const mf = currentFilter === 'all' || d.type === currentFilter;
-    const q = searchQuery.toLowerCase();
-    const ms = !q ||
-      (d.company||'').toLowerCase().includes(q) ||
-      (d.role||'').toLowerCase().includes(q) ||
-      (d.skills||[]).join(' ').toLowerCase().includes(q) ||
-      (d.description||'').toLowerCase().includes(q);
-    return mf && ms;
-  });
-}
-
-// ── Render cards ───────────────────────────────────────────────
-function renderCards() {
-  const filtered = getFiltered();
-  const grid = document.getElementById('cardsGrid');
-  const total = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  if (currentPage > total) currentPage = 1;
-  const start = (currentPage - 1) * PER_PAGE;
-  const items = filtered.slice(start, start + PER_PAGE);
-  if (!items.length) {
-    grid.innerHTML = '<div class="empty-state"><div style="font-size:2.5rem;margin-bottom:.5rem">🔍</div><p>No interviews found.</p></div>';
-    document.getElementById('pagination').innerHTML = '';
-    return;
-  }
-  grid.innerHTML = items.map((d, i) => `
-    <div class="card" style="animation-delay:${i*.04}s" onclick="location.href='detail.html?id=${d.id}'">
-      <div class="card-meta">
-        <span class="badge badge-company">${esc(d.company)}</span>
-        <span class="badge badge-type-${d.type}">${tl(d.type)}</span>
-        <span class="card-date">${fd(d.date)}</span>
-      </div>
-      <div class="card-title">${esc(d.role)}</div>
-      <div class="card-desc">${esc(d.description||'No description available.')}</div>
-      <div class="card-footer">
-        <div class="card-tags">${(d.skills||[]).slice(0,3).map(s=>`<span class="tag">${esc(s)}</span>`).join('')}</div>
-        <a class="card-link" href="detail.html?id=${d.id}" onclick="event.stopPropagation()">View & Apply →</a>
-      </div>
-    </div>`).join('');
-  renderPg(total, filtered.length);
-}
-
-function renderPg(total, count) {
-  const pg = document.getElementById('pagination');
-  if (total <= 1) { pg.innerHTML = `<span class="pg-info">${count} listing${count!==1?'s':''}</span>`; return; }
-  let h = `<span class="pg-info">${count} results</span>`;
-  h += `<button class="pg-btn" onclick="goPg(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Prev</button>`;
-  for (let i=1; i<=total; i++) {
-    if (total>7 && i>2 && i<total-1 && Math.abs(i-currentPage)>1) { if(i===3||i===total-2)h+=`<span class="pg-info">…</span>`; continue; }
-    h += `<button class="pg-btn${i===currentPage?' active':''}" onclick="goPg(${i})">${i}</button>`;
-  }
-  h += `<button class="pg-btn" onclick="goPg(${currentPage+1})" ${currentPage===total?'disabled':''}>Next ›</button>`;
-  pg.innerHTML = h;
-}
-
-function goPg(p) {
-  const t = Math.ceil(getFiltered().length / PER_PAGE);
-  if (p < 1 || p > t) return;
-  currentPage = p; renderCards(); window.scrollTo({top:280,behavior:'smooth'});
-}
-
-// ── Stats & sidebar ────────────────────────────────────────────
-function renderStats() {
-  const data = allData;
-  const today = new Date().toISOString().slice(0,10);
-  document.getElementById('statTotal').textContent  = data.length;
-  document.getElementById('statOnline').textContent  = data.filter(d=>d.type==='online').length;
-  document.getElementById('statOffline').textContent = data.filter(d=>d.type==='offline').length;
-  document.getElementById('statWalkin').textContent  = data.filter(d=>d.type==='walkin').length;
-  document.getElementById('statToday').textContent   = data.filter(d=>d.date===today).length;
-  const c = {};
-  data.forEach(d => c[d.company] = (c[d.company]||0) + 1);
-  document.getElementById('companyList').innerHTML =
-    Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,6)
-      .map(([co,n]) => `<div class="company-item" onclick="filterByCompany('${esc(co)}')"><span>${esc(co)}</span><span class="company-count">${n}</span></div>`).join('');
-}
-
-function renderTicker() {
-  if (!allData.length) return;
-  const items = [...allData].slice(0,15).map(d=>`🔔 ${d.company} – ${d.role} (${tl(d.type)})`).join('   •   ');
-  document.getElementById('tickerTrack').innerHTML = `<span>${items}</span><span>${items}</span>`;
-}
-
-// ── Filters & search ───────────────────────────────────────────
-function filterByCompany(co) {
-  document.getElementById('searchInput').value = co;
-  searchQuery = co.toLowerCase(); currentPage = 1; renderCards();
-  window.scrollTo({top:280,behavior:'smooth'});
-}
-function setFilter(f) {
-  currentFilter = f; currentPage = 1;
-  document.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.dataset.filter===f));
-  renderCards(); window.scrollTo({top:280,behavior:'smooth'});
-}
-
-document.getElementById('filterPills').onclick = e => {
-  const p = e.target.closest('.pill'); if (!p) return;
-  document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
-  p.classList.add('active'); currentFilter = p.dataset.filter; currentPage = 1; renderCards();
-};
-document.getElementById('searchInput').addEventListener('input', e => {
-  searchQuery = e.target.value.toLowerCase(); currentPage = 1; renderCards();
-});
-
-// ── Boot ───────────────────────────────────────────────────────
-loadData();
-</script>
 </body>
 </html>

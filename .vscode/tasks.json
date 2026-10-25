@@ -1,0 +1,29 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Install GCP migration dependencies",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/d",
+				"/c",
+				"npm install && node --check server.js && node --check database.js && node --check index.js && node --check detail.js && node --check admin.js && node --check admin-login.js && node --check backup-index/index.js && node --check backup-index/index1.js && node --check scripts/init-db.js && node --check scripts/hash-admin-password.js"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Test GCP migration",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/d",
+				"/c",
+				"node --check server.js && node --check database.js && node --check index.js && node --check detail.js && node --check admin.js && node --check admin-login.js && node --check backup-index/index.js && node --check backup-index/index1.js && node --check scripts/init-db.js && node --check scripts/hash-admin-password.js && npm test"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

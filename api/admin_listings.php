@@ -1,0 +1,240 @@
+<?php
+/**
+ * InterviewEdge - Admin Listings API (CRUD)
+ */
+
+header('Content-Type: application/json; charset=utf-8');
+
+require_once __DIR__ . '/../config/auth.php';
+require_once __DIR__ . '/../config/helpers.php';
+
+// Check authorization
+requireAdminApi();
+
+$pdo = getDB();
+$method = $_SERVER['REQUEST_METHOD'];
+$id = $_GET['id'] ?? null;
+$input = getJsonInput();
+$qp = getListingQueryParts($pdo);
+$hasCols = $qp['hasCols'];
+
+switch ($method) {
+    case 'GET':
+        try {
+            $stmt = $pdo->query("
+                {$qp['select']}
+                {$qp['from']}
+                ORDER BY {$qp['dateCol']} DESC, {$qp['createdCol']} DESC
+            ");
+            $rows = $stmt->fetchAll();
+            sendJsonResponse(['listings' => array_map('mapListingRow', $rows)]);
+        } catch (PDOException $e) {
+            sendJsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        }
+        break;
+
+    case 'POST':
+        $company = trim($input['company'] ?? '');
+        $role = trim($input['role'] ?? '');
+        $type = in_array($input['type'] ?? '', ['online', 'offline', 'walkin']) ? $input['type'] : 'online';
+        $date = trim($input['date'] ?? '');
+        $location = trim($input['location'] ?? '');
+        $experience = trim($input['experience'] ?? '');
+        $salary = trim($input['salary'] ?? '');
+        $applyLink = trim($input['applyLink'] ?? '');
+        $description = trim($input['description'] ?? '');
+        $skills = is_array($input['skills'] ?? null) ? $input['skills'] : [];
+        $categoryId = !empty($input['categoryId']) ? (int)$input['categoryId'] : null;
+
+        if (!$company || !$role || !$date || !$description) {
+            sendJsonResponse(['error' => 'Company, role, interview date, and description are required.'], 400);
+        }
+
+        $newId = generateUuid();
+
+        // Build dynamic columns based on table structure
+        $fields = ['id', 'company', 'role'];
+        $values = [$newId, $company, $role];
+
+        if (isset($hasCols['interview_type'])) {
+            $fields[] = 'interview_type';
+            $values[] = $type;
+        }
+        if (isset($hasCols['type'])) {
+            $fields[] = 'type';
+            $values[] = $type;
+        }
+
+        if (isset($hasCols['interview_date'])) {
+            $fields[] = 'interview_date';
+            $values[] = $date;
+        }
+        if (isset($hasCols['date'])) {
+            $fields[] = 'date';
+            $values[] = $date;
+        }
+
+        if (isset($hasCols['location'])) {
+            $fields[] = 'location';
+            $values[] = $location;
+        }
+        if (isset($hasCols['experience'])) {
+            $fields[] = 'experience';
+            $values[] = $experience;
+        }
+        if (isset($hasCols['salary'])) {
+            $fields[] = 'salary';
+            $values[] = $salary;
+        }
+
+        if (isset($hasCols['apply_link'])) {
+            $fields[] = 'apply_link';
+            $values[] = $applyLink;
+        }
+        if (isset($hasCols['applyLink'])) {
+            $fields[] = 'applyLink';
+            $values[] = $applyLink;
+        }
+        if (isset($hasCols['link'])) {
+            $fields[] = 'link';
+            $values[] = $applyLink;
+        }
+
+        if (isset($hasCols['description'])) {
+            $fields[] = 'description';
+            $values[] = $description;
+        }
+        if (isset($hasCols['skills'])) {
+            $fields[] = 'skills';
+            $values[] = json_encode(array_values($skills));
+        }
+        if (isset($hasCols['category_id'])) {
+            $fields[] = 'category_id';
+            $values[] = $categoryId;
+        }
+
+        $placeholders = implode(', ', array_fill(0, count($fields), '?'));
+        $fieldSql = implode(', ', array_map(function($f) { return "`{$f}`"; }, $fields));
+
+        try {
+            $stmt = $pdo->prepare("INSERT INTO `interviews` ({$fieldSql}) VALUES ({$placeholders})");
+            $stmt->execute($values);
+            sendJsonResponse(['id' => $newId, 'message' => 'Listing created successfully.'], 201);
+        } catch (PDOException $e) {
+            sendJsonResponse(['error' => 'Failed to create listing: ' . $e->getMessage()], 500);
+        }
+        break;
+
+    case 'PUT':
+        if (!$id) {
+            sendJsonResponse(['error' => 'Listing ID is required for update.'], 400);
+        }
+
+        $company = trim($input['company'] ?? '');
+        $role = trim($input['role'] ?? '');
+        $type = in_array($input['type'] ?? '', ['online', 'offline', 'walkin']) ? $input['type'] : 'online';
+        $date = trim($input['date'] ?? '');
+        $location = trim($input['location'] ?? '');
+        $experience = trim($input['experience'] ?? '');
+        $salary = trim($input['salary'] ?? '');
+        $applyLink = trim($input['applyLink'] ?? '');
+        $description = trim($input['description'] ?? '');
+        $skills = is_array($input['skills'] ?? null) ? $input['skills'] : [];
+        $categoryId = !empty($input['categoryId']) ? (int)$input['categoryId'] : null;
+
+        if (!$company || !$role || !$date || !$description) {
+            sendJsonResponse(['error' => 'Company, role, date, and description are required.'], 400);
+        }
+
+        $setPairs = ["`company` = ?", "`role` = ?"];
+        $values = [$company, $role];
+
+        if (isset($hasCols['interview_type'])) {
+            $setPairs[] = "`interview_type` = ?";
+            $values[] = $type;
+        }
+        if (isset($hasCols['type'])) {
+            $setPairs[] = "`type` = ?";
+            $values[] = $type;
+        }
+
+        if (isset($hasCols['interview_date'])) {
+            $setPairs[] = "`interview_date` = ?";
+            $values[] = $date;
+        }
+        if (isset($hasCols['date'])) {
+            $setPairs[] = "`date` = ?";
+            $values[] = $date;
+        }
+
+        if (isset($hasCols['location'])) {
+            $setPairs[] = "`location` = ?";
+            $values[] = $location;
+        }
+        if (isset($hasCols['experience'])) {
+            $setPairs[] = "`experience` = ?";
+            $values[] = $experience;
+        }
+        if (isset($hasCols['salary'])) {
+            $setPairs[] = "`salary` = ?";
+            $values[] = $salary;
+        }
+
+        if (isset($hasCols['apply_link'])) {
+            $setPairs[] = "`apply_link` = ?";
+            $values[] = $applyLink;
+        }
+        if (isset($hasCols['applyLink'])) {
+            $setPairs[] = "`applyLink` = ?";
+            $values[] = $applyLink;
+        }
+        if (isset($hasCols['link'])) {
+            $setPairs[] = "`link` = ?";
+            $values[] = $applyLink;
+        }
+
+        if (isset($hasCols['description'])) {
+            $setPairs[] = "`description` = ?";
+            $values[] = $description;
+        }
+        if (isset($hasCols['skills'])) {
+            $setPairs[] = "`skills` = ?";
+            $values[] = json_encode(array_values($skills));
+        }
+        if (isset($hasCols['category_id'])) {
+            $setPairs[] = "`category_id` = ?";
+            $values[] = $categoryId;
+        }
+
+        $values[] = $id;
+        $setSql = implode(', ', $setPairs);
+
+        try {
+            $stmt = $pdo->prepare("UPDATE `interviews` SET {$setSql} WHERE `id` = ?");
+            $stmt->execute($values);
+            sendJsonResponse(['id' => $id, 'message' => 'Listing updated successfully.']);
+        } catch (PDOException $e) {
+            sendJsonResponse(['error' => 'Failed to update listing: ' . $e->getMessage()], 500);
+        }
+        break;
+
+    case 'DELETE':
+        if (!$id) {
+            sendJsonResponse(['error' => 'Listing ID is required for deletion.'], 400);
+        }
+
+        try {
+            $stmt = $pdo->prepare("DELETE FROM `interviews` WHERE `id` = ?");
+            $stmt->execute([$id]);
+            if ($stmt->rowCount() === 0) {
+                sendJsonResponse(['error' => 'Listing not found.'], 404);
+            }
+            sendJsonResponse(['id' => $id, 'message' => 'Listing deleted successfully.']);
+        } catch (PDOException $e) {
+            sendJsonResponse(['error' => 'Failed to delete listing: ' . $e->getMessage()], 500);
+        }
+        break;
+
+    default:
+        sendJsonResponse(['error' => 'Method not allowed.'], 405);
+}
