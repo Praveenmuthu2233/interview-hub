@@ -38,13 +38,13 @@ function formatType(type) {
 }
 
 function backToHomeLink() {
-  return '<a class="back-home" href="index.php">← Back to Home</a>';
+  return '<a class="back-home" href="index.html">← Back to Home</a>';
 }
 
 relatedList.addEventListener("click", event => {
   const relatedItem = event.target.closest(".related-item[data-id]");
   if (relatedItem) {
-    window.location.href = `detail.php?id=${encodeURIComponent(relatedItem.dataset.id)}`;
+    window.location.href = `detail.html?id=${encodeURIComponent(relatedItem.dataset.id)}`;
   }
 });
 
@@ -84,8 +84,8 @@ async function loadListing() {
 
     mainContent.innerHTML = `
       <div class="breadcrumb">
-        <a href="index.php">Home</a><span>›</span>
-        <a href="index.php">Listings</a><span>›</span>
+        <a href="index.html">Home</a><span>›</span>
+        <a href="index.html">Listings</a><span>›</span>
         <span>${escapeHtml(listing.company)}</span>
       </div>
       <div class="ad-banner">

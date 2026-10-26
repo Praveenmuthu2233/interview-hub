@@ -99,9 +99,15 @@ function checkSameOrigin(request, response, next) {
   }
   try {
     const originUrl = new URL(origin);
-    const allowed = PUBLIC_ORIGINS.length
-      ? PUBLIC_ORIGINS.some(value => new URL(value).origin === originUrl.origin)
-      : originUrl.origin === `${request.protocol}://${request.get("host")}`;
+    const isSameHost = originUrl.host === request.get("host");
+    const isAllowedOrigin = PUBLIC_ORIGINS.some(value => {
+      try {
+        return new URL(value).origin === originUrl.origin;
+      } catch {
+        return false;
+      }
+    });
+    const allowed = isSameHost || isAllowedOrigin;
     if (!allowed) {
       response.status(403).json({ error: "Cross-origin request rejected." });
       return;
@@ -125,7 +131,7 @@ function requireAdmin(request, response, next) {
       issuer: JWT_ISSUER,
       audience: JWT_AUDIENCE
     });
-    if (payload.sub !== ADMIN_USERNAME) {
+    if (!payload.sub || payload.role !== "admin") {
       response.status(401).json({ error: "Authentication required." });
       return;
     }
@@ -146,7 +152,7 @@ function requireAdminPage(request, response, next) {
       issuer: JWT_ISSUER,
       audience: JWT_AUDIENCE
     });
-    if (payload.sub !== ADMIN_USERNAME) throw new Error("Invalid subject");
+    if (!payload.sub || payload.role !== "admin") throw new Error("Invalid subject");
     next();
   } catch {
     response.clearCookie(COOKIE_NAME, cookieOptions());
@@ -334,15 +340,38 @@ app.post("/api/admin/login", checkSameOrigin, loginLimiter, async (request, resp
     return;
   }
   try {
-    const [passwordMatches, usernameMatches] = await Promise.all([
-      bcrypt.compare(password, ADMIN_PASSWORD_HASH),
-      Promise.resolve(safeEqual(username, ADMIN_USERNAME))
-    ]);
-    if (!usernameMatches || !passwordMatches) {
+    let matched = false;
+    let authUser = username;
+
+    try {
+      const [dbRows] = await pool.execute(
+        "SELECT id, username, password_hash FROM admins WHERE username = ? LIMIT 1",
+        [username]
+      );
+      if (dbRows.length > 0) {
+        matched = await bcrypt.compare(password, dbRows[0].password_hash);
+        if (matched) authUser = dbRows[0].username;
+      }
+    } catch (dbErr) {
+      console.warn("Database admin check error, falling back to env:", dbErr.message);
+    }
+
+    if (!matched) {
+      const [passwordMatches, usernameMatches] = await Promise.all([
+        bcrypt.compare(password, ADMIN_PASSWORD_HASH),
+        Promise.resolve(safeEqual(username, ADMIN_USERNAME))
+      ]);
+      if (passwordMatches && usernameMatches) {
+        matched = true;
+        authUser = ADMIN_USERNAME;
+      }
+    }
+
+    if (!matched) {
       response.status(401).json({ error: "Invalid admin ID or password." });
       return;
     }
-    const token = jwt.sign({ sub: ADMIN_USERNAME, role: "admin" }, JWT_SECRET, {
+    const token = jwt.sign({ sub: authUser, role: "admin" }, JWT_SECRET, {
       algorithm: "HS256",
       expiresIn: JWT_TTL_SECONDS,
       issuer: JWT_ISSUER,
@@ -719,12 +748,12 @@ app.delete("/api/admin/categories/:id", checkSameOrigin, requireAdmin, async (re
   }
 });
 
-app.get(["/admin", "/admin.html"], requireAdminPage, (request, response) => {
+app.get(["/admin", "/admin.html", "/admin.php"], requireAdminPage, (request, response) => {
   response.set("Cache-Control", "no-store");
   response.sendFile(path.join(ROOT, "admin.html"));
 });
 
-app.get("/admin-login", (request, response) => {
+app.get(["/admin-login", "/admin-login.html", "/admin-login.php"], (request, response) => {
   response.sendFile(path.join(ROOT, "admin-login.html"));
 });
 
@@ -744,7 +773,7 @@ app.use((request, response, next) => {
   if (
     segments.some(segment => segment === ".git" || segment === "node_modules" || segment === "scripts" || segment === "sql" || segment === "test")
     || BLOCKED_STATIC_PATHS.has(path.basename(pathname))
-    || segments.some(segment => segment.startsWith(".env"))
+    || segments.some(segment => segment.startsWith(".env")) || pathname.endsWith(".php")
   ) {
     response.sendStatus(404);
     return;
