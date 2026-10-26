@@ -97,16 +97,7 @@ function renderListings(listings, user) {
     const skills = listing.skills.length
       ? listing.skills.map(skill => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join("")
       : '<span class="muted">See role details</span>';
-    const applyLink = (() => {
-      try {
-        const url = new URL(listing.applyLink);
-        return ["http:", "https:"].includes(url.protocol)
-          ? `<a class="apply-link" href="${escapeHtml(url.href)}" target="_blank" rel="noopener noreferrer">Apply on company site ↗</a>`
-          : "";
-      } catch {
-        return "";
-      }
-    })();
+    const applyLink = `<a class="apply-link" href="/detail.html?id=${encodeURIComponent(listing.id)}">Apply now</a>`;
     return `<article class="job-card">
       <div class="job-card-heading">
         <div><p class="company-name">${escapeHtml(listing.company)}</p><h3>${escapeHtml(listing.role)}</h3></div>
