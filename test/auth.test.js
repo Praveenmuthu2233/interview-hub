@@ -46,10 +46,16 @@ test("admin page and API routes reject requests without a JWT", async () => {
   assert.equal(page.status, 302);
   assert.equal(page.headers.get("location"), "/admin-login.html");
 
-  for (const route of ["/api/admin/listings", "/api/admin/questions", "/api/admin/categories"]) {
+  for (const route of ["/api/admin/listings", "/api/admin/questions", "/api/admin/categories", "/api/admin/users"]) {
     const response = await request(route);
     assert.equal(response.status, 401);
   }
+
+  const userApi = await request("/api/user/session");
+  assert.equal(userApi.status, 401);
+  const userPage = await request("/dashboard", { redirect: "manual" });
+  assert.equal(userPage.status, 302);
+  assert.equal(userPage.headers.get("location"), "/user-login.html");
 });
 
 test("server configuration and source files are not served as static assets", async () => {
@@ -94,7 +100,7 @@ test("valid login creates an HttpOnly JWT session and unlocks the admin page", a
 
   const page = await request("/admin.html", { headers: { cookie: cookieHeader } });
   assert.equal(page.status, 200);
-  assert.match(await page.text(), /JWT session/);
+  assert.match(await page.text(), /id="logoutBtn"/);
 });
 
 test("admin listings are read from interviews without requiring categories", async () => {
@@ -168,6 +174,136 @@ test("admin APIs validate invalid inputs before database access", async () => {
     body: JSON.stringify({ question: "Question without required fields" })
   });
   assert.equal(invalidQuestion.status, 400);
+});
+
+test("job seekers can register and access only their own profile and matching-drive API", async () => {
+  const originalExecute = pool.execute;
+  const insertedValues = [];
+  const userPasswordHash = bcrypt.hashSync("a-strong-user-password", 12);
+  pool.execute = async (sql, values = []) => {
+    if (/INSERT INTO users/i.test(sql)) {
+      insertedValues.push(values);
+      return [{ insertId: 17 }, []];
+    }
+    if (/SELECT id, password_hash FROM users/i.test(sql)) {
+      assert.deepEqual(values, ["applicant@example.com"]);
+      return [[{ id: 17, password_hash: userPasswordHash }], []];
+    }
+    if (/SELECT id, full_name, email/i.test(sql)) {
+      assert.deepEqual(values, ["17"]);
+      return [[{
+        id: 17,
+        full_name: "Test Applicant",
+        email: "applicant@example.com",
+        phone: "+91 99999 11111",
+        education: "B.E. Computer Science",
+        graduation_year: 2026,
+        skills: '["Java","SQL"]',
+        experience: "Fresher",
+        preferred_location: "Chennai",
+        created_at: "2026-10-26 00:00:00"
+      }], []];
+    }
+    if (/FROM interviews i LEFT JOIN categories/i.test(sql)) {
+      assert.match(sql, /interview_date >= CURDATE\(\)/);
+      return [[{
+        id: "job-1",
+        company: "Example",
+        role: "Engineer",
+        interview_type: "online",
+        interview_date: "2026-11-01",
+        location: "Chennai",
+        experience: "Fresher",
+        salary: "",
+        apply_link: "",
+        description: "Java and SQL role",
+        skills: ["Java", "SQL"],
+        category_id: null,
+        created_at: "2026-10-26 00:00:00",
+        updated_at: "2026-10-26 00:00:00"
+      }], []];
+    }
+    throw new Error(`Unexpected query: ${sql}`);
+  };
+
+  try {
+    const registration = await request("/api/user/register", {
+      method: "POST",
+      headers: { "content-type": "application/json", origin: baseUrl },
+      body: JSON.stringify({
+        fullName: "Test Applicant",
+        email: "Applicant@Example.com",
+        phone: "+91 99999 11111",
+        education: "B.E. Computer Science",
+        graduationYear: "2026",
+        skills: ["Java", "SQL"],
+        experience: "Fresher",
+        preferredLocation: "Chennai",
+        password: "a-strong-user-password"
+      })
+    });
+    assert.equal(registration.status, 201);
+    assert.equal(insertedValues.length, 1);
+    assert.equal(insertedValues[0][1], "applicant@example.com");
+    assert.match(registration.headers.get("set-cookie"), /HttpOnly/i);
+    const cookieHeader = registration.headers.get("set-cookie").split(";")[0];
+
+    const session = await request("/api/user/session", { headers: { cookie: cookieHeader } });
+    assert.equal(session.status, 200);
+    const sessionBody = await session.json();
+    assert.equal(sessionBody.user.fullName, "Test Applicant");
+    assert.deepEqual(sessionBody.user.skills, ["Java", "SQL"]);
+    assert.equal(JSON.stringify(sessionBody).includes("password_hash"), false);
+
+    const dashboard = await request("/api/user/dashboard", { headers: { cookie: cookieHeader } });
+    assert.equal(dashboard.status, 200);
+    assert.equal((await dashboard.json()).listings[0].role, "Engineer");
+
+    const userLogin = await request("/api/user/login", {
+      method: "POST",
+      headers: { "content-type": "application/json", origin: baseUrl },
+      body: JSON.stringify({ email: "APPLICANT@example.com", password: "a-strong-user-password" })
+    });
+    assert.equal(userLogin.status, 200);
+    assert.match(userLogin.headers.get("set-cookie"), /HttpOnly/i);
+  } finally {
+    pool.execute = originalExecute;
+  }
+});
+
+test("user registration validates profiles before database access and reports duplicate email", async () => {
+  const originalExecute = pool.execute;
+  let called = false;
+  pool.execute = async () => {
+    called = true;
+    const error = new Error("duplicate email");
+    error.code = "ER_DUP_ENTRY";
+    throw error;
+  };
+
+  try {
+    const invalid = await request("/api/user/register", {
+      method: "POST",
+      headers: { "content-type": "application/json", origin: baseUrl },
+      body: JSON.stringify({ fullName: "", email: "not-an-email", password: "short" })
+    });
+    assert.equal(invalid.status, 400);
+    assert.equal(called, false);
+
+    const duplicate = await request("/api/user/register", {
+      method: "POST",
+      headers: { "content-type": "application/json", origin: baseUrl },
+      body: JSON.stringify({
+        fullName: "Applicant",
+        email: "applicant@example.com",
+        password: "a-strong-user-password"
+      })
+    });
+    assert.equal(duplicate.status, 409);
+    assert.deepEqual(await duplicate.json(), { error: "An account with this email already exists." });
+  } finally {
+    pool.execute = originalExecute;
+  }
 });
 
 test("logout expires the JWT cookie", async () => {

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="color-scheme" content="light"/>
+  <title>Create Job Seeker Account – InterviewEdge</title>
+  <link rel="stylesheet" href="user-portal.css"/>
+  <script src="user-auth.js" defer></script>
+</head>
+<body>
+  <main class="auth-shell">
+    <form class="auth-card register-card" id="userAuthForm" data-mode="register">
+      <a class="portal-logo" href="index.html">Interview<span>Edge</span></a>
+      <h1>Create your job seeker profile</h1>
+      <p class="auth-intro">Add your details to see interview drives relevant to your profile.</p>
+      <div class="profile-form-grid">
+        <div class="portal-field full-width">
+          <label for="fullName">Full name *</label>
+          <input id="fullName" name="fullName" autocomplete="name" required maxlength="160"/>
+        </div>
+        <div class="portal-field">
+          <label for="email">Email address *</label>
+          <input id="email" name="email" type="email" autocomplete="email" required maxlength="254"/>
+        </div>
+        <div class="portal-field">
+          <label for="phone">Phone number</label>
+          <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="40"/>
+        </div>
+        <div class="portal-field">
+          <label for="education">Education / qualification</label>
+          <input id="education" name="education" placeholder="e.g. B.E. Computer Science" maxlength="180"/>
+        </div>
+        <div class="portal-field">
+          <label for="graduationYear">Graduation year</label>
+          <input id="graduationYear" name="graduationYear" type="number" min="1950" inputmode="numeric"/>
+        </div>
+        <div class="portal-field full-width">
+          <label for="skills">Skills</label>
+          <input id="skills" name="skills" placeholder="Java, SQL, communication (comma separated)" maxlength="1000"/>
+        </div>
+        <div class="portal-field">
+          <label for="experience">Experience</label>
+          <input id="experience" name="experience" placeholder="e.g. Fresher or 2 years" maxlength="240"/>
+        </div>
+        <div class="portal-field">
+          <label for="preferredLocation">Preferred job location</label>
+          <input id="preferredLocation" name="preferredLocation" placeholder="e.g. Chennai or Remote" maxlength="160"/>
+        </div>
+        <div class="portal-field full-width">
+          <label for="password">Password * (at least 10 characters)</label>
+          <input id="password" name="password" type="password" autocomplete="new-password" required minlength="10" maxlength="72"/>
+        </div>
+      </div>
+      <button class="portal-button" id="submitButton" type="submit">Create account</button>
+      <p class="auth-switch">Already registered? <a href="user-login.html">Sign in</a></p>
+      <a class="site-link" href="index.html">← Browse interview drives</a>
+      <div class="portal-message" id="authMessage" role="status" aria-live="polite"></div>
+    </form>
+  </main>
+</body>
+</html>

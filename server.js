@@ -24,9 +24,11 @@ const PUBLIC_ORIGINS = (process.env.PUBLIC_ORIGINS || "")
   .map(origin => origin.trim())
   .filter(Boolean);
 const JWT_TTL_SECONDS = 60 * 60;
-const COOKIE_NAME = "interviewedge_admin";
+const ADMIN_COOKIE_NAME = "interviewedge_admin";
+const USER_COOKIE_NAME = "interviewedge_user";
 const JWT_ISSUER = "interviewedge";
-const JWT_AUDIENCE = "interviewedge-admin";
+const ADMIN_JWT_AUDIENCE = "interviewedge-admin";
+const USER_JWT_AUDIENCE = "interviewedge-user";
 const ROOT = __dirname;
 const BLOCKED_STATIC_PATHS = new Set([
   ".env",
@@ -84,6 +86,13 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "Too many login attempts. Try again in 15 minutes." }
 });
+const userAuthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 8,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { error: "Too many account attempts. Try again in 15 minutes." }
+});
 
 function safeEqual(first, second) {
   const firstHash = crypto.createHash("sha256").update(String(first)).digest();
@@ -120,7 +129,7 @@ function checkSameOrigin(request, response, next) {
 }
 
 function requireAdmin(request, response, next) {
-  const token = request.cookies[COOKIE_NAME];
+  const token = request.cookies[ADMIN_COOKIE_NAME];
   if (!token) {
     response.status(401).json({ error: "Authentication required." });
     return;
@@ -129,7 +138,7 @@ function requireAdmin(request, response, next) {
     const payload = jwt.verify(token, JWT_SECRET, {
       algorithms: ["HS256"],
       issuer: JWT_ISSUER,
-      audience: JWT_AUDIENCE
+      audience: ADMIN_JWT_AUDIENCE
     });
     if (!payload.sub || payload.role !== "admin") {
       response.status(401).json({ error: "Authentication required." });
@@ -138,25 +147,66 @@ function requireAdmin(request, response, next) {
     request.admin = { username: payload.sub };
     next();
   } catch {
-    response.clearCookie(COOKIE_NAME, cookieOptions());
+    response.clearCookie(ADMIN_COOKIE_NAME, cookieOptions());
     response.status(401).json({ error: "Your admin session is invalid or has expired." });
   }
 }
 
 function requireAdminPage(request, response, next) {
-  const token = request.cookies[COOKIE_NAME];
+  const token = request.cookies[ADMIN_COOKIE_NAME];
   try {
     if (!token) throw new Error("Missing token");
     const payload = jwt.verify(token, JWT_SECRET, {
       algorithms: ["HS256"],
       issuer: JWT_ISSUER,
-      audience: JWT_AUDIENCE
+      audience: ADMIN_JWT_AUDIENCE
     });
     if (!payload.sub || payload.role !== "admin") throw new Error("Invalid subject");
     next();
   } catch {
-    response.clearCookie(COOKIE_NAME, cookieOptions());
+    response.clearCookie(ADMIN_COOKIE_NAME, cookieOptions());
     response.redirect(302, "/admin-login.html");
+  }
+}
+
+function requireUser(request, response, next) {
+  const token = request.cookies[USER_COOKIE_NAME];
+  if (!token) {
+    response.status(401).json({ error: "Authentication required." });
+    return;
+  }
+  try {
+    const payload = jwt.verify(token, JWT_SECRET, {
+      algorithms: ["HS256"],
+      issuer: JWT_ISSUER,
+      audience: USER_JWT_AUDIENCE
+    });
+    if (!payload.sub || payload.role !== "user") {
+      response.status(401).json({ error: "Authentication required." });
+      return;
+    }
+    request.user = { id: payload.sub };
+    next();
+  } catch {
+    response.clearCookie(USER_COOKIE_NAME, cookieOptions());
+    response.status(401).json({ error: "Your user session is invalid or has expired." });
+  }
+}
+
+function requireUserPage(request, response, next) {
+  const token = request.cookies[USER_COOKIE_NAME];
+  try {
+    if (!token) throw new Error("Missing token");
+    const payload = jwt.verify(token, JWT_SECRET, {
+      algorithms: ["HS256"],
+      issuer: JWT_ISSUER,
+      audience: USER_JWT_AUDIENCE
+    });
+    if (!payload.sub || payload.role !== "user") throw new Error("Invalid subject");
+    next();
+  } catch {
+    response.clearCookie(USER_COOKIE_NAME, cookieOptions());
+    response.redirect(302, "/user-login.html");
   }
 }
 
@@ -274,6 +324,68 @@ function sanitizeQuestion(body) {
   };
 }
 
+function sanitizeUser(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return { error: "A user profile is required." };
+  }
+  const fullName = text(body.fullName, 160);
+  const email = text(body.email, 254).toLowerCase();
+  const phone = text(body.phone, 40);
+  const education = text(body.education, 180);
+  const graduationYearText = text(body.graduationYear, 4);
+  const experience = text(body.experience, 240);
+  const preferredLocation = text(body.preferredLocation, 160);
+  const currentYear = new Date().getFullYear();
+  const graduationYear = graduationYearText ? Number(graduationYearText) : null;
+  const skills = Array.isArray(body.skills)
+    ? [...new Set(body.skills.filter(skill => typeof skill === "string").map(skill => text(skill, 80)).filter(Boolean))].slice(0, 30)
+    : [];
+
+  if (!fullName) return { error: "Full name is required." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Enter a valid email address." };
+  if (phone && !/^[+()\d.\-\s]{7,40}$/.test(phone)) return { error: "Enter a valid phone number." };
+  if (graduationYearText && (!Number.isInteger(graduationYear) || graduationYear < 1950 || graduationYear > currentYear + 10)) {
+    return { error: "Enter a valid graduation year." };
+  }
+  if (body.skills !== undefined && !Array.isArray(body.skills)) return { error: "Skills must be a list of text values." };
+
+  return {
+    user: {
+      fullName,
+      email,
+      phone,
+      education,
+      graduationYear,
+      skills,
+      experience,
+      preferredLocation
+    }
+  };
+}
+
+function mapUser(row) {
+  let skills = row.skills;
+  if (typeof skills === "string") {
+    try {
+      skills = JSON.parse(skills);
+    } catch {
+      skills = [];
+    }
+  }
+  return {
+    id: row.id,
+    fullName: row.full_name,
+    email: row.email,
+    phone: row.phone || "",
+    education: row.education || "",
+    graduationYear: row.graduation_year,
+    skills: Array.isArray(skills) ? skills : [],
+    experience: row.experience || "",
+    preferredLocation: row.preferred_location || "",
+    createdAt: row.created_at
+  };
+}
+
 async function hasCategory(categoryId, categoryType) {
   if (categoryId === null || categoryId === undefined) return categoryType === "listing";
   const [rows] = await pool.execute(
@@ -333,6 +445,120 @@ const QUESTION_SELECT = `SELECT q.id, q.category_id, q.question, q.answer, q.dif
   q.created_at, q.updated_at, c.name AS category_name
   FROM questions q JOIN categories c ON c.id = q.category_id`;
 
+function signUserSession(response, userId) {
+  const token = jwt.sign({ sub: String(userId), role: "user" }, JWT_SECRET, {
+    algorithm: "HS256",
+    expiresIn: JWT_TTL_SECONDS,
+    issuer: JWT_ISSUER,
+    audience: USER_JWT_AUDIENCE
+  });
+  response.cookie(USER_COOKIE_NAME, token, {
+    ...cookieOptions(),
+    maxAge: JWT_TTL_SECONDS * 1000
+  });
+}
+
+app.post("/api/user/register", checkSameOrigin, userAuthLimiter, async (request, response, next) => {
+  const sanitized = sanitizeUser(request.body);
+  const password = request.body && request.body.password;
+  if (sanitized.error) {
+    response.status(400).json({ error: sanitized.error });
+    return;
+  }
+  if (typeof password !== "string" || password.length < 10 || Buffer.byteLength(password, "utf8") > 72) {
+    response.status(400).json({ error: "Password must be at least 10 characters and no more than 72 bytes." });
+    return;
+  }
+  try {
+    const passwordHash = await bcrypt.hash(password, 12);
+    const user = sanitized.user;
+    const [result] = await pool.execute(
+      `INSERT INTO users (full_name, email, password_hash, phone, education, graduation_year, skills, experience, preferred_location)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        user.fullName,
+        user.email,
+        passwordHash,
+        user.phone,
+        user.education,
+        user.graduationYear,
+        JSON.stringify(user.skills),
+        user.experience,
+        user.preferredLocation
+      ]
+    );
+    signUserSession(response, result.insertId);
+    response.status(201).json({ authenticated: true });
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      response.status(409).json({ error: "An account with this email already exists." });
+      return;
+    }
+    next(error);
+  }
+});
+
+app.post("/api/user/login", checkSameOrigin, userAuthLimiter, async (request, response, next) => {
+  const email = text(request.body && request.body.email, 254).toLowerCase();
+  const password = request.body && request.body.password;
+  if (
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    || typeof password !== "string"
+    || Buffer.byteLength(password, "utf8") > 72
+  ) {
+    response.status(400).json({ error: "A valid email and password are required." });
+    return;
+  }
+  try {
+    const [rows] = await pool.execute(
+      "SELECT id, password_hash FROM users WHERE email = ? LIMIT 1",
+      [email]
+    );
+    if (!rows.length || !(await bcrypt.compare(password, rows[0].password_hash))) {
+      response.status(401).json({ error: "Invalid email or password." });
+      return;
+    }
+    signUserSession(response, rows[0].id);
+    response.json({ authenticated: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/user/logout", checkSameOrigin, (request, response) => {
+  response.clearCookie(USER_COOKIE_NAME, cookieOptions());
+  response.status(204).end();
+});
+
+app.get("/api/user/session", requireUser, async (request, response, next) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT id, full_name, email, phone, education, graduation_year, skills, experience, preferred_location, created_at
+       FROM users WHERE id = ? LIMIT 1`,
+      [request.user.id]
+    );
+    if (!rows.length) {
+      response.clearCookie(USER_COOKIE_NAME, cookieOptions());
+      response.status(401).json({ error: "This user account is no longer available." });
+      return;
+    }
+    response.json({ authenticated: true, user: mapUser(rows[0]) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/user/dashboard", requireUser, async (request, response, next) => {
+  try {
+    const [rows] = await pool.execute(
+      `${LISTING_SELECT} WHERE i.interview_date >= CURDATE() ORDER BY i.interview_date ASC LIMIT 100`
+    );
+    response.json({ listings: rows.map(mapListing) });
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.post("/api/admin/login", checkSameOrigin, loginLimiter, async (request, response, next) => {
   const { username, password } = request.body || {};
   if (typeof username !== "string" || typeof password !== "string" || password.length > 1024) {
@@ -375,9 +601,9 @@ app.post("/api/admin/login", checkSameOrigin, loginLimiter, async (request, resp
       algorithm: "HS256",
       expiresIn: JWT_TTL_SECONDS,
       issuer: JWT_ISSUER,
-      audience: JWT_AUDIENCE
+      audience: ADMIN_JWT_AUDIENCE
     });
-    response.cookie(COOKIE_NAME, token, {
+    response.cookie(ADMIN_COOKIE_NAME, token, {
       ...cookieOptions(),
       maxAge: JWT_TTL_SECONDS * 1000
     });
@@ -388,12 +614,24 @@ app.post("/api/admin/login", checkSameOrigin, loginLimiter, async (request, resp
 });
 
 app.post("/api/admin/logout", checkSameOrigin, (request, response) => {
-  response.clearCookie(COOKIE_NAME, cookieOptions());
+  response.clearCookie(ADMIN_COOKIE_NAME, cookieOptions());
   response.status(204).end();
 });
 
 app.get("/api/admin/session", requireAdmin, (request, response) => {
   response.json({ authenticated: true, username: request.admin.username });
+});
+
+app.get("/api/admin/users", requireAdmin, async (request, response, next) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT id, full_name, email, phone, education, graduation_year, skills, experience, preferred_location, created_at
+       FROM users ORDER BY created_at DESC`
+    );
+    response.json({ users: rows.map(mapUser) });
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.get("/api/listings", async (request, response, next) => {
@@ -753,8 +991,26 @@ app.get(["/admin", "/admin.html", "/admin.php"], requireAdminPage, (request, res
   response.sendFile(path.join(ROOT, "admin.html"));
 });
 
+app.get(["/admin/users", "/admin-users.html"], requireAdminPage, (request, response) => {
+  response.set("Cache-Control", "no-store");
+  response.sendFile(path.join(ROOT, "admin-users.html"));
+});
+
 app.get(["/admin-login", "/admin-login.html", "/admin-login.php"], (request, response) => {
   response.sendFile(path.join(ROOT, "admin-login.html"));
+});
+
+app.get(["/user-login", "/user-login.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "user-login.html"));
+});
+
+app.get(["/user-register", "/user-register.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "user-register.html"));
+});
+
+app.get(["/dashboard", "/user-dashboard.html"], requireUserPage, (request, response) => {
+  response.set("Cache-Control", "no-store");
+  response.sendFile(path.join(ROOT, "user-dashboard.html"));
 });
 
 app.use("/api", (request, response) => {

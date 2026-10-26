@@ -65,6 +65,23 @@ CREATE TABLE IF NOT EXISTS `admins` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `full_name` VARCHAR(160) NOT NULL,
+  `email` VARCHAR(254) NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `phone` VARCHAR(40) NOT NULL DEFAULT '',
+  `education` VARCHAR(180) NOT NULL DEFAULT '',
+  `graduation_year` SMALLINT UNSIGNED NULL,
+  `skills` JSON NOT NULL,
+  `experience` VARCHAR(240) NOT NULL DEFAULT '',
+  `preferred_location` VARCHAR(160) NOT NULL DEFAULT '',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_users_email` (`email`),
+  KEY `idx_users_created` (`created_at` DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Seed Categories
 INSERT IGNORE INTO `categories` (`id`, `name`, `slug`, `category_type`) VALUES
 (1, 'IT & Software', 'it-software', 'listing'),

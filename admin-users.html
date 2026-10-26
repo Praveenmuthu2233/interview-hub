@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="color-scheme" content="light"/>
+  <title>Registered Users – InterviewEdge Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="admin.css"/>
+  <script src="admin-users.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div style="display:flex;align-items:center;gap:.5rem;">
+        <div class="logo">Interview<span>Edge</span></div>
+        <span class="badge-admin">Admin</span>
+      </div>
+      <div class="header-actions">
+        <a href="admin.html" class="back-link">← Listings</a>
+        <button class="btn-secondary" id="logoutBtn" type="button">Log out</button>
+        <a href="index.html" class="back-link">View Public Site</a>
+      </div>
+    </div>
+  </header>
+  <main class="admin-wrap" style="display:block">
+    <div class="stats-bar" id="statsBar"></div>
+    <section class="table-card">
+      <div class="table-header">
+        <div>
+          <div class="table-title">Registered Job Seekers</div>
+          <div class="form-card-sub">Private profile details are visible only to authorized admins.</div>
+        </div>
+        <label class="table-search" for="userSearch">
+          <span aria-hidden="true">⌕</span>
+          <input id="userSearch" type="search" placeholder="Search profiles…"/>
+        </label>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Name / Email</th><th>Phone</th><th>Education</th><th>Skills</th><th>Experience / Location</th><th>Registered</th>
+          </tr></thead>
+          <tbody id="usersTableBody"><tr class="empty-row"><td colspan="6">Loading registered users…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

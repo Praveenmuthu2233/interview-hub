@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="color-scheme" content="light"/>
+  <title>Your Job Seeker Dashboard – InterviewEdge</title>
+  <link rel="stylesheet" href="user-portal.css"/>
+  <script src="user-dashboard.js" defer></script>
+</head>
+<body class="portal-page">
+  <header class="portal-header">
+    <a class="portal-logo" href="index.html">Interview<span>Edge</span></a>
+    <div class="portal-header-actions">
+      <span id="welcomeName">Your dashboard</span>
+      <button class="portal-button secondary" id="logoutButton" type="button">Log out</button>
+      <a class="site-link" href="index.html">Browse site</a>
+    </div>
+  </header>
+  <main class="portal-main">
+    <section class="dashboard-heading">
+      <div>
+        <p class="eyebrow">JOB SEEKER SPACE</p>
+        <h1>Your profile and interview drives</h1>
+        <p class="auth-intro">Review your details and explore current openings that fit your skills and preferences.</p>
+      </div>
+    </section>
+    <div class="dashboard-grid">
+      <section class="profile-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">YOUR DETAILS</p>
+            <h2>Profile</h2>
+          </div>
+        </div>
+        <div id="profileDetails" class="profile-details"><p class="muted">Loading your profile…</p></div>
+      </section>
+      <section class="jobs-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">BASED ON YOUR PROFILE</p>
+            <h2>Open interview drives</h2>
+          </div>
+          <span id="listingCount" class="count-badge">0</span>
+        </div>
+        <p class="match-note" id="matchNote">Loading available drives…</p>
+        <div class="job-list" id="jobList"></div>
+      </section>
+    </div>
+  </main>
+  <div class="portal-message" id="portalMessage" role="status" aria-live="polite"></div>
+</body>
+</html>

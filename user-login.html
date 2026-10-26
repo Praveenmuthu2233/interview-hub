@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="color-scheme" content="light"/>
+  <title>Job Seeker Sign In – InterviewEdge</title>
+  <link rel="stylesheet" href="user-portal.css"/>
+  <script src="user-auth.js" defer></script>
+</head>
+<body>
+  <main class="auth-shell">
+    <form class="auth-card" id="userAuthForm" data-mode="login">
+      <a class="portal-logo" href="index.html">Interview<span>Edge</span></a>
+      <h1>Welcome back</h1>
+      <p class="auth-intro">Sign in to view your profile and job matches.</p>
+      <label for="email">Email address</label>
+      <input id="email" name="email" type="email" autocomplete="email" required maxlength="254"/>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="72"/>
+      <button class="portal-button" id="submitButton" type="submit">Sign in</button>
+      <p class="auth-switch">New to InterviewEdge? <a href="user-register.html">Create an account</a></p>
+      <a class="site-link" href="index.html">← Browse interview drives</a>
+      <div class="portal-message" id="authMessage" role="status" aria-live="polite"></div>
+    </form>
+  </main>
+</body>
+</html>
