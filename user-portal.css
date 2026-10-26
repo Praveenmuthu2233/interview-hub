@@ -148,6 +148,7 @@ button, input { font: inherit; }
 
 .portal-header-actions { display: flex; align-items: center; gap: 16px; }
 .portal-header-actions > span { font-weight: 700; }
+.portal-header-actions .dashboard-user-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: #ffedd5; }
 .portal-main { width: min(1240px, calc(100% - 40px)); margin: 38px auto 70px; }
 .dashboard-heading { margin-bottom: 24px; }
 .dashboard-heading h1 { margin-top: 4px; }
