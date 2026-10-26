@@ -2,8 +2,12 @@
 
 const profileContainer = document.getElementById("profileDetails");
 const jobList = document.getElementById("jobList");
+const savedJobList = document.getElementById("savedJobList");
 const portalMessage = document.getElementById("portalMessage");
 let currentUser;
+let currentListings = [];
+let savedListings = [];
+const savedListingIds = new Set();
 
 function escapeHtml(value) {
   const element = document.createElement("div");
@@ -76,6 +80,35 @@ function formatDate(value) {
     : date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
+function jobCardMarkup(listing, matchedSkills = []) {
+  const type = listing.type === "walkin" ? "Walk-in" : listing.type;
+  const skills = listing.skills.length
+    ? listing.skills.map(skill => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join("")
+    : '<span class="muted">See role details</span>';
+  const isSaved = savedListingIds.has(listing.id);
+  return `<article class="job-card">
+    <div class="job-card-heading">
+      <div><p class="company-name">${escapeHtml(listing.company)}</p><h3>${escapeHtml(listing.role)}</h3></div>
+      <span class="type-pill">${escapeHtml(type)}</span>
+    </div>
+    <div class="job-meta">
+      <span>📅 ${escapeHtml(formatDate(listing.date))}</span>
+      <span>📍 ${escapeHtml(listing.location || "Location not specified")}</span>
+      <span>Experience: ${escapeHtml(listing.experience || "Not specified")}</span>
+      <span>Salary: ${escapeHtml(listing.salary || "Not specified")}</span>
+    </div>
+    <div class="requirements"><h4>Skills / requirements</h4><div class="skill-list">${skills}</div></div>
+    <details class="job-description"><summary>Read role and eligibility details</summary><p>${escapeHtml(listing.description)}</p></details>
+    ${matchedSkills.length ? `<p class="matched-skills">Matches your skills: ${escapeHtml(matchedSkills.join(", "))}</p>` : ""}
+    <div class="job-actions">
+      <a class="apply-link" href="/detail.html?id=${encodeURIComponent(listing.id)}">Apply now</a>
+      <button class="save-job-button" type="button" data-listing-id="${escapeHtml(listing.id)}" aria-pressed="${isSaved}">
+        ${isSaved ? "Remove saved job" : "Save job"}
+      </button>
+    </div>
+  </article>`;
+}
+
 function renderListings(listings, user) {
   const scored = listings.map(listing => ({ listing, ...scoreListing(listing, user) }));
   const hasPreferences = Boolean(user.skills.length || user.preferredLocation || user.education);
@@ -92,29 +125,48 @@ function renderListings(listings, user) {
     return;
   }
 
-  jobList.innerHTML = results.map(({ listing, matchedSkills }) => {
-    const type = listing.type === "walkin" ? "Walk-in" : listing.type;
-    const skills = listing.skills.length
-      ? listing.skills.map(skill => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join("")
-      : '<span class="muted">See role details</span>';
-    const applyLink = `<a class="apply-link" href="/detail.html?id=${encodeURIComponent(listing.id)}">Apply now</a>`;
-    return `<article class="job-card">
-      <div class="job-card-heading">
-        <div><p class="company-name">${escapeHtml(listing.company)}</p><h3>${escapeHtml(listing.role)}</h3></div>
-        <span class="type-pill">${escapeHtml(type)}</span>
-      </div>
-      <div class="job-meta">
-        <span>📅 ${escapeHtml(formatDate(listing.date))}</span>
-        <span>📍 ${escapeHtml(listing.location || "Location not specified")}</span>
-        <span>Experience: ${escapeHtml(listing.experience || "Not specified")}</span>
-        <span>Salary: ${escapeHtml(listing.salary || "Not specified")}</span>
-      </div>
-      <div class="requirements"><h4>Skills / requirements</h4><div class="skill-list">${skills}</div></div>
-      <details class="job-description"><summary>Read role and eligibility details</summary><p>${escapeHtml(listing.description)}</p></details>
-      ${matchedSkills.length ? `<p class="matched-skills">Matches your skills: ${escapeHtml(matchedSkills.join(", "))}</p>` : ""}
-      ${applyLink}
-    </article>`;
-  }).join("");
+  jobList.innerHTML = results.map(({ listing, matchedSkills }) => jobCardMarkup(listing, matchedSkills)).join("");
+}
+
+function renderSavedListings() {
+  document.getElementById("savedListingCount").textContent = String(savedListings.length);
+  document.getElementById("savedListingNote").textContent = savedListings.length
+    ? "Your bookmarked interview drives are ready whenever you need them."
+    : "Save a drive to keep it handy here.";
+  savedJobList.innerHTML = savedListings.length
+    ? savedListings.map(listing => jobCardMarkup(listing)).join("")
+    : '<div class="empty-state">You have no saved jobs yet.</div>';
+}
+
+async function toggleSavedListing(listingId, button) {
+  button.disabled = true;
+  try {
+    if (savedListingIds.has(listingId)) {
+      await apiRequest(`/api/user/saved-listings/${encodeURIComponent(listingId)}`, { method: "DELETE" });
+      savedListingIds.delete(listingId);
+      savedListings = savedListings.filter(listing => listing.id !== listingId);
+    } else {
+      await apiRequest("/api/user/saved-listings", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ listingId })
+      });
+      const listing = currentListings.find(item => item.id === listingId);
+      if (listing) savedListings.unshift(listing);
+      savedListingIds.add(listingId);
+    }
+    renderListings(currentListings, currentUser);
+    renderSavedListings();
+  } catch (error) {
+    portalMessage.textContent = error.message;
+    portalMessage.className = "portal-message show error";
+    button.disabled = false;
+  }
+}
+
+function handleSavedListingClick(event) {
+  const button = event.target.closest(".save-job-button[data-listing-id]");
+  if (button) toggleSavedListing(button.dataset.listingId, button);
 }
 
 async function loadDashboard() {
@@ -124,7 +176,22 @@ async function loadDashboard() {
       apiRequest("/api/user/dashboard")
     ]);
     renderProfile(session.user);
-    renderListings(dashboard.listings || [], currentUser);
+    currentListings = dashboard.listings || [];
+    renderListings(currentListings, currentUser);
+    try {
+      const saved = await apiRequest("/api/user/saved-listings");
+      savedListings = saved.listings || [];
+      savedListingIds.clear();
+      savedListings.forEach(listing => savedListingIds.add(listing.id));
+      renderListings(currentListings, currentUser);
+      renderSavedListings();
+    } catch (error) {
+      document.getElementById("savedListingNote").textContent = "Could not load saved jobs. Please refresh to try again.";
+      savedJobList.innerHTML = '<div class="empty-state">Saved jobs are temporarily unavailable.</div>';
+      portalMessage.textContent = error.message;
+      portalMessage.className = "portal-message show error";
+      console.error("Could not load saved jobs:", error);
+    }
   } catch (error) {
     if (error.message) {
       portalMessage.textContent = error.message;
@@ -132,6 +199,9 @@ async function loadDashboard() {
     }
   }
 }
+
+jobList.addEventListener("click", handleSavedListingClick);
+savedJobList.addEventListener("click", handleSavedListingClick);
 
 document.getElementById("logoutButton").addEventListener("click", async event => {
   const button = event.currentTarget;

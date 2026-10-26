@@ -317,6 +317,45 @@ header {
   opacity: 0.88;
 }
 
+.btn-save {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-save:hover,
+.save-sign-in:hover {
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.save-sign-in {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: var(--accent2);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.save-job-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
 .btn-share {
   width: 100%;
   display: flex;

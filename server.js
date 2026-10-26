@@ -559,6 +559,61 @@ app.get("/api/user/dashboard", requireUser, async (request, response, next) => {
   }
 });
 
+app.get("/api/user/saved-listings", requireUser, async (request, response, next) => {
+  try {
+    const [rows] = await pool.execute(
+      `${LISTING_SELECT}
+       JOIN user_saved_listings saved ON saved.listing_id = i.id
+       WHERE saved.user_id = ?
+       ORDER BY saved.saved_at DESC`,
+      [request.user.id]
+    );
+    response.json({ listings: rows.map(mapListing) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/user/saved-listings", checkSameOrigin, requireUser, async (request, response, next) => {
+  const listingId = typeof request.body?.listingId === "string" ? request.body.listingId : "";
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(listingId)) {
+    response.status(400).json({ error: "A valid listing ID is required." });
+    return;
+  }
+  try {
+    const [rows] = await pool.execute("SELECT id FROM interviews WHERE id = ? LIMIT 1", [listingId]);
+    if (!rows.length) {
+      response.status(404).json({ error: "Listing not found." });
+      return;
+    }
+    await pool.execute(
+      `INSERT INTO user_saved_listings (user_id, listing_id) VALUES (?, ?)
+       ON DUPLICATE KEY UPDATE saved_at = CURRENT_TIMESTAMP`,
+      [request.user.id, listingId]
+    );
+    response.json({ saved: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete("/api/user/saved-listings/:id", checkSameOrigin, requireUser, async (request, response, next) => {
+  const listingId = request.params.id;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(listingId)) {
+    response.status(400).json({ error: "A valid listing ID is required." });
+    return;
+  }
+  try {
+    await pool.execute(
+      "DELETE FROM user_saved_listings WHERE user_id = ? AND listing_id = ?",
+      [request.user.id, listingId]
+    );
+    response.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.post("/api/admin/login", checkSameOrigin, loginLimiter, async (request, response, next) => {
   const { username, password } = request.body || {};
   if (typeof username !== "string" || typeof password !== "string" || password.length > 1024) {

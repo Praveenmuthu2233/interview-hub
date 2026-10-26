@@ -41,6 +41,55 @@ function backToHomeLink() {
   return '<a class="back-home" href="index.html">← Back to Home</a>';
 }
 
+function renderSaveAction(isSaved) {
+  const saveAction = document.getElementById("detailSaveAction");
+  saveAction.innerHTML = `
+    <button class="btn-save" id="saveJobButton" type="button" aria-pressed="${isSaved}">
+      ${isSaved ? "Remove saved job" : "Save job"}
+    </button>`;
+  document.getElementById("saveJobButton").addEventListener("click", async event => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      const response = isSaved
+        ? await fetch(`/api/user/saved-listings/${encodeURIComponent(listingId)}`, { method: "DELETE" })
+        : await fetch("/api/user/saved-listings", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ listingId })
+        });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.error || `Could not update saved job (status ${response.status}).`);
+      }
+      renderSaveAction(!isSaved);
+    } catch (error) {
+      const status = document.getElementById("saveJobStatus");
+      status.textContent = error.message;
+      console.error("Could not update saved listing:", error);
+      button.disabled = false;
+    }
+  });
+}
+
+async function loadSaveAction() {
+  try {
+    const response = await fetch("/api/user/saved-listings");
+    const saveAction = document.getElementById("detailSaveAction");
+    if (response.status === 401) {
+      saveAction.innerHTML = '<a class="save-sign-in" href="/user-login.html">Sign in to save this job</a>';
+      return;
+    }
+    if (!response.ok) throw new Error(`Saved listings request failed with status ${response.status}`);
+    const result = await response.json();
+    renderSaveAction(result.listings.some(listing => listing.id === listingId));
+  } catch (error) {
+    const status = document.getElementById("saveJobStatus");
+    if (status) status.textContent = "Saved jobs are temporarily unavailable.";
+    console.error("Could not load saved listing status:", error);
+  }
+}
+
 relatedList.addEventListener("click", event => {
   const relatedItem = event.target.closest(".related-item[data-id]");
   if (relatedItem) {
@@ -121,7 +170,9 @@ async function loadListing() {
           <div class="apply-box">
             <h3>Ready to Apply?</h3>
             <p>Click below to visit the official application page for this position at ${escapeHtml(listing.company)}.</p>
+            <div id="detailSaveAction"></div>
             ${applyLink ? `<a class="btn-apply" href="${applyLink}" target="_blank" rel="noopener">🚀 Apply Now on Official Site</a>` : '<span class="apply-unavailable">No direct link available. Contact the company directly.</span>'}
+            <p class="save-job-status" id="saveJobStatus" role="status" aria-live="polite"></p>
             <button class="btn-share" id="shareJobButton" type="button">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               Share this Job
@@ -145,6 +196,7 @@ async function loadListing() {
       }
     });
     loadRelated();
+    loadSaveAction();
 
     document.getElementById("shareJobButton").addEventListener("click", async () => {
       try {

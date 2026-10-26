@@ -53,6 +53,8 @@ test("admin page and API routes reject requests without a JWT", async () => {
 
   const userApi = await request("/api/user/session");
   assert.equal(userApi.status, 401);
+  const savedListings = await request("/api/user/saved-listings");
+  assert.equal(savedListings.status, 401);
   const userPage = await request("/dashboard", { redirect: "manual" });
   assert.equal(userPage.status, 302);
   assert.equal(userPage.headers.get("location"), "/user-login.html");
@@ -179,6 +181,9 @@ test("admin APIs validate invalid inputs before database access", async () => {
 test("job seekers can register and access only their own profile and matching-drive API", async () => {
   const originalExecute = pool.execute;
   const insertedValues = [];
+  const savedListingValues = [];
+  const removedListingValues = [];
+  const listingId = "11111111-1111-4111-8111-111111111111";
   const userPasswordHash = bcrypt.hashSync("a-strong-user-password", 12);
   pool.execute = async (sql, values = []) => {
     if (/INSERT INTO users/i.test(sql)) {
@@ -204,10 +209,40 @@ test("job seekers can register and access only their own profile and matching-dr
         created_at: "2026-10-26 00:00:00"
       }], []];
     }
+    if (/JOIN user_saved_listings saved/i.test(sql)) {
+      assert.deepEqual(values, ["17"]);
+      return [[{
+        id: listingId,
+        company: "Example",
+        role: "Engineer",
+        interview_type: "online",
+        interview_date: "2026-11-01",
+        location: "Chennai",
+        experience: "Fresher",
+        salary: "",
+        apply_link: "",
+        description: "Java and SQL role",
+        skills: ["Java", "SQL"],
+        category_id: null,
+        created_at: "2026-10-26 00:00:00",
+        updated_at: "2026-10-26 00:00:00"
+      }], []];
+    }
+    if (/SELECT id FROM interviews WHERE id = \? LIMIT 1/i.test(sql)) {
+      return [values[0] === listingId ? [{ id: listingId }] : [], []];
+    }
+    if (/INSERT INTO user_saved_listings/i.test(sql)) {
+      savedListingValues.push(values);
+      return [{ affectedRows: 1 }, []];
+    }
+    if (/DELETE FROM user_saved_listings/i.test(sql)) {
+      removedListingValues.push(values);
+      return [{ affectedRows: 1 }, []];
+    }
     if (/FROM interviews i LEFT JOIN categories/i.test(sql)) {
       assert.match(sql, /interview_date >= CURDATE\(\)/);
       return [[{
-        id: "job-1",
+        id: listingId,
         company: "Example",
         role: "Engineer",
         interview_type: "online",
@@ -258,6 +293,64 @@ test("job seekers can register and access only their own profile and matching-dr
     const dashboard = await request("/api/user/dashboard", { headers: { cookie: cookieHeader } });
     assert.equal(dashboard.status, 200);
     assert.equal((await dashboard.json()).listings[0].role, "Engineer");
+
+    const saved = await request("/api/user/saved-listings", { headers: { cookie: cookieHeader } });
+    assert.equal(saved.status, 200);
+    assert.equal((await saved.json()).listings[0].id, listingId);
+
+    const save = await request("/api/user/saved-listings", {
+      method: "POST",
+      headers: {
+        cookie: cookieHeader,
+        "content-type": "application/json",
+        origin: baseUrl
+      },
+      body: JSON.stringify({ listingId })
+    });
+    assert.equal(save.status, 200);
+    assert.deepEqual(await save.json(), { saved: true });
+    assert.deepEqual(savedListingValues, [["17", listingId]]);
+
+    const invalidSave = await request("/api/user/saved-listings", {
+      method: "POST",
+      headers: {
+        cookie: cookieHeader,
+        "content-type": "application/json",
+        origin: baseUrl
+      },
+      body: JSON.stringify({ listingId: "not-a-listing-id" })
+    });
+    assert.equal(invalidSave.status, 400);
+
+    const missingListing = await request("/api/user/saved-listings", {
+      method: "POST",
+      headers: {
+        cookie: cookieHeader,
+        "content-type": "application/json",
+        origin: baseUrl
+      },
+      body: JSON.stringify({ listingId: "22222222-2222-4222-8222-222222222222" })
+    });
+    assert.equal(missingListing.status, 404);
+    assert.deepEqual(savedListingValues, [["17", listingId]]);
+
+    const crossOriginSave = await request("/api/user/saved-listings", {
+      method: "POST",
+      headers: {
+        cookie: cookieHeader,
+        "content-type": "application/json",
+        origin: "https://attacker.invalid"
+      },
+      body: JSON.stringify({ listingId })
+    });
+    assert.equal(crossOriginSave.status, 403);
+
+    const removeSaved = await request(`/api/user/saved-listings/${listingId}`, {
+      method: "DELETE",
+      headers: { cookie: cookieHeader, origin: baseUrl }
+    });
+    assert.equal(removeSaved.status, 204);
+    assert.deepEqual(removedListingValues, [["17", listingId]]);
 
     const userLogin = await request("/api/user/login", {
       method: "POST",

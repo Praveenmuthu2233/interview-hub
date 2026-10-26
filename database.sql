@@ -82,6 +82,20 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `idx_users_created` (`created_at` DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `user_saved_listings` (
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `listing_id` CHAR(36) NOT NULL,
+  `saved_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`user_id`, `listing_id`),
+  KEY `idx_saved_listings_listing` (`listing_id`),
+  CONSTRAINT `fk_saved_listings_user`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_saved_listings_listing`
+    FOREIGN KEY (`listing_id`) REFERENCES `interviews` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Seed Categories
 INSERT IGNORE INTO `categories` (`id`, `name`, `slug`, `category_type`) VALUES
 (1, 'IT & Software', 'it-software', 'listing'),
