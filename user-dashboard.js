@@ -54,7 +54,91 @@ function renderProfile(user) {
       <div><dt>Experience</dt><dd>${profileValue(user.experience)}</dd></div>
       <div><dt>Preferred location</dt><dd>${profileValue(user.preferredLocation)}</dd></div>
       <div class="skills-field"><dt>Skills</dt><dd class="skill-list">${skillTags}</dd></div>
-    </dl>`;
+    </dl>
+    <form id="profileEditForm" class="profile-edit-form" hidden>
+      <div class="profile-form-grid">
+        <div class="portal-field full-width">
+          <label for="editFullName">Full name</label>
+          <input id="editFullName" name="fullName" maxlength="160" required/>
+        </div>
+        <div class="portal-field">
+          <label for="editPhone">Phone</label>
+          <input id="editPhone" name="phone" maxlength="40"/>
+        </div>
+        <div class="portal-field">
+          <label for="editEducation">Education</label>
+          <input id="editEducation" name="education" maxlength="180"/>
+        </div>
+        <div class="portal-field">
+          <label for="editGraduationYear">Graduation year</label>
+          <input id="editGraduationYear" name="graduationYear" type="number" min="1950" max="${new Date().getFullYear() + 10}" inputmode="numeric"/>
+        </div>
+        <div class="portal-field">
+          <label for="editExperience">Experience</label>
+          <input id="editExperience" name="experience" maxlength="240"/>
+        </div>
+        <div class="portal-field">
+          <label for="editSkills">Skills</label>
+          <input id="editSkills" name="skills" maxlength="1000" placeholder="Java, SQL, communication"/>
+        </div>
+        <div class="portal-field">
+          <label for="editPreferredLocation">Preferred location</label>
+          <input id="editPreferredLocation" name="preferredLocation" maxlength="160"/>
+        </div>
+      </div>
+      <div class="profile-edit-actions">
+        <button class="portal-button" id="saveProfileButton" type="submit">Save changes</button>
+        <button class="portal-button secondary" id="cancelProfileButton" type="button">Cancel</button>
+      </div>
+    </form>`;
+  document.getElementById("editProfileButton").hidden = false;
+  document.getElementById("cancelProfileButton").addEventListener("click", closeProfileEditor);
+  document.getElementById("profileEditForm").addEventListener("submit", saveProfile);
+}
+
+function openProfileEditor() {
+  document.getElementById("editFullName").value = currentUser.fullName || "";
+  document.getElementById("editPhone").value = currentUser.phone || "";
+  document.getElementById("editEducation").value = currentUser.education || "";
+  document.getElementById("editGraduationYear").value = currentUser.graduationYear || "";
+  document.getElementById("editExperience").value = currentUser.experience || "";
+  document.getElementById("editSkills").value = currentUser.skills.join(", ");
+  document.getElementById("editPreferredLocation").value = currentUser.preferredLocation || "";
+  document.getElementById("profileEditForm").hidden = false;
+  document.getElementById("editProfileButton").hidden = true;
+}
+
+function closeProfileEditor() {
+  document.getElementById("profileEditForm").hidden = true;
+  document.getElementById("editProfileButton").hidden = false;
+}
+
+document.getElementById("editProfileButton").addEventListener("click", openProfileEditor);
+
+async function saveProfile(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const button = document.getElementById("saveProfileButton");
+  const values = new FormData(form);
+  const profile = Object.fromEntries(values.entries());
+  profile.email = currentUser.email;
+  profile.skills = String(profile.skills).split(",").map(skill => skill.trim()).filter(Boolean);
+  button.disabled = true;
+  try {
+    const result = await apiRequest("/api/user/profile", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(profile)
+    });
+    renderProfile(result.user);
+    renderListings(currentListings, currentUser);
+    portalMessage.textContent = "Your profile has been updated.";
+    portalMessage.className = "portal-message show success";
+  } catch (error) {
+    portalMessage.textContent = error.message;
+    portalMessage.className = "portal-message show error";
+    button.disabled = false;
+  }
 }
 
 function scoreListing(listing, user) {

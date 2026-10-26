@@ -183,8 +183,21 @@ test("job seekers can register and access only their own profile and matching-dr
   const insertedValues = [];
   const savedListingValues = [];
   const removedListingValues = [];
+  const profileUpdateValues = [];
   const listingId = "11111111-1111-4111-8111-111111111111";
   const userPasswordHash = bcrypt.hashSync("a-strong-user-password", 12);
+  const profileRow = {
+    id: 17,
+    full_name: "Test Applicant",
+    email: "applicant@example.com",
+    phone: "+91 99999 11111",
+    education: "B.E. Computer Science",
+    graduation_year: 2026,
+    skills: '["Java","SQL"]',
+    experience: "Fresher",
+    preferred_location: "Chennai",
+    created_at: "2026-10-26 00:00:00"
+  };
   pool.execute = async (sql, values = []) => {
     if (/INSERT INTO users/i.test(sql)) {
       insertedValues.push(values);
@@ -196,18 +209,20 @@ test("job seekers can register and access only their own profile and matching-dr
     }
     if (/SELECT id, full_name, email/i.test(sql)) {
       assert.deepEqual(values, ["17"]);
-      return [[{
-        id: 17,
-        full_name: "Test Applicant",
-        email: "applicant@example.com",
-        phone: "+91 99999 11111",
-        education: "B.E. Computer Science",
-        graduation_year: 2026,
-        skills: '["Java","SQL"]',
-        experience: "Fresher",
-        preferred_location: "Chennai",
-        created_at: "2026-10-26 00:00:00"
-      }], []];
+      return [[profileRow], []];
+    }
+    if (/UPDATE users\s+SET full_name/i.test(sql)) {
+      profileUpdateValues.push(values);
+      [
+        profileRow.full_name,
+        profileRow.phone,
+        profileRow.education,
+        profileRow.graduation_year,
+        profileRow.skills,
+        profileRow.experience,
+        profileRow.preferred_location
+      ] = values;
+      return [{ affectedRows: 1 }, []];
     }
     if (/JOIN user_saved_listings saved/i.test(sql)) {
       assert.deepEqual(values, ["17"]);
@@ -289,6 +304,56 @@ test("job seekers can register and access only their own profile and matching-dr
     assert.equal(sessionBody.user.fullName, "Test Applicant");
     assert.deepEqual(sessionBody.user.skills, ["Java", "SQL"]);
     assert.equal(JSON.stringify(sessionBody).includes("password_hash"), false);
+
+    const invalidProfile = await request("/api/user/profile", {
+      method: "PUT",
+      headers: {
+        cookie: cookieHeader,
+        "content-type": "application/json",
+        origin: baseUrl
+      },
+      body: JSON.stringify({
+        fullName: "",
+        email: "applicant@example.com",
+        skills: []
+      })
+    });
+    assert.equal(invalidProfile.status, 400);
+    assert.equal(profileUpdateValues.length, 0);
+
+    const profileUpdate = await request("/api/user/profile", {
+      method: "PUT",
+      headers: {
+        cookie: cookieHeader,
+        "content-type": "application/json",
+        origin: baseUrl
+      },
+      body: JSON.stringify({
+        fullName: "Updated Applicant",
+        email: "changed@example.com",
+        phone: "+91 88888 22222",
+        education: "B.Sc. Computer Science",
+        graduationYear: "2025",
+        skills: ["Node.js", "SQL"],
+        experience: "1 year",
+        preferredLocation: "Remote"
+      })
+    });
+    assert.equal(profileUpdate.status, 200);
+    const updatedUser = (await profileUpdate.json()).user;
+    assert.equal(updatedUser.fullName, "Updated Applicant");
+    assert.equal(updatedUser.email, "applicant@example.com");
+    assert.deepEqual(updatedUser.skills, ["Node.js", "SQL"]);
+    assert.deepEqual(profileUpdateValues[0], [
+      "Updated Applicant",
+      "+91 88888 22222",
+      "B.Sc. Computer Science",
+      2025,
+      '["Node.js","SQL"]',
+      "1 year",
+      "Remote",
+      "17"
+    ]);
 
     const dashboard = await request("/api/user/dashboard", { headers: { cookie: cookieHeader } });
     assert.equal(dashboard.status, 200);

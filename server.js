@@ -548,6 +548,45 @@ app.get("/api/user/session", requireUser, async (request, response, next) => {
   }
 });
 
+app.put("/api/user/profile", checkSameOrigin, requireUser, async (request, response, next) => {
+  const sanitized = sanitizeUser(request.body);
+  if (sanitized.error) {
+    response.status(400).json({ error: sanitized.error });
+    return;
+  }
+  const user = sanitized.user;
+  try {
+    await pool.execute(
+      `UPDATE users
+       SET full_name = ?, phone = ?, education = ?, graduation_year = ?, skills = ?, experience = ?, preferred_location = ?
+       WHERE id = ?`,
+      [
+        user.fullName,
+        user.phone,
+        user.education,
+        user.graduationYear,
+        JSON.stringify(user.skills),
+        user.experience,
+        user.preferredLocation,
+        request.user.id
+      ]
+    );
+    const [rows] = await pool.execute(
+      `SELECT id, full_name, email, phone, education, graduation_year, skills, experience, preferred_location, created_at
+       FROM users WHERE id = ? LIMIT 1`,
+      [request.user.id]
+    );
+    if (!rows.length) {
+      response.clearCookie(USER_COOKIE_NAME, cookieOptions());
+      response.status(401).json({ error: "This user account is no longer available." });
+      return;
+    }
+    response.json({ user: mapUser(rows[0]) });
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.get("/api/user/dashboard", requireUser, async (request, response, next) => {
   try {
     const [rows] = await pool.execute(
