@@ -97,6 +97,7 @@ header {
 
 .adsbygoogle {
   display: block;
+  width: 100%;
 }
 
 .ad-label {

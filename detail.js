@@ -130,8 +130,20 @@ async function loadListing() {
         </div>
       </div>`;
 
-    window.adsbygoogle = window.adsbygoogle || [];
-    window.adsbygoogle.push({});
+    const listingAd = mainContent.querySelector(".adsbygoogle");
+    window.requestAnimationFrame(() => {
+      if (!listingAd || listingAd.getBoundingClientRect().width === 0) {
+        console.warn("Listing ad was not initialized because its container has no available width.");
+        return;
+      }
+
+      try {
+        window.adsbygoogle = window.adsbygoogle || [];
+        window.adsbygoogle.push({});
+      } catch (error) {
+        console.error("Listing ad initialization failed:", error);
+      }
+    });
     loadRelated();
 
     document.getElementById("shareJobButton").addEventListener("click", async () => {
