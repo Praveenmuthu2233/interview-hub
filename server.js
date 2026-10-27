@@ -228,6 +228,10 @@ function positiveId(value) {
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
+function isListingId(value) {
+  return typeof value === "string" && /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(value);
+}
+
 function validDate(value) {
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const date = new Date(`${value}T00:00:00Z`);
@@ -615,7 +619,7 @@ app.get("/api/user/saved-listings", requireUser, async (request, response, next)
 
 app.post("/api/user/saved-listings", checkSameOrigin, requireUser, async (request, response, next) => {
   const listingId = typeof request.body?.listingId === "string" ? request.body.listingId : "";
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(listingId)) {
+  if (!isListingId(listingId)) {
     response.status(400).json({ error: "A valid listing ID is required." });
     return;
   }
@@ -638,7 +642,7 @@ app.post("/api/user/saved-listings", checkSameOrigin, requireUser, async (reques
 
 app.delete("/api/user/saved-listings/:id", checkSameOrigin, requireUser, async (request, response, next) => {
   const listingId = request.params.id;
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(listingId)) {
+  if (!isListingId(listingId)) {
     response.status(400).json({ error: "A valid listing ID is required." });
     return;
   }

@@ -185,6 +185,7 @@ test("job seekers can register and access only their own profile and matching-dr
   const removedListingValues = [];
   const profileUpdateValues = [];
   const listingId = "11111111-1111-4111-8111-111111111111";
+  const legacyListingId = "11111111-1111-1111-1111-111111111101";
   const userPasswordHash = bcrypt.hashSync("a-strong-user-password", 12);
   const profileRow = {
     id: 17,
@@ -244,7 +245,7 @@ test("job seekers can register and access only their own profile and matching-dr
       }], []];
     }
     if (/SELECT id FROM interviews WHERE id = \? LIMIT 1/i.test(sql)) {
-      return [values[0] === listingId ? [{ id: listingId }] : [], []];
+      return [[listingId, legacyListingId].includes(values[0]) ? [{ id: values[0] }] : [], []];
     }
     if (/INSERT INTO user_saved_listings/i.test(sql)) {
       savedListingValues.push(values);
@@ -376,6 +377,19 @@ test("job seekers can register and access only their own profile and matching-dr
     assert.deepEqual(await save.json(), { saved: true });
     assert.deepEqual(savedListingValues, [["17", listingId]]);
 
+    const saveLegacyListing = await request("/api/user/saved-listings", {
+      method: "POST",
+      headers: {
+        cookie: cookieHeader,
+        "content-type": "application/json",
+        origin: baseUrl
+      },
+      body: JSON.stringify({ listingId: legacyListingId })
+    });
+    assert.equal(saveLegacyListing.status, 200);
+    assert.deepEqual(await saveLegacyListing.json(), { saved: true });
+    assert.deepEqual(savedListingValues, [["17", listingId], ["17", legacyListingId]]);
+
     const invalidSave = await request("/api/user/saved-listings", {
       method: "POST",
       headers: {
@@ -397,7 +411,7 @@ test("job seekers can register and access only their own profile and matching-dr
       body: JSON.stringify({ listingId: "22222222-2222-4222-8222-222222222222" })
     });
     assert.equal(missingListing.status, 404);
-    assert.deepEqual(savedListingValues, [["17", listingId]]);
+    assert.deepEqual(savedListingValues, [["17", listingId], ["17", legacyListingId]]);
 
     const crossOriginSave = await request("/api/user/saved-listings", {
       method: "POST",
@@ -416,6 +430,13 @@ test("job seekers can register and access only their own profile and matching-dr
     });
     assert.equal(removeSaved.status, 204);
     assert.deepEqual(removedListingValues, [["17", listingId]]);
+
+    const removeLegacySaved = await request(`/api/user/saved-listings/${legacyListingId}`, {
+      method: "DELETE",
+      headers: { cookie: cookieHeader, origin: baseUrl }
+    });
+    assert.equal(removeLegacySaved.status, 204);
+    assert.deepEqual(removedListingValues, [["17", listingId], ["17", legacyListingId]]);
 
     const userLogin = await request("/api/user/login", {
       method: "POST",
