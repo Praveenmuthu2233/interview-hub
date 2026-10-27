@@ -17,7 +17,7 @@ async function checkExistingSession() {
     });
 
     if (response.ok) {
-      window.location.replace("admin.html");
+      window.location.replace("/admin.html");
     }
   } catch {
     showMessage("Cannot connect to the admin server. Please try again.");
@@ -55,7 +55,7 @@ form.addEventListener("submit", async (event) => {
     }
 
     document.getElementById("password").value = "";
-    window.location.assign("admin.html");
+    window.location.assign("/admin.html");
 
   } catch {
     showMessage("Cannot connect to the admin server. Check your connection.");

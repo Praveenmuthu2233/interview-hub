@@ -165,7 +165,7 @@ function requireAdminPage(request, response, next) {
     next();
   } catch {
     response.clearCookie(ADMIN_COOKIE_NAME, cookieOptions());
-    response.redirect(302, "/admin-login.html");
+    response.redirect(302, "/admin/login.php");
   }
 }
 
@@ -1094,7 +1094,7 @@ app.get(["/admin/users", "/admin-users.html"], requireAdminPage, (request, respo
   response.sendFile(path.join(ROOT, "admin-users.html"));
 });
 
-app.get(["/admin-login", "/admin-login.html", "/admin-login.php"], (request, response) => {
+app.get(["/admin/login.php", "/admin/login", "/admin-login", "/admin-login.html", "/admin-login.php"], (request, response) => {
   response.sendFile(path.join(ROOT, "admin-login.html"));
 });
 
