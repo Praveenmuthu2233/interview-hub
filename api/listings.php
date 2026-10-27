@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Public Listings API
+ * Codeloop - Public Listings API
  * Handles listing retrieval (all, single, related)
  */
 

@@ -1144,7 +1144,7 @@ app.use((error, request, response, next) => {
 
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`InterviewEdge is running at http://localhost:${PORT}`);
+    console.log(`Codeloop is running at http://localhost:${PORT}`);
   });
 }
 

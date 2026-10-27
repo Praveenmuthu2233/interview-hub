@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Database Connection & Auto-Setup
+ * Codeloop - Database Connection & Auto-Setup
  * Configured for XAMPP Apache & MySQL
  */
 

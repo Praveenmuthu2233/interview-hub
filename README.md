@@ -1,6 +1,6 @@
-# InterviewEdge
+# Codeloop
 
-InterviewEdge is a responsive static website backed by a Node.js/Express API. Public pages load interview-drive listings from Cloud SQL for MySQL. Admin sign-in uses bcrypt-verified credentials and a short-lived JWT in an HttpOnly cookie. Cloud Run hosts the API and protected admin page; Firebase Hosting serves the public files and rewrites API/admin-page requests to Cloud Run so cookies stay same-origin.
+Codeloop is a responsive static website backed by a Node.js/Express API. Public pages load interview-drive listings from Cloud SQL for MySQL. Admin sign-in uses bcrypt-verified credentials and a short-lived JWT in an HttpOnly cookie. Cloud Run hosts the API and protected admin page; Firebase Hosting serves the public files and rewrites API/admin-page requests to Cloud Run so cookies stay same-origin.
 
 The existing site is a job/interview-drive portal. The migration preserves the listing fields and functionality, and adds Cloud SQL tables and APIs for interview questions, answers, categories, and registered job seekers. Existing Firestore records are not copied; see the cutover notes below.
 
@@ -165,7 +165,7 @@ Use the resulting Hosting domain (or attach a custom domain) for the website. Si
 
 ## Structure
 
-- Root HTML, CSS, and public JS: existing InterviewEdge website and responsive UI.
+- Root HTML, CSS, and public JS: existing Codeloop website and responsive UI.
 - `index.js`, `detail.js`, and `backup-index/`: public pages now call the JSON API instead of Firestore.
 - `admin.html`, `admin.css`, `admin.js`: protected existing listing dashboard.
 - `admin-login.html`, `admin-login.js`: separate login form; it sends credentials to the server and never handles a token in JavaScript.

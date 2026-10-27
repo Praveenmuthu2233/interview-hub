@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Admin Login Page (PHP + MySQL + Apache)
+ * Codeloop - Admin Login Page (PHP + MySQL + Apache)
  */
 require_once __DIR__ . '/config/auth.php';
 
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="color-scheme" content="light"/>
-  <title>Admin Sign In – InterviewEdge</title>
+  <title>Admin Sign In – Codeloop</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="admin.css"/>
   <script src="admin-login.js" defer></script>

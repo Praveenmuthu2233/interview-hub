@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Admin Dashboard (PHP + MySQL + Apache)
+ * Codeloop - Admin Dashboard (PHP + MySQL + Apache)
  */
 require_once __DIR__ . '/config/auth.php';
 require_once __DIR__ . '/config/helpers.php';
@@ -30,7 +30,7 @@ try {
 <html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Admin Panel – InterviewEdge</title>
+<title>Admin Panel – Codeloop</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="admin.css"/>
 <script src="admin.js" defer></script>
@@ -40,7 +40,7 @@ try {
 <header>
   <div class="header-inner">
     <div style="display:flex;align-items:center;gap:.5rem;">
-      <div class="logo">Interview<span>Edge</span></div>
+      <div class="logo"><img class="logo-image" src="11zon_cropped.png" alt=""/>Codeloop</div>
       <span class="badge-admin">Admin</span>
       <span class="fb-badge">⚡ PHP &amp; MySQL Connected</span>
     </div>

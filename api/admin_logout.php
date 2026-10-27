@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Admin Logout API
+ * Codeloop - Admin Logout API
  */
 
 header('Content-Type: application/json; charset=utf-8');

@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Categories API
+ * Codeloop - Categories API
  */
 
 header('Content-Type: application/json; charset=utf-8');

@@ -129,7 +129,7 @@ async function loadListing() {
     const { listing } = await response.json();
     const type = normalizedType(listing.type);
     const applyLink = safeExternalUrl(listing.applyLink);
-    document.title = `${listing.role} at ${listing.company} – InterviewEdge`;
+    document.title = `${listing.role} at ${listing.company} – Codeloop`;
 
     mainContent.innerHTML = `
       <div class="breadcrumb">

@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Health Check API
+ * Codeloop - Health Check API
  */
 
 header('Content-Type: application/json; charset=utf-8');

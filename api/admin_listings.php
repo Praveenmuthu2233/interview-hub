@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Admin Listings API (CRUD)
+ * Codeloop - Admin Listings API (CRUD)
  */
 
 header('Content-Type: application/json; charset=utf-8');

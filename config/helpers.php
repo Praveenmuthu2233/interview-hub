@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Data Mapping & Utility Helpers
+ * Codeloop - Data Mapping & Utility Helpers
  */
 
 /**

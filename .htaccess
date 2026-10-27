@@ -1,4 +1,4 @@
-# InterviewEdge - Apache Configuration for XAMPP
+# Codeloop - Apache Configuration for XAMPP
 DirectoryIndex index.php index.html
 
 <IfModule mod_rewrite.c>

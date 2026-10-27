@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Authentication Helper
+ * Codeloop - Authentication Helper
  * Handles session-based and cookie-based authentication for Admin Panel
  */
 

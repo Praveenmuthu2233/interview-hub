@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Master API Router
+ * Codeloop - Master API Router
  * Handles all requests routed through /api/*
  */
 
@@ -29,7 +29,7 @@ $segments = $apiPath !== '' ? explode('/', $apiPath) : [];
 
 // Route dispatching
 if (empty($segments)) {
-    sendJsonResponse(['status' => 'InterviewEdge API v1.0', 'endpoints' => ['/api/listings', '/api/categories', '/api/admin/listings']]);
+    sendJsonResponse(['status' => 'Codeloop API v1.0', 'endpoints' => ['/api/listings', '/api/categories', '/api/admin/listings']]);
 }
 
 $resource = $segments[0] ?? '';

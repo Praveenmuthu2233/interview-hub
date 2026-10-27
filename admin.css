@@ -1,5 +1,5 @@
 /* =========================================
-   InterviewEdge Admin Dashboard
+   Codeloop Admin Dashboard
    Clean, Modern & Fully Responsive Design
 ========================================= */
 
@@ -175,6 +175,13 @@ header {
   font-size: 1.55rem;
   font-weight: 900;
   letter-spacing: -0.8px;
+}
+
+.logo-image {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+  vertical-align: middle;
 }
 
 .logo span {

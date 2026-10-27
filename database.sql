@@ -1,4 +1,4 @@
--- InterviewEdge Database Schema and Seed Data
+-- Codeloop Database Schema and Seed Data
 -- Compatible with XAMPP Apache, MySQL & MariaDB
 -- Character set: utf8mb4
 
