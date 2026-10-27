@@ -15,7 +15,7 @@ require_once __DIR__ . '/config/db.php';
 <meta name="author" content="Codeloop"/>
 <meta name="robots" content="index, follow"/>
 <link rel="stylesheet" href="blog.css"/>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2328429365429845" crossorigin="anonymous"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4688273676746522" crossorigin="anonymous"></script>
 </head>
 <body>
 <header><div class="header-inner">
@@ -106,13 +106,13 @@ require_once __DIR__ . '/config/db.php';
       </a>
       <div class="ad-banner ad-banner--spaced">
         <div class="ad-label">Advertisement</div>
-        <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8556272397" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" data-ad-client="ca-pub-4688273676746522" data-ad-slot="8556272397" data-ad-format="auto" data-full-width-responsive="true"></ins>
       </div>
     </main>
     <aside class="sidebar">
       <div class="ad-banner">
         <div class="ad-label">Advertisement</div>
-        <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="8061448376" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" data-ad-client="ca-pub-4688273676746522" data-ad-slot="8061448376" data-ad-format="auto" data-full-width-responsive="true"></ins>
       </div>
       <div class="widget">
         <div class="widget-header">🔥 Popular Articles</div>

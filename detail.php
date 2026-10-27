@@ -56,7 +56,7 @@ $pageTitle = $listing ? htmlspecialchars($listing['role'] . ' at ' . $listing['c
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title><?= $pageTitle ?></title>
 <link rel="stylesheet" href="detail.css"/>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2328429365429845" crossorigin="anonymous"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4688273676746522" crossorigin="anonymous"></script>
 <script src="ads.js" defer></script>
 </head>
 <body>
@@ -91,7 +91,7 @@ $pageTitle = $listing ? htmlspecialchars($listing['role'] . ' at ' . $listing['c
 
       <div class="ad-banner">
         <div class="ad-label">Advertisement</div>
-        <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="2233445566" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" data-ad-client="ca-pub-4688273676746522" data-ad-slot="2233445566" data-ad-format="auto" data-full-width-responsive="true"></ins>
       </div>
 
       <div class="detail-card">
@@ -165,7 +165,7 @@ $pageTitle = $listing ? htmlspecialchars($listing['role'] . ' at ' . $listing['c
   <aside class="sidebar">
     <div class="ad-banner">
       <div class="ad-label">Advertisement</div>
-      <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="1122334455" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <ins class="adsbygoogle" data-ad-client="ca-pub-4688273676746522" data-ad-slot="1122334455" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
     <div class="sidebar-widget">
       <div class="widget-header">🔗 Related Listings</div>
@@ -185,7 +185,7 @@ $pageTitle = $listing ? htmlspecialchars($listing['role'] . ' at ' . $listing['c
     </div>
     <div class="ad-banner">
       <div class="ad-label">Advertisement</div>
-      <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="5566778899" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <ins class="adsbygoogle" data-ad-client="ca-pub-4688273676746522" data-ad-slot="5566778899" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
   </aside>
 </div>

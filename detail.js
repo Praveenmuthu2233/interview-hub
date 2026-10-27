@@ -139,7 +139,7 @@ async function loadListing() {
       </div>
       <div class="ad-banner">
         <div class="ad-label">Advertisement</div>
-        <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="2233445566" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" data-ad-client="ca-pub-4688273676746522" data-ad-slot="2233445566" data-ad-format="auto" data-full-width-responsive="true"></ins>
       </div>
       <div class="detail-card">
         <div class="detail-hero">
