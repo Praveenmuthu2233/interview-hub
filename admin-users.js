@@ -24,7 +24,7 @@ async function apiRequest(path, options = {}) {
     throw new Error("The admin server could not be reached. Check your connection and retry.");
   }
   if (response.status === 401) {
-    window.location.replace("/admin/login.php");
+    window.location.replace("/admin-login");
     throw new Error("Your admin session expired. Please sign in again.");
   }
   if (response.status === 204) return null;
@@ -86,7 +86,7 @@ document.getElementById("userSearch").addEventListener("input", renderUsers);
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   try {
     await apiRequest("/api/admin/logout", { method: "POST" });
-    window.location.replace("/admin/login.php");
+    window.location.replace("/admin-login");
   } catch (error) {
     showToast(error.message || "Could not log out.");
   }

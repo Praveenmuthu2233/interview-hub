@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Codeloop - Interview Detail Page (PHP + MySQL + Apache)
  */
@@ -63,8 +63,8 @@ $pageTitle = $listing ? htmlspecialchars($listing['role'] . ' at ' . $listing['c
 
 <header>
   <div class="header-inner">
-    <a href="index.php" class="logo"><img class="logo-image" src="11zon_cropped.png" alt=""/>Codeloop</a>
-    <a href="index.php" class="back-btn">
+    <a href="/" class="logo"><img class="logo-image" src="11zon_cropped.png" alt=""/>Codeloop</a>
+    <a href="/" class="back-btn">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       Back to Listings
     </a>
@@ -77,15 +77,15 @@ $pageTitle = $listing ? htmlspecialchars($listing['role'] . ' at ' . $listing['c
       <div class="not-found">
         <h2>Listing Not Found</h2>
         <p>This interview listing may have been removed or the link is incorrect.</p>
-        <a class="back-home" href="index.php">← Back to Home</a>
+        <a class="back-home" href="/">← Back to Home</a>
       </div>
     <?php else: 
       $type = in_array($listing['type'], ['online', 'offline', 'walkin']) ? $listing['type'] : 'other';
       $typeLabel = $type === 'walkin' ? 'Walk-in' : ucfirst($type);
     ?>
       <div class="breadcrumb">
-        <a href="index.php">Home</a><span>›</span>
-        <a href="index.php">Listings</a><span>›</span>
+        <a href="/">Home</a><span>›</span>
+        <a href="/">Listings</a><span>›</span>
         <span><?= htmlspecialchars($listing['company']) ?></span>
       </div>
 
@@ -172,7 +172,7 @@ $pageTitle = $listing ? htmlspecialchars($listing['role'] . ' at ' . $listing['c
       <div class="widget-body" id="relatedList">
         <?php if (!empty($relatedListings)): ?>
           <?php foreach ($relatedListings as $rel): ?>
-            <div class="related-item" data-id="<?= htmlspecialchars($rel['id']) ?>" role="button" tabindex="0" onclick="window.location.href='detail.php?id=<?= urlencode($rel['id']) ?>'">
+            <div class="related-item" data-id="<?= htmlspecialchars($rel['id']) ?>" role="button" tabindex="0" onclick="window.location.href='/detail?id=<?= urlencode($rel['id']) ?>'">
               <div class="related-company"><?= htmlspecialchars($rel['company']) ?></div>
               <div class="related-role"><?= htmlspecialchars($rel['role']) ?></div>
               <div class="related-date"><?= formatDetailDate($rel['date']) ?></div>
@@ -194,12 +194,12 @@ $pageTitle = $listing ? htmlspecialchars($listing['role'] . ' at ' . $listing['c
   <div class="footer-bottom">
     <div class="footer-copy">© 2026 Codeloop · Built with PHP &amp; MySQL in Chennai, Tamil Nadu</div>
     <div class="footer-links-row">
-      <a href="index.php">Home</a>
-      <a href="about.html">About</a>
-      <a href="contact.php">Contact</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="terms.html">Terms</a>
-      <a href="disclaimer.html">Disclaimer</a>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/disclaimer">Disclaimer</a>
     </div>
   </div>
 </footer>

@@ -67,6 +67,16 @@ if (
 const app = express();
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
+// Redirect Render hostname to canonical domain
+app.use((request, response, next) => {
+  const host = request.get("host") || "";
+  const fwdHost = request.get("x-forwarded-host") || "";
+  if (host.includes("interview-hub-1-kvh8.onrender.com") || fwdHost.includes("interview-hub-1-kvh8.onrender.com")) {
+    return response.redirect(302, "https://codeloopyt.site" + request.originalUrl);
+  }
+  next();
+});
+
 app.use(express.json({ limit: "50kb" }));
 app.use(cookieParser());
 app.use((request, response, next) => {
@@ -165,7 +175,7 @@ function requireAdminPage(request, response, next) {
     next();
   } catch {
     response.clearCookie(ADMIN_COOKIE_NAME, cookieOptions());
-    response.redirect(302, "/admin/login.php");
+    response.redirect(302, "/admin-login");
   }
 }
 
@@ -206,7 +216,7 @@ function requireUserPage(request, response, next) {
     next();
   } catch {
     response.clearCookie(USER_COOKIE_NAME, cookieOptions());
-    response.redirect(302, "/user-login.html");
+    response.redirect(302, "/user-login");
   }
 }
 
@@ -1110,6 +1120,59 @@ app.get(["/dashboard", "/user-dashboard.html"], requireUserPage, (request, respo
   response.set("Cache-Control", "no-store");
   response.sendFile(path.join(ROOT, "user-dashboard.html"));
 });
+
+app.get(["/about", "/about.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "about.html"));
+});
+
+app.get(["/privacy", "/privacy.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "privacy.html"));
+});
+
+app.get(["/terms", "/terms.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "terms.html"));
+});
+
+app.get(["/disclaimer", "/disclaimer.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "disclaimer.html"));
+});
+
+app.get(["/blog", "/blog.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog.html"));
+});
+
+app.get(["/contact", "/contact.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "contact.html"));
+});
+
+app.get(["/detail", "/detail.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "detail.html"));
+});
+
+app.get(["/blog/hr-interview-questions", "/blog-hr-interview-questions.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-hr-interview-questions.html"));
+});
+
+app.get(["/blog/crack-technical-interview", "/blog-crack-technical-interview.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-crack-technical-interview.html"));
+});
+
+app.get(["/blog/fresher-resume-tips", "/blog-fresher-resume-tips.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-fresher-resume-tips.html"));
+});
+
+app.get(["/blog/java-interview-questions", "/blog-java-interview-questions.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-java-interview-questions.html"));
+});
+
+app.get(["/blog/walk-in-interview-tips", "/blog-walk-in-interview-tips.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-walk-in-interview-tips.html"));
+});
+
+app.get(["/blog/aptitude-test-tips", "/blog-aptitude-test-tips.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-aptitude-test-tips.html"));
+});
+
 
 app.use("/api", (request, response) => {
   response.status(404).json({ error: "API endpoint not found." });

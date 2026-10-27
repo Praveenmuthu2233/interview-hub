@@ -3,7 +3,7 @@
 <head>
 <link rel="icon" type="image/png" href="favicon.png"/>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Admin Panel ‚Äì Codeloop</title>
+<title>Admin Panel ñ Codeloop</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <!-- <style>
 :root{--bg:#0a0e1a;--surface:#111827;--card:#161d2e;--border:#1e2d45;--accent:#f59e0b;--accent2:#3b82f6;--text:#e2e8f0;--muted:#64748b;--green:#10b981;--red:#ef4444;--red-bg:rgba(239,68,68,.12);}
@@ -89,12 +89,12 @@ tr:hover td{background:rgba(255,255,255,.012);}
     <div style="display:flex;align-items:center;gap:.5rem;">
       <div class="logo">Code<span style="color: #ff5e00;">Loop</span></div>
       <span class="badge-admin">Admin</span>
-      <span class="fb-badge">‚ö° PHP &amp; MySQL Connected</span>
+      <span class="fb-badge">? PHP &amp; MySQL Connected</span>
     </div>
     <div class="header-actions">
-      <a href="admin-users.html" class="back-link">Registered Users</a>
+      <a href="/admin/users" class="back-link">Registered Users</a>
       <button class="btn-secondary" id="logoutBtn" type="button">Log out</button>
-      <a href="index.html" class="back-link">‚Üê View Public Site</a>
+      <a href="/" class="back-link">? View Public Site</a>
     </div>
   </div>
 </header>
@@ -103,7 +103,7 @@ tr:hover td{background:rgba(255,255,255,.012);}
   <div>
     <div class="form-card">
       <div class="form-card-header">
-        <div class="form-card-title" id="formTitle">‚ûï Add Interview Listing</div>
+        <div class="form-card-title" id="formTitle">? Add Interview Listing</div>
         <div class="form-card-sub" id="formSub">Fill in all the details below</div>
       </div>
       <div class="form-body">
@@ -143,13 +143,13 @@ tr:hover td{background:rgba(255,255,255,.012);}
           </div>
           <div class="form-group">
             <label>Salary / Package</label>
-            <input class="form-control" id="fSalary" placeholder="e.g. ‚Çπ4 LPA"/>
+            <input class="form-control" id="fSalary" placeholder="e.g. ?4 LPA"/>
           </div>
         </div>
         <div class="form-group">
           <label>Skills (press Enter or comma)</label>
           <div class="tags-input-wrap" id="tagsWrap">
-            <input id="tagField" class="tag-input-field" placeholder="e.g. Java, Python‚Ä¶"/>
+            <input id="tagField" class="tag-input-field" placeholder="e.g. Java, PythonÖ"/>
           </div>
         </div>
         <div class="form-group">
@@ -158,11 +158,11 @@ tr:hover td{background:rgba(255,255,255,.012);}
         </div>
         <div class="form-group">
           <label>Description * (full details, eligibility, process)</label>
-          <textarea class="form-control" id="fDesc" placeholder="Describe the interview process, eligibility criteria, documents needed, venue details, deadlines‚Ä¶"></textarea>
+          <textarea class="form-control" id="fDesc" placeholder="Describe the interview process, eligibility criteria, documents needed, venue details, deadlinesÖ"></textarea>
         </div>
         <div style="display:flex;gap:.5rem;">
-          <button class="btn-primary" id="saveBtn" type="button">üíæ Save Listing</button>
-          <button class="btn-secondary" id="resetBtn" type="button">‚úï Reset</button>
+          <button class="btn-primary" id="saveBtn" type="button">?? Save Listing</button>
+          <button class="btn-secondary" id="resetBtn" type="button">? Reset</button>
         </div>
       </div>
     </div>
@@ -170,10 +170,10 @@ tr:hover td{background:rgba(255,255,255,.012);}
 
   <div>
     <div class="stats-bar" id="statsBar">
-      <div class="stat-card"><div class="stat-card-label">Total</div><div class="stat-card-val accent">‚Äì</div></div>
-      <div class="stat-card"><div class="stat-card-label">Online</div><div class="stat-card-val green">‚Äì</div></div>
-      <div class="stat-card"><div class="stat-card-label">Walk-in</div><div class="stat-card-val blue">‚Äì</div></div>
-      <div class="stat-card"><div class="stat-card-label">Today</div><div class="stat-card-val red">‚Äì</div></div>
+      <div class="stat-card"><div class="stat-card-label">Total</div><div class="stat-card-val accent">ñ</div></div>
+      <div class="stat-card"><div class="stat-card-label">Online</div><div class="stat-card-val green">ñ</div></div>
+      <div class="stat-card"><div class="stat-card-label">Walk-in</div><div class="stat-card-val blue">ñ</div></div>
+      <div class="stat-card"><div class="stat-card-label">Today</div><div class="stat-card-val red">ñ</div></div>
     </div>
     <div class="table-card">
       <div class="table-header">
@@ -183,7 +183,7 @@ tr:hover td{background:rgba(255,255,255,.012);}
         </div>
         <div class="table-search">
           <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" id="adminSearch" placeholder="Search‚Ä¶" aria-label="Search listings"/>
+          <input type="text" id="adminSearch" placeholder="SearchÖ" aria-label="Search listings"/>
         </div>
       </div>
       <div class="table-wrap">
@@ -191,7 +191,7 @@ tr:hover td{background:rgba(255,255,255,.012);}
           <thead>
             <tr><th>Company</th><th>Role</th><th>Type</th><th>Date</th><th>Location</th><th>Actions</th></tr>
           </thead>
-          <tbody id="tableBody"><tr class="empty-row"><td colspan="6">Loading‚Ä¶</td></tr></tbody>
+          <tbody id="tableBody"><tr class="empty-row"><td colspan="6">LoadingÖ</td></tr></tbody>
         </table>
       </div>
     </div>

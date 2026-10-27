@@ -33,7 +33,7 @@ async function apiRequest(path, options = {}) {
   }
 
   if (response.status === 401) {
-    window.location.assign("/admin/login.php");
+    window.location.assign("/admin-login");
     throw new Error("Your admin session expired. Please sign in again.");
   }
   if (response.status === 204) return null;
@@ -53,7 +53,7 @@ function renderTags() {
     removeButton.type = "button";
     removeButton.dataset.removeTag = String(index);
     removeButton.setAttribute("aria-label", `Remove ${skill}`);
-    removeButton.textContent = "×";
+    removeButton.textContent = "�";
     tag.append(removeButton);
     tagsWrap.insertBefore(tag, tagField);
   });
@@ -67,16 +67,16 @@ function resetForm() {
   document.getElementById("fType").value = "online";
   skills = [];
   renderTags();
-  document.getElementById("formTitle").textContent = "➕ Add Interview Listing";
+  document.getElementById("formTitle").textContent = "? Add Interview Listing";
   document.getElementById("formSub").textContent = "Fill in all the details below";
   document.getElementById("fDate").value = new Date().toISOString().slice(0, 10);
 }
 
 function formatDate(value) {
-  if (!value) return "—";
+  if (!value) return "�";
   const date = new Date(value);
   return Number.isNaN(date.getTime())
-    ? "—"
+    ? "�"
     : date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
@@ -111,17 +111,17 @@ function renderTable() {
       <td class="td-role">${escapeHtml(item.role)}</td>
       <td><span class="type-badge type-${type}">${type === "walkin" ? "Walk-in" : escapeHtml(type)}</span></td>
       <td>${formatDate(item.date)}</td>
-      <td>${escapeHtml(item.location || "—")}</td>
+      <td>${escapeHtml(item.location || "�")}</td>
       <td><div class="action-btns">
-        <button class="btn-edit" type="button" data-action="edit" data-entry-id="${encodeURIComponent(item.id)}">✏️ Edit</button>
-        <button class="btn-delete" type="button" data-action="delete" data-entry-id="${encodeURIComponent(item.id)}">🗑️ Delete</button>
+        <button class="btn-edit" type="button" data-action="edit" data-entry-id="${encodeURIComponent(item.id)}">?? Edit</button>
+        <button class="btn-delete" type="button" data-action="delete" data-entry-id="${encodeURIComponent(item.id)}">??? Delete</button>
       </div></td>
     </tr>`;
   }).join("");
 }
 
 async function loadListings() {
-  tableBody.innerHTML = '<tr class="empty-row"><td colspan="6">Loading listings…</td></tr>';
+  tableBody.innerHTML = '<tr class="empty-row"><td colspan="6">Loading listings�</td></tr>';
   try {
     const result = await apiRequest("/api/admin/listings");
     cachedData = result.listings || [];
@@ -157,21 +157,21 @@ async function saveEntry() {
 
   const editId = document.getElementById("editId").value;
   saveButton.disabled = true;
-  saveButton.textContent = "⏳ Saving…";
+  saveButton.textContent = "? Saving�";
   try {
     await apiRequest(editId ? `/api/admin/listings/${encodeURIComponent(editId)}` : "/api/admin/listings", {
       method: editId ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(listing)
     });
-    showToast(editId ? "✅ Listing updated." : "✅ Listing saved.", true);
+    showToast(editId ? "? Listing updated." : "? Listing saved.", true);
     resetForm();
     await loadListings();
   } catch (error) {
     showToast(error.message || "Could not save the listing.");
   } finally {
     saveButton.disabled = false;
-    saveButton.textContent = "💾 Save Listing";
+    saveButton.textContent = "?? Save Listing";
   }
 }
 
@@ -193,7 +193,7 @@ function editEntry(id) {
   document.getElementById("fDesc").value = item.description || "";
   skills = Array.isArray(item.skills) ? [...item.skills] : [];
   renderTags();
-  document.getElementById("formTitle").textContent = "✏️ Edit Listing";
+  document.getElementById("formTitle").textContent = "?? Edit Listing";
   document.getElementById("formSub").textContent = `Editing: ${item.role} @ ${item.company}`;
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -202,7 +202,7 @@ async function deleteEntry(id) {
   if (!window.confirm("Delete this listing? This cannot be undone.")) return;
   try {
     await apiRequest(`/api/admin/listings/${encodeURIComponent(id)}`, { method: "DELETE" });
-    showToast("🗑️ Listing deleted.", true);
+    showToast("??? Listing deleted.", true);
     await loadListings();
   } catch (error) {
     showToast(error.message || "Could not delete the listing.");
@@ -249,7 +249,7 @@ document.getElementById("resetBtn").addEventListener("click", resetForm);
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   try {
     await apiRequest("/api/admin/logout", { method: "POST" });
-    window.location.replace("/admin/login.php");
+    window.location.replace("/admin-login");
   } catch (error) {
     showToast(error.message || "Could not log out.");
   }

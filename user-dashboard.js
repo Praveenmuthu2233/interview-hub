@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 const profileContainer = document.getElementById("profileDetails");
 const jobList = document.getElementById("jobList");
@@ -23,7 +23,7 @@ async function apiRequest(path, options = {}) {
     throw new Error("The account service could not be reached. Check your connection and retry.");
   }
   if (response.status === 401) {
-    window.location.replace("/user-login.html");
+    window.location.replace("/user-login");
     throw new Error("Your session expired. Please sign in again.");
   }
   if (response.status === 204) return null;
@@ -185,7 +185,7 @@ function jobCardMarkup(listing, matchedSkills = []) {
     <details class="job-description"><summary>Read role and eligibility details</summary><p>${escapeHtml(listing.description)}</p></details>
     ${matchedSkills.length ? `<p class="matched-skills">Matches your skills: ${escapeHtml(matchedSkills.join(", "))}</p>` : ""}
     <div class="job-actions">
-      <a class="apply-link" href="/detail.html?id=${encodeURIComponent(listing.id)}">Apply now</a>
+      <a class="apply-link" href="/detail?id=${encodeURIComponent(listing.id)}">Apply now</a>
       <button class="save-job-button" type="button" data-listing-id="${escapeHtml(listing.id)}" aria-pressed="${isSaved}">
         ${isSaved ? "Remove saved job" : "Save job"}
       </button>
@@ -292,7 +292,7 @@ document.getElementById("logoutButton").addEventListener("click", async event =>
   button.disabled = true;
   try {
     await apiRequest("/api/user/logout", { method: "POST" });
-    window.location.replace("/user-login.html");
+    window.location.replace("/user-login");
   } catch (error) {
     portalMessage.textContent = error.message;
     portalMessage.className = "portal-message show error";

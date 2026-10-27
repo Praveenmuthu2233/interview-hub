@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 const mainContent = document.getElementById("mainContent");
 const relatedList = document.getElementById("relatedList");
@@ -38,7 +38,7 @@ function formatType(type) {
 }
 
 function backToHomeLink() {
-  return '<a class="back-home" href="index.html">← Back to Home</a>';
+  return '<a class="back-home" href="/">← Back to Home</a>';
 }
 
 function renderSaveAction(isSaved) {
@@ -77,7 +77,7 @@ async function loadSaveAction() {
     const response = await fetch("/api/user/saved-listings");
     const saveAction = document.getElementById("detailSaveAction");
     if (response.status === 401) {
-      saveAction.innerHTML = '<a class="save-sign-in" href="/user-login.html">Sign in to save this job</a>';
+      saveAction.innerHTML = '<a class="save-sign-in" href="/user-login">Sign in to save this job</a>';
       return;
     }
     if (!response.ok) throw new Error(`Saved listings request failed with status ${response.status}`);
@@ -93,7 +93,7 @@ async function loadSaveAction() {
 relatedList.addEventListener("click", event => {
   const relatedItem = event.target.closest(".related-item[data-id]");
   if (relatedItem) {
-    window.location.href = `detail.html?id=${encodeURIComponent(relatedItem.dataset.id)}`;
+    window.location.href = `/detail?id=${encodeURIComponent(relatedItem.dataset.id)}`;
   }
 });
 
@@ -133,8 +133,8 @@ async function loadListing() {
 
     mainContent.innerHTML = `
       <div class="breadcrumb">
-        <a href="index.html">Home</a><span>›</span>
-        <a href="index.html">Listings</a><span>›</span>
+        <a href="/">Home</a><span>›</span>
+        <a href="/">Listings</a><span>›</span>
         <span>${escapeHtml(listing.company)}</span>
       </div>
       <div class="ad-banner">

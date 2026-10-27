@@ -1,4 +1,4 @@
-const PER_PAGE = 9;
+﻿const PER_PAGE = 9;
 let allData = [];
 let currentFilter = 'all';
 let searchQuery = '';
@@ -90,7 +90,7 @@ function renderCards() {
       <div class="card-desc">${esc(d.description || 'No description available.')}</div>
       <div class="card-footer">
         <div class="card-tags">${(d.skills || []).slice(0, 3).map(s => `<span class="tag">${esc(s)}</span>`).join('')}</div>
-        <a class="card-link" href="detail.html?id=${encodeURIComponent(d.id)}">View &amp; Apply →</a>
+        <a class="card-link" href="/detail?id=${encodeURIComponent(d.id)}">View &amp; Apply →</a>
       </div>
     </div>`;
   }).join('');
@@ -226,14 +226,14 @@ document.getElementById('pagination').addEventListener('click', e => {
 document.getElementById('cardsGrid').addEventListener('click', e => {
   if (e.target.closest('a')) return;
   const card = e.target.closest('[data-detail-id]');
-  if (card) window.location.href = `detail.html?id=${card.dataset.detailId}`;
+  if (card) window.location.href = `/detail?id=${card.dataset.detailId}`;
 });
 
 document.getElementById('cardsGrid').addEventListener('keydown', e => {
   const card = e.target.closest('[data-detail-id]');
   if (card && e.target === card && (e.key === 'Enter' || e.key === ' ')) {
     e.preventDefault();
-    window.location.href = `detail.html?id=${card.dataset.detailId}`;
+    window.location.href = `/detail?id=${card.dataset.detailId}`;
   }
 });
 

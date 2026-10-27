@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Codeloop - Main Home Page (PHP + MySQL + Apache)
  */
@@ -57,11 +57,11 @@ try {
 <meta name="keywords" content="latest interview drives India, walk-in jobs India, fresher jobs 2026, off campus drives India, TCS interview drive, Infosys hiring freshers, Wipro walk-in drive, IT jobs Chennai 2026"/>
 <meta name="author" content="Codeloop"/>
 <meta name="robots" content="index, follow"/>
-<link rel="canonical" href="http://localhost/"/>
+<link rel="canonical" href="https://codeloopyt.site/"/>
 <meta property="og:title" content="Codeloop – Latest Interview Drives & Jobs India"/>
 <meta property="og:description" content="Daily updated job interviews, walk-ins and fresher hiring alerts across India."/>
 <meta property="og:type" content="website"/>
-<meta property="og:url" content="http://localhost/"/>
+<meta property="og:url" content="https://codeloopyt.site/"/>
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4688273676746522" crossorigin="anonymous"></script>
 <script src="ads.js" defer></script>
@@ -75,22 +75,22 @@ try {
 <!-- ── HEADER ─────────────────────────────────────────── -->
 <header>
   <div class="header-inner">
-    <a href="index.php" class="logo"><img class="logo-image" src="11zon_cropped.png" alt=""/>Codeloop</a>
+    <a href="/" class="logo"><img class="logo-image" src="11zon_cropped.png" alt=""/>Codeloop</a>
     <button class="nav-toggle" id="navToggle" type="button" aria-controls="mainNav" aria-expanded="false" aria-label="Open navigation">Menu</button>
     <nav class="nav" id="mainNav">
-      <a href="index.php" class="active">Home</a>
-      <a href="blog.php">Blog</a>
-      <a href="about.html">About</a>
-      <a href="contact.php">Contact</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="disclaimer.html">Disclaimer</a>
+      <a href="/" class="active">Home</a>
+      <a href="/blog">Blog</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/disclaimer">Disclaimer</a>
     </nav>
     <div class="header-actions">
       <div class="search-wrap">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input type="text" id="searchInput" placeholder="Search company, role…" aria-label="Search jobs by company, role, skills, or description"/>
       </div>
-      <a href="admin.php" class="btn-admin">⚙ Admin</a>
+      <a href="/admin" class="btn-admin">⚙ Admin</a>
     </div>
   </div>
 </header>
@@ -112,7 +112,7 @@ try {
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         Browse Listings
       </a>
-      <a href="blog.php" class="btn-secondary">
+      <a href="/blog" class="btn-secondary">
         📝 Interview Tips
       </a>
     </div>
@@ -173,40 +173,40 @@ try {
     <div class="blog-strip">
       <div class="section-header">
         <div class="section-title">📝 Interview Tips &amp; Guides</div>
-        <a href="blog.php" class="blog-all-link">View All →</a>
+        <a href="/blog" class="blog-all-link">View All →</a>
       </div>
       <div class="blog-cards">
-        <a href="blog-hr-interview-questions.html" class="blog-card">
+        <a href="/blog/hr-interview-questions" class="blog-card">
           <span class="blog-tag">HR Interview</span>
           <div class="blog-title">Top 50 HR Interview Questions &amp; Best Answers (2026)</div>
           <div class="blog-meta">📅 May 2026 · ⏱ 12 min read</div>
           <div class="blog-arrow">Read Guide →</div>
         </a>
-        <a href="blog-crack-technical-interview.html" class="blog-card">
+        <a href="/blog/crack-technical-interview" class="blog-card">
           <span class="blog-tag">Technical</span>
           <div class="blog-title">How to Crack Technical Interviews at TCS, Infosys &amp; Wipro</div>
           <div class="blog-meta">📅 Apr 2026 · ⏱ 10 min read</div>
           <div class="blog-arrow">Read Guide →</div>
         </a>
-        <a href="blog-java-interview-questions.html" class="blog-card">
+        <a href="/blog/java-interview-questions" class="blog-card">
           <span class="blog-tag">Java</span>
           <div class="blog-title">Top 60 Java Interview Questions &amp; Answers (2026)</div>
           <div class="blog-meta">📅 Mar 2026 · ⏱ 14 min read</div>
           <div class="blog-arrow">Read Guide →</div>
         </a>
-        <a href="blog-fresher-resume-tips.html" class="blog-card">
+        <a href="/blog/fresher-resume-tips" class="blog-card">
           <span class="blog-tag">Resume</span>
           <div class="blog-title">How to Write a Fresher Resume That Gets Shortlisted</div>
           <div class="blog-meta">📅 Apr 2026 · ⏱ 8 min read</div>
           <div class="blog-arrow">Read Guide →</div>
         </a>
-        <a href="blog-walk-in-interview-tips.html" class="blog-card">
+        <a href="/blog/walk-in-interview-tips" class="blog-card">
           <span class="blog-tag">Walk-in Prep</span>
           <div class="blog-title">Walk-In Interview Tips: Complete Preparation Checklist</div>
           <div class="blog-meta">📅 Mar 2026 · ⏱ 7 min read</div>
           <div class="blog-arrow">Read Guide →</div>
         </a>
-        <a href="blog-aptitude-test-tips.html" class="blog-card">
+        <a href="/blog/aptitude-test-tips" class="blog-card">
           <span class="blog-tag">Aptitude</span>
           <div class="blog-title">How to Clear Aptitude Tests for IT Companies</div>
           <div class="blog-meta">📅 Feb 2026 · ⏱ 9 min read</div>
@@ -267,7 +267,7 @@ try {
   <div class="footer-inner">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="index.php" class="logo"><img class="logo-image" src="11zon_cropped.png" alt=""/>Codeloop</a>
+        <a href="/" class="logo"><img class="logo-image" src="11zon_cropped.png" alt=""/>Codeloop</a>
         <p class="footer-desc">Your go-to source for the latest interview drives, walk-ins, and job openings. Updated daily with verified listings from top companies across India.</p>
         <a class="contact-link social-link" href="https://www.instagram.com/codeloop_yt/" target="_blank" rel="noopener noreferrer">Instagram: @codeloop_yt</a>
         <a class="contact-link social-link" href="https://www.youtube.com/@CodeLoop-SP" target="_blank" rel="noopener noreferrer">YouTube: Codeloop</a>
@@ -283,11 +283,11 @@ try {
       <div class="footer-col">
         <h4>Quick Links</h4>
         <div class="footer-links">
-          <a href="index.php">Home</a>
-          <a href="blog.php">Blog &amp; Guides</a>
-          <a href="about.html">About Us</a>
-          <a href="contact.php">Contact Us</a>
-          <a href="admin.php">Admin Panel</a>
+          <a href="/">Home</a>
+          <a href="/blog">Blog &amp; Guides</a>
+          <a href="/about">About Us</a>
+          <a href="/contact">Contact Us</a>
+          <a href="/admin">Admin Panel</a>
         </div>
       </div>
       <div class="footer-col">
@@ -301,15 +301,15 @@ try {
       <div class="footer-col">
         <h4>Legal</h4>
         <div class="footer-links">
-          <a href="privacy.html">Privacy Policy</a>
-          <a href="terms.html">Terms of Service</a>
-          <a href="disclaimer.html">Disclaimer</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/disclaimer">Disclaimer</a>
         </div>
       </div>
     </div>
     <div class="footer-bottom">
       <div class="footer-copy">© 2026 Codeloop. All rights reserved. Powered by PHP &amp; MySQL. Built with ❤️ in Chennai.</div>
-      <div class="footer-copy"><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="disclaimer.html">Disclaimer</a></div>
+      <div class="footer-copy"><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/disclaimer">Disclaimer</a></div>
     </div>
   </div>
 </footer>

@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 const header = document.querySelector("header .header-inner, header .hi");
 
@@ -6,7 +6,7 @@ if (header) {
   const accountControls = document.createElement("div");
   accountControls.className = "user-header-controls";
   accountControls.innerHTML = `
-    <a class="user-header-login" href="/user-login.html">👤 User Login</a>
+    <a class="user-header-login" href="/user-login">👤 User Login</a>
     <a class="user-header-profile" href="/dashboard" aria-label="Open your profile">
       <span class="user-header-avatar" aria-hidden="true">👤</span>
       <span class="user-header-name"></span>

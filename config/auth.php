@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Codeloop - Authentication Helper
  * Handles session-based and cookie-based authentication for Admin Panel
@@ -135,7 +135,7 @@ function logoutAdmin() {
  */
 function requireAdminPage() {
     if (!isAdminLoggedIn()) {
-        header('Location: admin-login.php');
+        header('Location: /admin-login');
         exit;
     }
 }

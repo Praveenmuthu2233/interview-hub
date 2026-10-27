@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Codeloop - Contact Page (PHP + MySQL + Apache)
  */
@@ -26,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 <header><div class="header-inner">
-  <a href="index.php" class="logo"><img class="logo-image" src="11zon_cropped.png" alt=""/>Codeloop</a>
-  <a href="index.php" class="back-btn">← Back to Home</a>
+  <a href="/" class="logo"><img class="logo-image" src="11zon_cropped.png" alt=""/>Codeloop</a>
+  <a href="/" class="back-btn">← Back to Home</a>
 </div></header>
 <div class="page">
   <h1>Contact <span>Us</span></h1>
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
     <div class="form-card">
       <h2>Send us a Message</h2>
-      <form method="POST" action="contact.php">
+      <form method="POST" action="/contact">
         <div class="form-group">
           <label for="cName">Your Name *</label>
           <input type="text" id="cName" name="cName" required placeholder="e.g. Praveen Kumar"/>
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 </div>
-<footer><div class="footer-copy">© 2026 Codeloop · <a href="index.php">Home</a> · <a href="about.html">About</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="disclaimer.html">Disclaimer</a></div></footer>
+<footer><div class="footer-copy">© 2026 Codeloop · <a href="/">Home</a> · <a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/disclaimer">Disclaimer</a></div></footer>
 
 <script src="contact.js" defer></script>
 </body></html>

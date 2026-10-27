@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Codeloop - Admin Dashboard (PHP + MySQL + Apache)
  */
@@ -47,7 +47,7 @@ try {
     </div>
     <div class="header-actions">
       <button class="btn-secondary" id="logoutBtn" type="button">Log out</button>
-      <a href="index.php" class="back-link">← View Public Site</a>
+      <a href="/" class="back-link">← View Public Site</a>
     </div>
   </div>
 </header>
