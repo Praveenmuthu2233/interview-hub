@@ -17,6 +17,7 @@ $id = $_GET['id'] ?? null;
 $input = getJsonInput();
 $qp = getListingQueryParts($pdo);
 $hasCols = $qp['hasCols'];
+$currentAdmin = getCurrentAdminUsername();
 
 switch ($method) {
     case 'GET':
@@ -112,6 +113,10 @@ switch ($method) {
             $fields[] = 'category_id';
             $values[] = $categoryId;
         }
+        if (isset($hasCols['created_by'])) {
+            $fields[] = 'created_by';
+            $values[] = $currentAdmin;
+        }
 
         $placeholders = implode(', ', array_fill(0, count($fields), '?'));
         $fieldSql = implode(', ', array_map(function($f) { return "`{$f}`"; }, $fields));
@@ -119,6 +124,11 @@ switch ($method) {
         try {
             $stmt = $pdo->prepare("INSERT INTO `interviews` ({$fieldSql}) VALUES ({$placeholders})");
             $stmt->execute($values);
+
+            // Record in audit log
+            $logDetails = "Added {$type} listing at {$company} for {$role}. Location: " . ($location ?: 'N/A') . ", Experience: " . ($experience ?: 'N/A') . ", Salary: " . ($salary ?: 'N/A');
+            logAdminActivity($pdo, $currentAdmin, 'INSERT_JOB', 'listing', $newId, "{$company} - {$role}", $logDetails);
+
             sendJsonResponse(['id' => $newId, 'message' => 'Listing created successfully.'], 201);
         } catch (PDOException $e) {
             sendJsonResponse(['error' => 'Failed to create listing: ' . $e->getMessage()], 500);
@@ -205,6 +215,10 @@ switch ($method) {
             $setPairs[] = "`category_id` = ?";
             $values[] = $categoryId;
         }
+        if (isset($hasCols['updated_by'])) {
+            $setPairs[] = "`updated_by` = ?";
+            $values[] = $currentAdmin;
+        }
 
         $values[] = $id;
         $setSql = implode(', ', $setPairs);
@@ -212,6 +226,11 @@ switch ($method) {
         try {
             $stmt = $pdo->prepare("UPDATE `interviews` SET {$setSql} WHERE `id` = ?");
             $stmt->execute($values);
+
+            // Record in audit log
+            $logDetails = "Updated {$type} listing at {$company} for {$role}. Location: " . ($location ?: 'N/A') . ", Experience: " . ($experience ?: 'N/A') . ", Salary: " . ($salary ?: 'N/A');
+            logAdminActivity($pdo, $currentAdmin, 'UPDATE_JOB', 'listing', $id, "{$company} - {$role}", $logDetails);
+
             sendJsonResponse(['id' => $id, 'message' => 'Listing updated successfully.']);
         } catch (PDOException $e) {
             sendJsonResponse(['error' => 'Failed to update listing: ' . $e->getMessage()], 500);
@@ -223,12 +242,29 @@ switch ($method) {
             sendJsonResponse(['error' => 'Listing ID is required for deletion.'], 400);
         }
 
+        // Fetch listing info before deletion so audit trail preserves full context
+        $existing = null;
+        try {
+            $fetchStmt = $pdo->prepare("SELECT company, role, location, salary, date_format(created_at, '%Y-%m-%d') as created_date FROM `interviews` WHERE `id` = ? LIMIT 1");
+            $fetchStmt->execute([$id]);
+            $existing = $fetchStmt->fetch();
+        } catch (Exception $e) {}
+
+        $targetTitle = $existing ? "{$existing['company']} - {$existing['role']}" : "Listing ID: {$id}";
+        $logDetails = $existing
+            ? "Deleted job listing: {$existing['company']} - {$existing['role']} (Location: " . ($existing['location'] ?: 'N/A') . ", Salary: " . ($existing['salary'] ?: 'N/A') . ")"
+            : "Deleted job listing ID: {$id}";
+
         try {
             $stmt = $pdo->prepare("DELETE FROM `interviews` WHERE `id` = ?");
             $stmt->execute([$id]);
             if ($stmt->rowCount() === 0) {
                 sendJsonResponse(['error' => 'Listing not found.'], 404);
             }
+
+            // Record in audit log
+            logAdminActivity($pdo, $currentAdmin, 'DELETE_JOB', 'listing', $id, $targetTitle, $logDetails);
+
             sendJsonResponse(['id' => $id, 'message' => 'Listing deleted successfully.']);
         } catch (PDOException $e) {
             sendJsonResponse(['error' => 'Failed to delete listing: ' . $e->getMessage()], 500);

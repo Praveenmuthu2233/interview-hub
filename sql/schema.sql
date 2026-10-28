@@ -25,12 +25,15 @@ CREATE TABLE IF NOT EXISTS interviews (
   description TEXT NOT NULL,
   skills JSON NOT NULL,
   category_id BIGINT UNSIGNED NULL,
+  created_by VARCHAR(100) NOT NULL DEFAULT 'admin',
+  updated_by VARCHAR(100) NULL DEFAULT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY idx_interviews_date (interview_date DESC),
   KEY idx_interviews_created (created_at DESC),
   KEY idx_interviews_category (category_id),
+  KEY idx_interviews_created_by (created_by),
   CONSTRAINT fk_interviews_category
     FOREIGN KEY (category_id) REFERENCES categories (id)
     ON DELETE SET NULL
@@ -58,8 +61,23 @@ CREATE TABLE IF NOT EXISTS admins (
   username VARCHAR(100) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
   email VARCHAR(200) DEFAULT '',
+  created_by VARCHAR(100) NOT NULL DEFAULT 'system',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS admin_activity_logs (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  admin_username VARCHAR(100) NOT NULL,
+  action_type VARCHAR(50) NOT NULL,
+  entity_type VARCHAR(50) NOT NULL DEFAULT 'listing',
+  entity_id VARCHAR(100) DEFAULT NULL,
+  item_title VARCHAR(255) DEFAULT '',
+  details TEXT DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_activity_created (created_at DESC),
+  KEY idx_activity_admin (admin_username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS users (
