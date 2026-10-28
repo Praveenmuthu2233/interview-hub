@@ -432,6 +432,8 @@ function mapListing(row) {
     skills: Array.isArray(skills) ? skills : [],
     categoryId: row.category_id,
     categoryName: row.category_name || null,
+    createdBy: row.created_by || "admin",
+    updatedBy: row.updated_by || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };
@@ -667,6 +669,60 @@ app.delete("/api/user/saved-listings/:id", checkSameOrigin, requireUser, async (
   }
 });
 
+async function ensureAdminTables() {
+  try {
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS admin_activity_logs (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        admin_username VARCHAR(100) NOT NULL,
+        action_type VARCHAR(50) NOT NULL,
+        entity_type VARCHAR(50) NOT NULL DEFAULT 'listing',
+        entity_id VARCHAR(100) DEFAULT NULL,
+        item_title VARCHAR(255) DEFAULT '',
+        details TEXT DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_activity_created (created_at DESC),
+        KEY idx_activity_admin (admin_username)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    try {
+      const [cols] = await pool.query("SHOW COLUMNS FROM interviews");
+      const colNames = cols.map(c => c.Field);
+      if (!colNames.includes("created_by")) {
+        await pool.query("ALTER TABLE interviews ADD COLUMN created_by VARCHAR(100) NOT NULL DEFAULT 'admin'");
+      }
+      if (!colNames.includes("updated_by")) {
+        await pool.query("ALTER TABLE interviews ADD COLUMN updated_by VARCHAR(100) NULL DEFAULT NULL");
+      }
+    } catch (e) {}
+
+    try {
+      const [cols] = await pool.query("SHOW COLUMNS FROM admins");
+      const colNames = cols.map(c => c.Field);
+      if (!colNames.includes("created_by")) {
+        await pool.query("ALTER TABLE admins ADD COLUMN created_by VARCHAR(100) NOT NULL DEFAULT 'system'");
+      }
+    } catch (e) {}
+  } catch (err) {
+    console.warn("Auto-migration notice:", err.message);
+  }
+}
+ensureAdminTables().catch(() => {});
+
+async function logAdminActivity(adminUsername, actionType, entityType, entityId, itemTitle, details = "") {
+  try {
+    await pool.execute(
+      `INSERT INTO admin_activity_logs (admin_username, action_type, entity_type, entity_id, item_title, details, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+      [adminUsername || "admin", actionType, entityType, entityId ? String(entityId) : null, (itemTitle || "").slice(0, 255), details || ""]
+    );
+  } catch (err) {
+    console.warn("Failed to log admin activity:", err.message);
+  }
+}
+
 app.post("/api/admin/login", checkSameOrigin, loginLimiter, async (request, response, next) => {
   const { username, password } = request.body || {};
   if (typeof username !== "string" || typeof password !== "string" || password.length > 1024) {
@@ -836,9 +892,17 @@ app.get("/api/questions/:id", async (request, response, next) => {
 
 app.get("/api/admin/listings", requireAdmin, async (request, response, next) => {
   try {
+    let extraCols = "";
+    try {
+      const [cols] = await pool.query("SHOW COLUMNS FROM interviews");
+      const names = cols.map(c => c.Field);
+      if (names.includes("created_by")) extraCols += ", i.created_by";
+      if (names.includes("updated_by")) extraCols += ", i.updated_by";
+    } catch (e) {}
+
     const [rows] = await pool.execute(
       `SELECT i.id, i.company, i.role, i.interview_type, DATE_FORMAT(i.interview_date, '%Y-%m-%d') AS interview_date,
-        i.location, i.experience, i.salary, i.apply_link, i.description, i.skills, i.category_id,
+        i.location, i.experience, i.salary, i.apply_link, i.description, i.skills, i.category_id${extraCols},
         i.created_at, i.updated_at
        FROM interviews i
        ORDER BY i.interview_date DESC, i.created_at DESC`
@@ -855,6 +919,7 @@ app.post("/api/admin/listings", checkSameOrigin, requireAdmin, async (request, r
     response.status(400).json({ error: result.error });
     return;
   }
+  const adminUser = request.admin?.username || "admin";
   try {
     const id = crypto.randomUUID();
     const listing = result.listing;
@@ -862,13 +927,34 @@ app.post("/api/admin/listings", checkSameOrigin, requireAdmin, async (request, r
       response.status(400).json({ error: "The selected listing category does not exist." });
       return;
     }
-    await pool.execute(
-      `INSERT INTO interviews
-        (id, company, role, interview_type, interview_date, location, experience, salary, apply_link, description, skills, category_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [id, listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
-        listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId]
+
+    try {
+      await pool.execute(
+        `INSERT INTO interviews
+          (id, company, role, interview_type, interview_date, location, experience, salary, apply_link, description, skills, category_id, created_by)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
+          listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId, adminUser]
+      );
+    } catch (insertErr) {
+      await pool.execute(
+        `INSERT INTO interviews
+          (id, company, role, interview_type, interview_date, location, experience, salary, apply_link, description, skills, category_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
+          listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId]
+      );
+    }
+
+    await logAdminActivity(
+      adminUser,
+      "INSERT_JOB",
+      "listing",
+      id,
+      `${listing.company} - ${listing.role}`,
+      `Added ${listing.type} listing at ${listing.company} for ${listing.role}. Location: ${listing.location || 'N/A'}, Salary: ${listing.salary || 'N/A'}`
     );
+
     response.status(201).json({ id });
   } catch (error) {
     next(error);
@@ -881,18 +967,31 @@ app.put("/api/admin/listings/:id", checkSameOrigin, requireAdmin, async (request
     response.status(400).json({ error: result.error });
     return;
   }
+  const adminUser = request.admin?.username || "admin";
   try {
     const listing = result.listing;
     if (listing.categoryId && !await hasCategory(listing.categoryId, "listing")) {
       response.status(400).json({ error: "The selected listing category does not exist." });
       return;
     }
-    const [resultSet] = await pool.execute(
-      `UPDATE interviews SET company = ?, role = ?, interview_type = ?, interview_date = ?, location = ?,
-       experience = ?, salary = ?, apply_link = ?, description = ?, skills = ?, category_id = ? WHERE id = ?`,
-      [listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
-        listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId, request.params.id]
-    );
+
+    let resultSet;
+    try {
+      [resultSet] = await pool.execute(
+        `UPDATE interviews SET company = ?, role = ?, interview_type = ?, interview_date = ?, location = ?,
+         experience = ?, salary = ?, apply_link = ?, description = ?, skills = ?, category_id = ?, updated_by = ? WHERE id = ?`,
+        [listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
+          listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId, adminUser, request.params.id]
+      );
+    } catch (updateErr) {
+      [resultSet] = await pool.execute(
+        `UPDATE interviews SET company = ?, role = ?, interview_type = ?, interview_date = ?, location = ?,
+         experience = ?, salary = ?, apply_link = ?, description = ?, skills = ?, category_id = ? WHERE id = ?`,
+        [listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
+          listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId, request.params.id]
+      );
+    }
+
     if (!resultSet.affectedRows) {
       const [rows] = await pool.execute("SELECT id FROM interviews WHERE id = ? LIMIT 1", [request.params.id]);
       if (!rows.length) {
@@ -900,6 +999,16 @@ app.put("/api/admin/listings/:id", checkSameOrigin, requireAdmin, async (request
         return;
       }
     }
+
+    await logAdminActivity(
+      adminUser,
+      "UPDATE_JOB",
+      "listing",
+      request.params.id,
+      `${listing.company} - ${listing.role}`,
+      `Updated ${listing.type} listing at ${listing.company} for ${listing.role}. Location: ${listing.location || 'N/A'}, Salary: ${listing.salary || 'N/A'}`
+    );
+
     response.status(204).end();
   } catch (error) {
     next(error);
@@ -907,13 +1016,232 @@ app.put("/api/admin/listings/:id", checkSameOrigin, requireAdmin, async (request
 });
 
 app.delete("/api/admin/listings/:id", checkSameOrigin, requireAdmin, async (request, response, next) => {
+  const adminUser = request.admin?.username || "admin";
   try {
+    let targetTitle = `Listing ID: ${request.params.id}`;
+    let details = `Deleted job listing ID: ${request.params.id}`;
+    try {
+      const [existing] = await pool.execute("SELECT company, role, location, salary FROM interviews WHERE id = ? LIMIT 1", [request.params.id]);
+      if (existing.length) {
+        targetTitle = `${existing[0].company} - ${existing[0].role}`;
+        details = `Deleted job listing: ${existing[0].company} - ${existing[0].role} (Location: ${existing[0].location || 'N/A'}, Salary: ${existing[0].salary || 'N/A'})`;
+      }
+    } catch (e) {}
+
     const [result] = await pool.execute("DELETE FROM interviews WHERE id = ?", [request.params.id]);
     if (!result.affectedRows) {
       response.status(404).json({ error: "Listing not found." });
       return;
     }
+
+    await logAdminActivity(adminUser, "DELETE_JOB", "listing", request.params.id, targetTitle, details);
     response.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ---------- Admin Management & Activity Log Endpoints ----------
+app.get("/api/admin/admins", requireAdmin, async (request, response, next) => {
+  try {
+    let createdByCol = "'system' AS created_by";
+    try {
+      const [cols] = await pool.query("SHOW COLUMNS FROM admins");
+      if (cols.some(c => c.Field === "created_by")) {
+        createdByCol = "created_by";
+      }
+    } catch (e) {}
+
+    const [rows] = await pool.execute(`SELECT id, username, email, ${createdByCol}, created_at FROM admins ORDER BY id ASC`);
+    const currentAdmin = request.admin?.username || "admin";
+
+    response.json({
+      admins: rows.map(r => ({
+        id: r.id,
+        username: r.username,
+        email: r.email || "",
+        createdBy: r.created_by || "system",
+        createdAt: r.created_at,
+        isCurrent: r.username.toLowerCase() === currentAdmin.toLowerCase()
+      })),
+      currentAdmin,
+      total: rows.length
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/admin/admins", checkSameOrigin, requireAdmin, async (request, response, next) => {
+  const { username, password, email } = request.body || {};
+  const trimmedUser = typeof username === "string" ? username.trim() : "";
+  const trimmedEmail = typeof email === "string" ? email.trim() : "";
+  const currentAdmin = request.admin?.username || "admin";
+
+  if (!trimmedUser || trimmedUser.length < 3 || trimmedUser.length > 50) {
+    response.status(400).json({ error: "Username must be between 3 and 50 characters." });
+    return;
+  }
+  if (!/^[a-zA-Z0-9_\-\.]+$/.test(trimmedUser)) {
+    response.status(400).json({ error: "Username may only contain letters, numbers, hyphens, and underscores." });
+    return;
+  }
+  if (typeof password !== "string" || password.length < 6) {
+    response.status(400).json({ error: "Password must be at least 6 characters long." });
+    return;
+  }
+  if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    response.status(400).json({ error: "Please provide a valid email address." });
+    return;
+  }
+
+  try {
+    const [existing] = await pool.execute("SELECT id FROM admins WHERE LOWER(username) = LOWER(?) LIMIT 1", [trimmedUser]);
+    if (existing.length > 0) {
+      response.status(409).json({ error: `An admin with username '${trimmedUser}' already exists.` });
+      return;
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    let newId;
+    try {
+      const [insertRes] = await pool.execute(
+        "INSERT INTO admins (username, password_hash, email, created_by, created_at) VALUES (?, ?, ?, ?, NOW())",
+        [trimmedUser, passwordHash, trimmedEmail, currentAdmin]
+      );
+      newId = insertRes.insertId;
+    } catch (insertErr) {
+      const [insertRes] = await pool.execute(
+        "INSERT INTO admins (username, password_hash, email, created_at) VALUES (?, ?, ?, NOW())",
+        [trimmedUser, passwordHash, trimmedEmail]
+      );
+      newId = insertRes.insertId;
+    }
+
+    await logAdminActivity(
+      currentAdmin,
+      "CREATE_ADMIN",
+      "admin",
+      newId,
+      trimmedUser,
+      `Added new admin user: '${trimmedUser}'` + (trimmedEmail ? ` (${trimmedEmail})` : "")
+    );
+
+    response.status(201).json({
+      id: newId,
+      username: trimmedUser,
+      email: trimmedEmail,
+      message: `Admin user '${trimmedUser}' created successfully.`
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete("/api/admin/admins/:id", checkSameOrigin, requireAdmin, async (request, response, next) => {
+  const currentAdmin = request.admin?.username || "admin";
+  const id = request.params.id;
+
+  try {
+    const [target] = await pool.execute("SELECT id, username FROM admins WHERE id = ? LIMIT 1", [id]);
+    if (!target.length) {
+      response.status(404).json({ error: "Admin not found." });
+      return;
+    }
+
+    if (target[0].username.toLowerCase() === currentAdmin.toLowerCase()) {
+      response.status(400).json({ error: "You cannot delete your own active admin account." });
+      return;
+    }
+
+    const [totalRows] = await pool.query("SELECT COUNT(*) AS total FROM admins");
+    if ((totalRows[0]?.total || 0) <= 1) {
+      response.status(400).json({ error: "Cannot delete the only remaining admin account." });
+      return;
+    }
+
+    await pool.execute("DELETE FROM admins WHERE id = ?", [id]);
+    await logAdminActivity(currentAdmin, "DELETE_ADMIN", "admin", id, target[0].username, `Deleted admin account: '${target[0].username}'`);
+
+    response.json({ message: `Admin '${target[0].username}' deleted successfully.` });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/admin/activity", requireAdmin, async (request, response, next) => {
+  const search = typeof request.query.search === "string" ? request.query.search.trim() : "";
+  const adminFilter = typeof request.query.admin === "string" ? request.query.admin.trim() : "";
+  const actionFilter = typeof request.query.action === "string" ? request.query.action.trim() : "";
+  const limit = Math.min(Math.max(Number(request.query.limit) || 100, 10), 300);
+  const currentAdmin = request.admin?.username || "admin";
+
+  try {
+    let whereClauses = [];
+    let params = [];
+
+    if (search) {
+      whereClauses.push("(admin_username LIKE ? OR item_title LIKE ? OR details LIKE ?)");
+      const term = `%${search}%`;
+      params.push(term, term, term);
+    }
+    if (adminFilter) {
+      whereClauses.push("admin_username = ?");
+      params.push(adminFilter);
+    }
+    if (actionFilter) {
+      whereClauses.push("action_type = ?");
+      params.push(actionFilter);
+    }
+
+    const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
+    let logs = [];
+    try {
+      const [rows] = await pool.execute(
+        `SELECT id, admin_username, action_type, entity_type, entity_id, item_title, details, created_at
+         FROM admin_activity_logs
+         ${whereSql}
+         ORDER BY created_at DESC, id DESC
+         LIMIT ${limit}`,
+        params
+      );
+      logs = rows.map(r => ({
+        id: r.id,
+        adminUsername: r.admin_username,
+        actionType: r.action_type,
+        entityType: r.entity_type,
+        entityId: r.entity_id,
+        itemTitle: r.item_title || "",
+        details: r.details || "",
+        createdAt: r.created_at
+      }));
+    } catch (tblErr) {
+      // Table might not exist yet
+    }
+
+    let stats = { total: 0, inserted: 0, updated: 0, deleted: 0, admins: 0 };
+    try {
+      const [counts] = await pool.query(`
+        SELECT
+          COUNT(*) AS total,
+          SUM(action_type = 'INSERT_JOB') AS inserted,
+          SUM(action_type = 'UPDATE_JOB') AS updated,
+          SUM(action_type = 'DELETE_JOB') AS deleted,
+          SUM(action_type IN ('CREATE_ADMIN', 'DELETE_ADMIN')) AS admins
+        FROM admin_activity_logs
+      `);
+      if (counts.length) {
+        stats = {
+          total: Number(counts[0].total) || 0,
+          inserted: Number(counts[0].inserted) || 0,
+          updated: Number(counts[0].updated) || 0,
+          deleted: Number(counts[0].deleted) || 0,
+          admins: Number(counts[0].admins) || 0
+        };
+      }
+    } catch (e) {}
+
+    response.json({ logs, stats, currentAdmin });
   } catch (error) {
     next(error);
   }
