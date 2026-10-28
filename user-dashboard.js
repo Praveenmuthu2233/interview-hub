@@ -1,13 +1,21 @@
-﻿"use strict";
+"use strict";
 
 const profileContainer = document.getElementById("profileDetails");
 const jobList = document.getElementById("jobList");
 const savedJobList = document.getElementById("savedJobList");
 const portalMessage = document.getElementById("portalMessage");
+
 let currentUser;
 let currentListings = [];
 let savedListings = [];
 const savedListingIds = new Set();
+
+// Pagination State
+const JOBS_PER_PAGE = 5;
+const SAVED_PER_PAGE = 5;
+let currentJobPage = 1;
+let currentSavedPage = 1;
+let processedResults = [];
 
 function escapeHtml(value) {
   const element = document.createElement("div");
@@ -131,7 +139,7 @@ async function saveProfile(event) {
       body: JSON.stringify(profile)
     });
     renderProfile(result.user);
-    renderListings(currentListings, currentUser);
+    renderListings(currentListings, currentUser, 1);
     portalMessage.textContent = "Your profile has been updated.";
     portalMessage.className = "portal-message show success";
   } catch (error) {
@@ -193,35 +201,175 @@ function jobCardMarkup(listing, matchedSkills = []) {
   </article>`;
 }
 
-function renderListings(listings, user) {
+/* ----------------------------------------------------
+   Pagination Component
+---------------------------------------------------- */
+function renderPagination(containerId, currentPage, totalPages, totalItems, startItem, endItem, onPageChange) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  if (totalPages <= 1) {
+    container.hidden = true;
+    container.innerHTML = "";
+    return;
+  }
+
+  container.hidden = false;
+
+  let pageButtonsHtml = "";
+  const maxButtons = 5;
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+  if (endPage - startPage < maxButtons - 1) {
+    startPage = Math.max(1, endPage - maxButtons + 1);
+  }
+
+  if (startPage > 1) {
+    pageButtonsHtml += `<button type="button" class="pagination-page-btn" data-page="1">1</button>`;
+    if (startPage > 2) {
+      pageButtonsHtml += `<span class="pagination-ellipsis">…</span>`;
+    }
+  }
+
+  for (let p = startPage; p <= endPage; p++) {
+    const isActive = p === currentPage;
+    pageButtonsHtml += `<button type="button" class="pagination-page-btn ${isActive ? "active" : ""}" data-page="${p}" ${isActive ? 'aria-current="page"' : ""}>${p}</button>`;
+  }
+
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      pageButtonsHtml += `<span class="pagination-ellipsis">…</span>`;
+    }
+    pageButtonsHtml += `<button type="button" class="pagination-page-btn" data-page="${totalPages}">${totalPages}</button>`;
+  }
+
+  container.innerHTML = `
+    <div class="pagination-container">
+      <div class="pagination-summary">Showing <strong>${startItem}–${endItem}</strong> of <strong>${totalItems}</strong> drives (Page ${currentPage} of ${totalPages})</div>
+      <div class="pagination-nav">
+        <button type="button" class="pagination-btn prev-btn" data-page="${currentPage - 1}" ${currentPage <= 1 ? "disabled" : ""}>
+          ← Previous
+        </button>
+        <div class="pagination-numbers">
+          ${pageButtonsHtml}
+        </div>
+        <button type="button" class="pagination-btn next-btn" data-page="${currentPage + 1}" ${currentPage >= totalPages ? "disabled" : ""}>
+          Next →
+        </button>
+      </div>
+    </div>
+  `;
+
+  container.querySelectorAll("[data-page]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const pageNum = Number(btn.dataset.page);
+      if (!Number.isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages && pageNum !== currentPage) {
+        onPageChange(pageNum);
+      }
+    });
+  });
+}
+
+/* ----------------------------------------------------
+   Open Drives Render with 5-per-page Pagination
+---------------------------------------------------- */
+function renderJobPage(page) {
+  const total = processedResults.length;
+  if (!total) {
+    jobList.innerHTML = '<div class="empty-state">There are no upcoming interview drives right now. Please check back soon.</div>';
+    const paginationEl = document.getElementById("jobPagination");
+    if (paginationEl) paginationEl.hidden = true;
+    return;
+  }
+
+  const totalPages = Math.ceil(total / JOBS_PER_PAGE);
+  currentJobPage = Math.max(1, Math.min(page, totalPages));
+
+  const startIndex = (currentJobPage - 1) * JOBS_PER_PAGE;
+  const endIndex = Math.min(startIndex + JOBS_PER_PAGE, total);
+  const pageItems = processedResults.slice(startIndex, endIndex);
+
+  jobList.innerHTML = pageItems.map(({ listing, matchedSkills }) => jobCardMarkup(listing, matchedSkills)).join("");
+
+  renderPagination(
+    "jobPagination",
+    currentJobPage,
+    totalPages,
+    total,
+    startIndex + 1,
+    endIndex,
+    (newPage) => {
+      renderJobPage(newPage);
+      const section = document.querySelector(".jobs-section");
+      if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  );
+}
+
+function renderListings(listings, user, page = 1) {
   const scored = listings.map(listing => ({ listing, ...scoreListing(listing, user) }));
   const hasPreferences = Boolean(user.skills.length || user.preferredLocation || user.education);
   const matches = hasPreferences ? scored.filter(item => item.score > 0) : [];
-  const results = matches.length ? matches : scored;
-  results.sort((first, second) => second.score - first.score);
-  document.getElementById("listingCount").textContent = String(results.length);
+  processedResults = matches.length ? matches : scored;
+  processedResults.sort((first, second) => second.score - first.score);
+
+  const total = processedResults.length;
+  document.getElementById("listingCount").textContent = String(total);
   document.getElementById("matchNote").textContent = matches.length
     ? `${matches.length} drive${matches.length === 1 ? "" : "s"} matched your skills or location.`
     : "No direct profile matches yet, so here are all current open drives.";
 
-  if (!results.length) {
-    jobList.innerHTML = '<div class="empty-state">There are no upcoming interview drives right now. Please check back soon.</div>';
+  renderJobPage(page);
+}
+
+/* ----------------------------------------------------
+   Saved Jobs Render with 5-per-page Pagination
+---------------------------------------------------- */
+function renderSavedPage(page) {
+  const total = savedListings.length;
+  document.getElementById("savedListingCount").textContent = String(total);
+  document.getElementById("savedListingNote").textContent = total
+    ? "Your bookmarked interview drives are ready whenever you need them."
+    : "Save a drive to keep it handy here.";
+
+  if (!total) {
+    savedJobList.innerHTML = '<div class="empty-state">You have no saved jobs yet.</div>';
+    const paginationEl = document.getElementById("savedJobPagination");
+    if (paginationEl) paginationEl.hidden = true;
     return;
   }
 
-  jobList.innerHTML = results.map(({ listing, matchedSkills }) => jobCardMarkup(listing, matchedSkills)).join("");
+  const totalPages = Math.ceil(total / SAVED_PER_PAGE);
+  currentSavedPage = Math.max(1, Math.min(page, totalPages));
+
+  const startIndex = (currentSavedPage - 1) * SAVED_PER_PAGE;
+  const endIndex = Math.min(startIndex + SAVED_PER_PAGE, total);
+  const pageItems = savedListings.slice(startIndex, endIndex);
+
+  savedJobList.innerHTML = pageItems.map(listing => jobCardMarkup(listing)).join("");
+
+  renderPagination(
+    "savedJobPagination",
+    currentSavedPage,
+    totalPages,
+    total,
+    startIndex + 1,
+    endIndex,
+    (newPage) => {
+      renderSavedPage(newPage);
+      const section = document.querySelector(".saved-section");
+      if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  );
 }
 
-function renderSavedListings() {
-  document.getElementById("savedListingCount").textContent = String(savedListings.length);
-  document.getElementById("savedListingNote").textContent = savedListings.length
-    ? "Your bookmarked interview drives are ready whenever you need them."
-    : "Save a drive to keep it handy here.";
-  savedJobList.innerHTML = savedListings.length
-    ? savedListings.map(listing => jobCardMarkup(listing)).join("")
-    : '<div class="empty-state">You have no saved jobs yet.</div>';
+function renderSavedListings(page = 1) {
+  renderSavedPage(page);
 }
 
+/* ----------------------------------------------------
+   Save / Unsave Action Handler
+---------------------------------------------------- */
 async function toggleSavedListing(listingId, button) {
   button.disabled = true;
   try {
@@ -239,8 +387,8 @@ async function toggleSavedListing(listingId, button) {
       if (listing) savedListings.unshift(listing);
       savedListingIds.add(listingId);
     }
-    renderListings(currentListings, currentUser);
-    renderSavedListings();
+    renderJobPage(currentJobPage);
+    renderSavedPage(currentSavedPage);
   } catch (error) {
     portalMessage.textContent = error.message;
     portalMessage.className = "portal-message show error";
@@ -253,6 +401,9 @@ function handleSavedListingClick(event) {
   if (button) toggleSavedListing(button.dataset.listingId, button);
 }
 
+/* ----------------------------------------------------
+   Dashboard Initialization
+---------------------------------------------------- */
 async function loadDashboard() {
   try {
     const [session, dashboard] = await Promise.all([
@@ -261,14 +412,14 @@ async function loadDashboard() {
     ]);
     renderProfile(session.user);
     currentListings = dashboard.listings || [];
-    renderListings(currentListings, currentUser);
+    renderListings(currentListings, currentUser, 1);
     try {
       const saved = await apiRequest("/api/user/saved-listings");
       savedListings = saved.listings || [];
       savedListingIds.clear();
       savedListings.forEach(listing => savedListingIds.add(listing.id));
-      renderListings(currentListings, currentUser);
-      renderSavedListings();
+      renderJobPage(currentJobPage);
+      renderSavedListings(1);
     } catch (error) {
       document.getElementById("savedListingNote").textContent = "Could not load saved jobs. Please refresh to try again.";
       savedJobList.innerHTML = '<div class="empty-state">Saved jobs are temporarily unavailable.</div>';
