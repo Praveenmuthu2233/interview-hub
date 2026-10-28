@@ -1198,6 +1198,8 @@ app.use((request, response, next) => {
   next();
 });
 
+app.use("/blog", express.static(ROOT, { dotfiles: "deny" }));
+app.use("/admin", express.static(ROOT, { dotfiles: "deny" }));
 app.use(express.static(ROOT, { dotfiles: "deny", index: "index.html" }));
 
 app.use((error, request, response, next) => {

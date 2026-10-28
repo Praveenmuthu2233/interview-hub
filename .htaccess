@@ -14,6 +14,10 @@ DirectoryIndex index.php index.html
     RewriteRule ^healthz/?$ api/healthz.php [L,QSA]
     RewriteRule ^api/(.*)$ api/index.php [L,QSA]
 
+    # ── 2b. Static asset fallback for nested routes (/blog/..., /admin/...) ──
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(?:blog|admin)/(.+\.(css|js|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf))$ $1 [L,NC]
+
     # ── 3. Strip index.php and index.html to root / ──
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.(php|html) [NC]
     RewriteRule ^index\.(php|html)$ / [R=302,L]
