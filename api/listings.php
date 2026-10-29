@@ -29,7 +29,7 @@ if ($id && $related) {
         $stmt = $pdo->prepare("
             {$qp['select']}
             {$qp['from']}
-            WHERE i.id <> ? 
+            WHERE {$qp['dateCol']} >= CURDATE() AND i.id <> ?
             ORDER BY {$qp['dateCol']} DESC 
             LIMIT 6
         ");
@@ -47,13 +47,13 @@ if ($id) {
         $stmt = $pdo->prepare("
             {$qp['select']}
             {$qp['from']}
-            WHERE i.id = ? 
+            WHERE i.id = ? AND {$qp['dateCol']} >= CURDATE()
             LIMIT 1
         ");
         $stmt->execute([$id]);
         $row = $stmt->fetch();
         if (!$row) {
-            sendJsonResponse(['error' => 'Listing not found.'], 404);
+            sendJsonResponse(['error' => 'Job not found.'], 404);
         }
         sendJsonResponse(['listing' => mapListingRow($row)]);
     } catch (PDOException $e) {
@@ -66,6 +66,7 @@ try {
     $stmt = $pdo->query("
         {$qp['select']}
         {$qp['from']}
+        WHERE {$qp['dateCol']} >= CURDATE()
         ORDER BY {$qp['createdCol']} DESC
     ");
     $rows = $stmt->fetchAll();

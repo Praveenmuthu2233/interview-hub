@@ -45,7 +45,7 @@ $currentAdmin = getCurrentAdminUsername();
   <div class="admin-subnav-inner">
     <div class="admin-nav-tabs" role="tablist">
       <button type="button" class="admin-nav-tab active" data-tab="listings" id="tabListings" role="tab" aria-selected="true">
-        <span>📋 Job Listings</span>
+        <span>📋 Jobs</span>
         <span class="tab-count" id="tabListingsCount">0</span>
       </button>
       <button type="button" class="admin-nav-tab" data-tab="activity" id="tabActivity" role="tab" aria-selected="false">
@@ -71,7 +71,7 @@ $currentAdmin = getCurrentAdminUsername();
     <div>
       <div class="form-card">
         <div class="form-card-header">
-          <div class="form-card-title" id="formTitle">➕ Add Interview Listing</div>
+          <div class="form-card-title" id="formTitle">➕ Add Job</div>
           <div class="form-card-sub" id="formSub">Fill in details. All additions and changes will be logged with your admin ID.</div>
         </div>
         <div class="form-body">
@@ -129,7 +129,7 @@ $currentAdmin = getCurrentAdminUsername();
             <textarea class="form-control" id="fDesc" placeholder="Describe interview process, eligibility criteria, required documents, venue details, deadlines."></textarea>
           </div>
           <div style="display:flex;gap:.5rem;">
-            <button class="btn-primary" id="saveBtn" type="button">💾 Save Listing</button>
+            <button class="btn-primary" id="saveBtn" type="button">💾 Save Job</button>
             <button class="btn-secondary" id="resetBtn" type="button">Reset</button>
           </div>
         </div>
@@ -138,7 +138,7 @@ $currentAdmin = getCurrentAdminUsername();
 
     <div>
       <div class="stats-bar" id="statsBar">
-        <div class="stat-card"><div class="stat-card-label">Total Listings</div><div class="stat-card-val accent" id="statTotalVal">-</div></div>
+        <div class="stat-card"><div class="stat-card-label">Total Jobs</div><div class="stat-card-val accent" id="statTotalVal">-</div></div>
         <div class="stat-card"><div class="stat-card-label">Online</div><div class="stat-card-val green" id="statOnlineVal">-</div></div>
         <div class="stat-card"><div class="stat-card-label">Walk-in</div><div class="stat-card-val blue" id="statWalkinVal">-</div></div>
         <div class="stat-card"><div class="stat-card-label">Today's Drives</div><div class="stat-card-val red" id="statTodayVal">-</div></div>
@@ -146,12 +146,12 @@ $currentAdmin = getCurrentAdminUsername();
       <div class="table-card">
         <div class="table-header">
           <div style="display:flex;align-items:center;gap:.65rem;">
-            <div class="table-title">All Job Listings</div>
+            <div class="table-title">Current Jobs</div>
             <span class="entry-count" id="entryCount">0</span>
           </div>
           <div class="table-search">
             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" id="adminSearch" placeholder="Search company, role..." aria-label="Search listings"/>
+            <input type="text" id="adminSearch" placeholder="Search company, role..." aria-label="Search jobs"/>
           </div>
         </div>
         <div class="table-wrap">
@@ -168,7 +168,7 @@ $currentAdmin = getCurrentAdminUsername();
               </tr>
             </thead>
             <tbody id="tableBody">
-              <tr class="empty-row"><td colspan="7">Loading listings from database...</td></tr>
+              <tr class="empty-row"><td colspan="7">Loading jobs from database...</td></tr>
             </tbody>
           </table>
         </div>
@@ -241,7 +241,7 @@ $currentAdmin = getCurrentAdminUsername();
       <div class="form-card">
         <div class="form-card-header">
           <div class="form-card-title">➕ Add New Admin</div>
-          <div class="form-card-sub">Create a new admin account with full access to manage listings.</div>
+          <div class="form-card-sub">Create a new admin account with full access to manage jobs.</div>
         </div>
         <div class="form-body">
           <div class="form-group">
@@ -265,7 +265,7 @@ $currentAdmin = getCurrentAdminUsername();
           <button class="btn-primary" id="createAdminBtn" type="button" style="margin-top:.5rem;">➕ Create Admin Account</button>
           <div class="admin-helper-callout">
             <strong>🔒 Accountability Note:</strong><br/>
-            The new admin can log in at <code>/admin-login</code>. Any action they take (adding, updating, or deleting job listings) will be transparently logged under their username in the <strong>Activity Log</strong> so all admins know who made each change.
+            The new admin can log in at <code>/admin-login</code>. Any action they take (adding, updating, or deleting jobs) will be transparently logged under their username in the <strong>Activity Log</strong> so all admins know who made each change.
           </div>
         </div>
       </div>
@@ -290,11 +290,12 @@ $currentAdmin = getCurrentAdminUsername();
                 <th>Email</th>
                 <th>Created By</th>
                 <th>Date Created</th>
+                <th>Last Seen</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody id="adminsTableBody">
-              <tr class="empty-row"><td colspan="5">Loading admin accounts...</td></tr>
+              <tr class="empty-row"><td colspan="6">Loading admin accounts...</td></tr>
             </tbody>
           </table>
         </div>

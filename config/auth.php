@@ -123,6 +123,7 @@ function verifyAdminCredentials($username, $password) {
 function loginAdmin($username) {
     $_SESSION['admin_logged_in'] = true;
     $_SESSION['admin_user'] = $username;
+    recordAdminLastSeen($username);
 
     $token = generateAdminToken($username);
     setcookie(ADMIN_COOKIE_NAME, $token, [
@@ -131,6 +132,22 @@ function loginAdmin($username) {
         'httponly' => true,
         'samesite' => 'Lax'
     ]);
+}
+
+/**
+ * Updates the last activity timestamp for admins stored in the admins table.
+ */
+function recordAdminLastSeen($username) {
+    if (!$username) {
+        return;
+    }
+
+    try {
+        $stmt = getDB()->prepare("UPDATE `admins` SET `last_seen_at` = NOW() WHERE `username` = ?");
+        $stmt->execute([$username]);
+    } catch (PDOException $e) {
+        error_log("Failed to update admin last seen timestamp: " . $e->getMessage());
+    }
 }
 
 /**
@@ -169,4 +186,6 @@ function requireAdminApi() {
         echo json_encode(['error' => 'Authentication required. Your admin session may have expired.']);
         exit;
     }
+
+    recordAdminLastSeen(getCurrentAdminUsername());
 }

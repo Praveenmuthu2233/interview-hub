@@ -25,6 +25,7 @@ switch ($method) {
             $stmt = $pdo->query("
                 {$qp['select']}
                 {$qp['from']}
+                WHERE {$qp['dateCol']} >= CURDATE()
                 ORDER BY {$qp['dateCol']} DESC, {$qp['createdCol']} DESC
             ");
             $rows = $stmt->fetchAll();
@@ -126,18 +127,18 @@ switch ($method) {
             $stmt->execute($values);
 
             // Record in audit log
-            $logDetails = "Added {$type} listing at {$company} for {$role}. Location: " . ($location ?: 'N/A') . ", Experience: " . ($experience ?: 'N/A') . ", Salary: " . ($salary ?: 'N/A');
+            $logDetails = "Added {$type} job at {$company} for {$role}. Location: " . ($location ?: 'N/A') . ", Experience: " . ($experience ?: 'N/A') . ", Salary: " . ($salary ?: 'N/A');
             logAdminActivity($pdo, $currentAdmin, 'INSERT_JOB', 'listing', $newId, "{$company} - {$role}", $logDetails);
 
-            sendJsonResponse(['id' => $newId, 'message' => 'Listing created successfully.'], 201);
+            sendJsonResponse(['id' => $newId, 'message' => 'Job created successfully.'], 201);
         } catch (PDOException $e) {
-            sendJsonResponse(['error' => 'Failed to create listing: ' . $e->getMessage()], 500);
+            sendJsonResponse(['error' => 'Failed to create job: ' . $e->getMessage()], 500);
         }
         break;
 
     case 'PUT':
         if (!$id) {
-            sendJsonResponse(['error' => 'Listing ID is required for update.'], 400);
+            sendJsonResponse(['error' => 'Job ID is required for update.'], 400);
         }
 
         $company = trim($input['company'] ?? '');
@@ -228,21 +229,21 @@ switch ($method) {
             $stmt->execute($values);
 
             // Record in audit log
-            $logDetails = "Updated {$type} listing at {$company} for {$role}. Location: " . ($location ?: 'N/A') . ", Experience: " . ($experience ?: 'N/A') . ", Salary: " . ($salary ?: 'N/A');
+            $logDetails = "Updated {$type} job at {$company} for {$role}. Location: " . ($location ?: 'N/A') . ", Experience: " . ($experience ?: 'N/A') . ", Salary: " . ($salary ?: 'N/A');
             logAdminActivity($pdo, $currentAdmin, 'UPDATE_JOB', 'listing', $id, "{$company} - {$role}", $logDetails);
 
-            sendJsonResponse(['id' => $id, 'message' => 'Listing updated successfully.']);
+            sendJsonResponse(['id' => $id, 'message' => 'Job updated successfully.']);
         } catch (PDOException $e) {
-            sendJsonResponse(['error' => 'Failed to update listing: ' . $e->getMessage()], 500);
+            sendJsonResponse(['error' => 'Failed to update job: ' . $e->getMessage()], 500);
         }
         break;
 
     case 'DELETE':
         if (!$id) {
-            sendJsonResponse(['error' => 'Listing ID is required for deletion.'], 400);
+            sendJsonResponse(['error' => 'Job ID is required for deletion.'], 400);
         }
 
-        // Fetch listing info before deletion so audit trail preserves full context
+        // Fetch job details before deletion so the audit trail preserves context.
         $existing = null;
         try {
             $fetchStmt = $pdo->prepare("SELECT company, role, location, salary, date_format(created_at, '%Y-%m-%d') as created_date FROM `interviews` WHERE `id` = ? LIMIT 1");
@@ -250,24 +251,24 @@ switch ($method) {
             $existing = $fetchStmt->fetch();
         } catch (Exception $e) {}
 
-        $targetTitle = $existing ? "{$existing['company']} - {$existing['role']}" : "Listing ID: {$id}";
+        $targetTitle = $existing ? "{$existing['company']} - {$existing['role']}" : "Job ID: {$id}";
         $logDetails = $existing
-            ? "Deleted job listing: {$existing['company']} - {$existing['role']} (Location: " . ($existing['location'] ?: 'N/A') . ", Salary: " . ($existing['salary'] ?: 'N/A') . ")"
-            : "Deleted job listing ID: {$id}";
+            ? "Deleted job: {$existing['company']} - {$existing['role']} (Location: " . ($existing['location'] ?: 'N/A') . ", Salary: " . ($existing['salary'] ?: 'N/A') . ")"
+            : "Deleted job ID: {$id}";
 
         try {
             $stmt = $pdo->prepare("DELETE FROM `interviews` WHERE `id` = ?");
             $stmt->execute([$id]);
             if ($stmt->rowCount() === 0) {
-                sendJsonResponse(['error' => 'Listing not found.'], 404);
+                sendJsonResponse(['error' => 'Job not found.'], 404);
             }
 
             // Record in audit log
             logAdminActivity($pdo, $currentAdmin, 'DELETE_JOB', 'listing', $id, $targetTitle, $logDetails);
 
-            sendJsonResponse(['id' => $id, 'message' => 'Listing deleted successfully.']);
+            sendJsonResponse(['id' => $id, 'message' => 'Job deleted successfully.']);
         } catch (PDOException $e) {
-            sendJsonResponse(['error' => 'Failed to delete listing: ' . $e->getMessage()], 500);
+            sendJsonResponse(['error' => 'Failed to delete job: ' . $e->getMessage()], 500);
         }
         break;
 

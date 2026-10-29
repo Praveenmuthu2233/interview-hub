@@ -205,7 +205,7 @@ function resetForm() {
   skills = [];
   renderTags();
   const formTitle = document.getElementById("formTitle");
-  if (formTitle) formTitle.textContent = "➕ Add Interview Listing";
+  if (formTitle) formTitle.textContent = "➕ Add Job";
   const formSub = document.getElementById("formSub");
   if (formSub) formSub.textContent = "Fill in details. All additions and changes will be logged with your admin ID.";
   const fDate = document.getElementById("fDate");
@@ -247,7 +247,7 @@ function renderListingsTable() {
   if (entryCount) entryCount.textContent = String(cachedListings.length);
 
   if (!results.length) {
-    tableBody.innerHTML = `<tr class="empty-row"><td colspan="7">${query ? "No listings found matching search." : "No interview listings in the database yet."}</td></tr>`;
+    tableBody.innerHTML = `<tr class="empty-row"><td colspan="7">${query ? "No jobs found matching search." : "No jobs in the database yet."}</td></tr>`;
     return;
   }
 
@@ -282,7 +282,7 @@ function renderListingsTable() {
 }
 
 async function loadListings() {
-  if (tableBody) tableBody.innerHTML = '<tr class="empty-row"><td colspan="7">Loading listings from database...</td></tr>';
+  if (tableBody) tableBody.innerHTML = '<tr class="empty-row"><td colspan="7">Loading jobs from database...</td></tr>';
   try {
     const result = await apiRequest("/api/admin/listings");
     cachedListings = result.listings || [];
@@ -290,7 +290,7 @@ async function loadListings() {
     renderListingsStats();
   } catch (error) {
     if (error.message) showToast(error.message);
-    if (tableBody) tableBody.innerHTML = '<tr class="empty-row"><td colspan="7">Could not retrieve listings. Check MySQL connection.</td></tr>';
+    if (tableBody) tableBody.innerHTML = '<tr class="empty-row"><td colspan="7">Could not retrieve jobs. Check MySQL connection.</td></tr>';
   }
 }
 
@@ -325,22 +325,22 @@ async function saveEntry() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(listing)
     });
-    showToast(editId ? " Listing updated successfully." : " Listing created and logged successfully.", true);
+    showToast(editId ? " Job updated successfully." : " Job created and logged successfully.", true);
     resetForm();
     await loadListings();
     loadActivitySilent();
   } catch (error) {
-    showToast(error.message || "Could not save the listing.");
+    showToast(error.message || "Could not save the job.");
   } finally {
     saveButton.disabled = false;
-    saveButton.textContent = "💾 Save Listing";
+    saveButton.textContent = "💾 Save Job";
   }
 }
 
 function editEntry(id) {
   const item = cachedListings.find(listing => listing.id === id);
   if (!item) {
-    showToast("Listing not found. Refreshing...", false);
+    showToast("Job not found. Refreshing...", false);
     return;
   }
   document.getElementById("editId").value = item.id;
@@ -355,23 +355,23 @@ function editEntry(id) {
   document.getElementById("fDesc").value = item.description || "";
   skills = Array.isArray(item.skills) ? [...item.skills] : [];
   renderTags();
-  document.getElementById("formTitle").textContent = "✏️ Edit Interview Listing";
+  document.getElementById("formTitle").textContent = "✏️ Edit Job";
   document.getElementById("formSub").textContent = `Editing: ${item.role} @ ${item.company} (Will be recorded in Audit Log)`;
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 async function deleteEntry(id) {
   const item = cachedListings.find(listing => listing.id === id);
-  const label = item ? `${item.company} - ${item.role}` : "this listing";
+  const label = item ? `${item.company} - ${item.role}` : "this job";
   if (!window.confirm(`Delete ${label}? This action and your username will be permanently logged in the audit trail.`)) return;
 
   try {
     await apiRequest(`/api/admin/listings/${encodeURIComponent(id)}`, { method: "DELETE" });
-    showToast("🗑 Listing deleted and recorded in audit log.", true);
+    showToast("🗑 Job deleted and recorded in audit log.", true);
     await loadListings();
     loadActivitySilent();
   } catch (error) {
-    showToast(error.message || "Could not delete the listing.");
+    showToast(error.message || "Could not delete the job.");
   }
 }
 
@@ -497,7 +497,7 @@ function renderAdminsTable() {
   if (tabAdminsCount) tabAdminsCount.textContent = String(cachedAdmins.length);
 
   if (!results.length) {
-    adminsTableBody.innerHTML = `<tr class="empty-row"><td colspan="5">${query ? "No admin matching search." : "No admin accounts found."}</td></tr>`;
+    adminsTableBody.innerHTML = `<tr class="empty-row"><td colspan="6">${query ? "No admin matching search." : "No admin accounts found."}</td></tr>`;
     return;
   }
 
@@ -511,6 +511,7 @@ function renderAdminsTable() {
       <td>${escapeHtml(admin.email || "—")}</td>
       <td><span class="activity-user-badge">👤 ${escapeHtml(admin.createdBy || "system")}</span></td>
       <td>${formatDateTime(admin.createdAt)}</td>
+      <td>${admin.lastSeenAt ? formatDateTime(admin.lastSeenAt) : "Never"}</td>
       <td>
         ${isCurrent
           ? '<span style="color:var(--muted);font-size:.75rem;">Active Session</span>'
@@ -522,14 +523,14 @@ function renderAdminsTable() {
 }
 
 async function loadAdmins() {
-  if (adminsTableBody) adminsTableBody.innerHTML = '<tr class="empty-row"><td colspan="5">Loading admin accounts...</td></tr>';
+  if (adminsTableBody) adminsTableBody.innerHTML = '<tr class="empty-row"><td colspan="6">Loading admin accounts...</td></tr>';
   try {
     const result = await apiRequest("/api/admin/admins");
     cachedAdmins = result.admins || [];
     if (result.currentAdmin) currentAdminUsername = result.currentAdmin;
     renderAdminsTable();
   } catch (error) {
-    if (adminsTableBody) adminsTableBody.innerHTML = '<tr class="empty-row"><td colspan="5">Could not retrieve admin accounts.</td></tr>';
+    if (adminsTableBody) adminsTableBody.innerHTML = '<tr class="empty-row"><td colspan="6">Could not retrieve admin accounts.</td></tr>';
     showToast(error.message || "Failed to load admin list.");
   }
 }

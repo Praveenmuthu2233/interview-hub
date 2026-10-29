@@ -261,7 +261,7 @@ function cleanUrl(value) {
 
 function sanitizeListing(body) {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
-    return { error: "A listing object is required." };
+    return { error: "A job object is required." };
   }
   const type = ["online", "offline", "walkin"].includes(body.type) ? body.type : "";
   const listing = {
@@ -619,7 +619,7 @@ app.get("/api/user/saved-listings", requireUser, async (request, response, next)
     const [rows] = await pool.execute(
       `${LISTING_SELECT}
        JOIN user_saved_listings saved ON saved.listing_id = i.id
-       WHERE saved.user_id = ?
+       WHERE saved.user_id = ? AND i.interview_date >= CURDATE()
        ORDER BY saved.saved_at DESC`,
       [request.user.id]
     );
@@ -632,13 +632,16 @@ app.get("/api/user/saved-listings", requireUser, async (request, response, next)
 app.post("/api/user/saved-listings", checkSameOrigin, requireUser, async (request, response, next) => {
   const listingId = typeof request.body?.listingId === "string" ? request.body.listingId : "";
   if (!isListingId(listingId)) {
-    response.status(400).json({ error: "A valid listing ID is required." });
+    response.status(400).json({ error: "A valid job ID is required." });
     return;
   }
   try {
-    const [rows] = await pool.execute("SELECT id FROM interviews WHERE id = ? LIMIT 1", [listingId]);
+    const [rows] = await pool.execute(
+      "SELECT id FROM interviews WHERE id = ? AND interview_date >= CURDATE() LIMIT 1",
+      [listingId]
+    );
     if (!rows.length) {
-      response.status(404).json({ error: "Listing not found." });
+      response.status(404).json({ error: "Job not found." });
       return;
     }
     await pool.execute(
@@ -655,7 +658,7 @@ app.post("/api/user/saved-listings", checkSameOrigin, requireUser, async (reques
 app.delete("/api/user/saved-listings/:id", checkSameOrigin, requireUser, async (request, response, next) => {
   const listingId = request.params.id;
   if (!isListingId(listingId)) {
-    response.status(400).json({ error: "A valid listing ID is required." });
+    response.status(400).json({ error: "A valid job ID is required." });
     return;
   }
   try {
@@ -800,7 +803,9 @@ app.get("/api/admin/users", requireAdmin, async (request, response, next) => {
 
 app.get("/api/listings", async (request, response, next) => {
   try {
-    const [rows] = await pool.execute(`${LISTING_SELECT} ORDER BY i.created_at DESC`);
+    const [rows] = await pool.execute(
+      `${LISTING_SELECT} WHERE i.interview_date >= CURDATE() ORDER BY i.created_at DESC`
+    );
     response.json({ listings: rows.map(mapListing) });
   } catch (error) {
     next(error);
@@ -809,9 +814,12 @@ app.get("/api/listings", async (request, response, next) => {
 
 app.get("/api/listings/:id", async (request, response, next) => {
   try {
-    const [rows] = await pool.execute(`${LISTING_SELECT} WHERE i.id = ? LIMIT 1`, [request.params.id]);
+    const [rows] = await pool.execute(
+      `${LISTING_SELECT} WHERE i.id = ? AND i.interview_date >= CURDATE() LIMIT 1`,
+      [request.params.id]
+    );
     if (!rows.length) {
-      response.status(404).json({ error: "Listing not found." });
+      response.status(404).json({ error: "Job not found." });
       return;
     }
     response.json({ listing: mapListing(rows[0]) });
@@ -823,7 +831,7 @@ app.get("/api/listings/:id", async (request, response, next) => {
 app.get("/api/listings/:id/related", async (request, response, next) => {
   try {
     const [rows] = await pool.execute(
-      `${LISTING_SELECT} WHERE i.id <> ? ORDER BY i.interview_date DESC LIMIT 6`,
+      `${LISTING_SELECT} WHERE i.id <> ? AND i.interview_date >= CURDATE() ORDER BY i.interview_date DESC LIMIT 6`,
       [request.params.id]
     );
     response.json({ listings: rows.map(mapListing) });
@@ -905,6 +913,7 @@ app.get("/api/admin/listings", requireAdmin, async (request, response, next) => 
         i.location, i.experience, i.salary, i.apply_link, i.description, i.skills, i.category_id${extraCols},
         i.created_at, i.updated_at
        FROM interviews i
+       WHERE i.interview_date >= CURDATE()
        ORDER BY i.interview_date DESC, i.created_at DESC`
     );
     response.json({ listings: rows.map(mapListing) });

@@ -64,6 +64,8 @@ Public endpoints:
 - `GET /api/questions?page=1&pageSize=20&categoryId=...` (published questions only)
 - `GET /api/questions/:id` (published questions only)
 
+Jobs with an interview date before today are automatically hidden from public, related, saved, and admin job lists. Expired records remain in the database; they are not permanently deleted.
+
 Admin endpoints require the JWT cookie:
 
 - `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/session`

@@ -152,13 +152,18 @@ function syncInterviewsSchema($pdo) {
             $pdo->exec("ALTER TABLE `interviews` ADD COLUMN `updated_by` VARCHAR(100) NULL DEFAULT NULL");
         }
 
-        // 8. Ensure admins table has created_by
+        // 8. Ensure admins table has account metadata
         try {
             $adminCols = array_flip($pdo->query("SHOW COLUMNS FROM `admins`")->fetchAll(PDO::FETCH_COLUMN, 0));
             if (!isset($adminCols['created_by'])) {
                 $pdo->exec("ALTER TABLE `admins` ADD COLUMN `created_by` VARCHAR(100) NOT NULL DEFAULT 'system'");
             }
-        } catch (Exception $e) {}
+            if (!isset($adminCols['last_seen_at'])) {
+                $pdo->exec("ALTER TABLE `admins` ADD COLUMN `last_seen_at` DATETIME NULL DEFAULT NULL");
+            }
+        } catch (Exception $e) {
+            error_log("Failed to synchronize admin metadata schema: " . $e->getMessage());
+        }
 
         // 9. Ensure admin_activity_logs table exists
         try {
@@ -242,7 +247,8 @@ function initializeDatabaseSchema($pdo) {
       password_hash VARCHAR(255) NOT NULL,
       email VARCHAR(200) DEFAULT '',
       created_by VARCHAR(100) NOT NULL DEFAULT 'system',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      last_seen_at DATETIME NULL DEFAULT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
     CREATE TABLE IF NOT EXISTS admin_activity_logs (

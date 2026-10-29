@@ -109,9 +109,9 @@ async function loadRelated() {
           <div class="related-role">${escapeHtml(item.role)}</div>
           <div class="related-date">${formatDate(item.date)}</div>
         </div>`).join("")
-      : '<p class="empty-related">No related listings.</p>';
+      : '<p class="empty-related">No related jobs.</p>';
   } catch (error) {
-    relatedList.innerHTML = '<p class="empty-related">Could not load related listings.</p>';
+    relatedList.innerHTML = '<p class="empty-related">Could not load related jobs.</p>';
     console.error("Related listing API request failed:", error);
   }
 }
@@ -120,8 +120,8 @@ async function loadListing() {
   try {
     const response = await fetch(`/api/listings/${encodeURIComponent(listingId)}`);
     if (response.status === 404) {
-      mainContent.innerHTML = `<div class="not-found"><h2>Listing Not Found</h2><p>This interview listing may have been removed or the link is incorrect.</p>${backToHomeLink()}</div>`;
-      relatedList.innerHTML = '<p class="empty-related">No related listings.</p>';
+      mainContent.innerHTML = `<div class="not-found"><h2>Job Not Found</h2><p>This job may have expired or the link is incorrect.</p>${backToHomeLink()}</div>`;
+      relatedList.innerHTML = '<p class="empty-related">No related jobs.</p>';
       return;
     }
     if (!response.ok) throw new Error(`Listing request failed with status ${response.status}`);
@@ -134,7 +134,7 @@ async function loadListing() {
     mainContent.innerHTML = `
       <div class="breadcrumb">
         <a href="/">Home</a><span>›</span>
-        <a href="/">Listings</a><span>›</span>
+        <a href="/">Jobs</a><span>›</span>
         <span>${escapeHtml(listing.company)}</span>
       </div>
       <div class="ad-banner">
@@ -217,8 +217,8 @@ async function loadListing() {
 }
 
 if (!listingId) {
-  mainContent.innerHTML = `<div class="not-found"><h2>No Listing ID</h2><p>Please navigate from the home page.</p>${backToHomeLink()}</div>`;
-  relatedList.innerHTML = '<p class="empty-related">No related listings.</p>';
+  mainContent.innerHTML = `<div class="not-found"><h2>No Job ID</h2><p>Please navigate from the home page.</p>${backToHomeLink()}</div>`;
+  relatedList.innerHTML = '<p class="empty-related">No related jobs.</p>';
 } else {
   loadListing();
 }

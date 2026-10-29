@@ -23,9 +23,10 @@ switch ($method) {
             // Check if created_by column exists in admins table
             $cols = array_flip($pdo->query("SHOW COLUMNS FROM `admins`")->fetchAll(PDO::FETCH_COLUMN, 0));
             $createdByField = isset($cols['created_by']) ? "created_by" : "'system' AS created_by";
+            $lastSeenField = isset($cols['last_seen_at']) ? "last_seen_at" : "NULL AS last_seen_at";
 
             $stmt = $pdo->query("
-                SELECT id, username, email, {$createdByField}, created_at
+                SELECT id, username, email, {$createdByField}, created_at, {$lastSeenField}
                 FROM `admins`
                 ORDER BY id ASC
             ");
@@ -38,6 +39,7 @@ switch ($method) {
                     'email'      => $row['email'] ?? '',
                     'createdBy'  => $row['created_by'] ?? 'system',
                     'createdAt'  => $row['created_at'] ?? null,
+                    'lastSeenAt' => $row['last_seen_at'] ?? null,
                     'isCurrent'  => strcasecmp($row['username'], $currentAdmin) === 0
                 ];
             }, $rows);

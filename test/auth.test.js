@@ -136,6 +136,7 @@ test("admin listings are read from interviews without requiring categories", asy
     });
     assert.equal(listingsResponse.status, 200);
     assert.match(query, /FROM interviews i/i);
+    assert.match(query, /i\.interview_date >= CURDATE\(\)/i);
     assert.doesNotMatch(query, /JOIN categories/i);
     assert.deepEqual((await listingsResponse.json()).listings[0], {
       id: "listing-1",
@@ -154,6 +155,31 @@ test("admin listings are read from interviews without requiring categories", asy
       createdAt: "2026-10-25 00:00:00",
       updatedAt: "2026-10-25 00:00:00"
     });
+  } finally {
+    pool.execute = originalExecute;
+  }
+});
+
+test("public job endpoints exclude jobs with past interview dates", async () => {
+  const originalExecute = pool.execute;
+  const queries = [];
+  pool.execute = async sql => {
+    queries.push(sql);
+    return [[], []];
+  };
+
+  try {
+    const jobs = await request("/api/listings");
+    const job = await request("/api/listings/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa");
+    const related = await request("/api/listings/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/related");
+
+    assert.equal(jobs.status, 200);
+    assert.equal(job.status, 404);
+    assert.equal(related.status, 200);
+    assert.equal(queries.length, 3);
+    for (const query of queries) {
+      assert.match(query, /i\.interview_date >= CURDATE\(\)/i);
+    }
   } finally {
     pool.execute = originalExecute;
   }
@@ -244,7 +270,7 @@ test("job seekers can register and access only their own profile and matching-dr
         updated_at: "2026-10-26 00:00:00"
       }], []];
     }
-    if (/SELECT id FROM interviews WHERE id = \? LIMIT 1/i.test(sql)) {
+    if (/SELECT id FROM interviews WHERE id = \? AND interview_date >= CURDATE\(\) LIMIT 1/i.test(sql)) {
       return [[listingId, legacyListingId].includes(values[0]) ? [{ id: values[0] }] : [], []];
     }
     if (/INSERT INTO user_saved_listings/i.test(sql)) {

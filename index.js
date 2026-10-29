@@ -100,7 +100,7 @@ function renderCards() {
 function renderPg(total, count) {
   const pagination = document.getElementById('pagination');
   if (total <= 1) {
-    pagination.innerHTML = `<span class="pg-info">${count} listing${count !== 1 ? 's' : ''}</span>`;
+    pagination.innerHTML = `<span class="pg-info">${count} job${count !== 1 ? 's' : ''}</span>`;
     return;
   }
   let html = `<span class="pg-info">${count} results</span>`;
