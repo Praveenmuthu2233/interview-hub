@@ -3,6 +3,16 @@
 const form = document.getElementById("loginForm");
 const loginButton = document.getElementById("loginButton");
 const toast = document.getElementById("toast");
+const passwordInput = document.getElementById("password");
+const passwordToggle = document.getElementById("passwordToggle");
+
+passwordToggle.addEventListener("click", () => {
+  const showPassword = passwordInput.type === "password";
+  passwordInput.type = showPassword ? "text" : "password";
+  passwordToggle.textContent = showPassword ? "Hide" : "Show";
+  passwordToggle.setAttribute("aria-label", `${showPassword ? "Hide" : "Show"} password`);
+  passwordToggle.setAttribute("aria-pressed", String(showPassword));
+});
 
 function showMessage(message, success = false) {
   toast.textContent = message;

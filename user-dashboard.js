@@ -1,26 +1,31 @@
 "use strict";
 
-const profileContainer = document.getElementById("profileDetails");
-const jobList = document.getElementById("jobList");
-const savedJobList = document.getElementById("savedJobList");
-const portalMessage = document.getElementById("portalMessage");
+const profileContainer   = document.getElementById("profileDetails");
+const jobList            = document.getElementById("jobList");
+const savedJobList       = document.getElementById("savedJobList");
+const portalMessage      = document.getElementById("portalMessage");
+const jobSkeletonList    = document.getElementById("jobSkeletonList");
+const profileSkeleton    = document.getElementById("profileSkeleton");
 
 let currentUser;
-let currentListings = [];
-let savedListings = [];
+let currentListings  = [];
+let savedListings    = [];
 const savedListingIds = new Set();
 
 // Pagination State
-const JOBS_PER_PAGE = 5;
+const JOBS_PER_PAGE  = 5;
 const SAVED_PER_PAGE = 5;
-let currentJobPage = 1;
+let currentJobPage   = 1;
 let currentSavedPage = 1;
 let processedResults = [];
 
+/* ============================================================
+   Utilities
+   ============================================================ */
 function escapeHtml(value) {
-  const element = document.createElement("div");
-  element.textContent = value == null ? "" : String(value);
-  return element.innerHTML;
+  const el = document.createElement("div");
+  el.textContent = value == null ? "" : String(value);
+  return el.innerHTML;
 }
 
 async function apiRequest(path, options = {}) {
@@ -40,32 +45,90 @@ async function apiRequest(path, options = {}) {
   return result;
 }
 
-function profileValue(value) {
-  return value ? escapeHtml(value) : '<span class="muted">Not provided</span>';
+function showToast(message, type = "error") {
+  portalMessage.textContent = message;
+  portalMessage.className   = `dash-toast show ${type}`;
+  clearTimeout(portalMessage._timer);
+  portalMessage._timer = setTimeout(() => {
+    portalMessage.className = "dash-toast";
+  }, 5000);
+}
+
+function formatDate(value) {
+  const date = new Date(`${value}T00:00:00`);
+  return Number.isNaN(date.getTime())
+    ? "Date N/A"
+    : date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
+
+/* ============================================================
+   Profile Render
+   ============================================================ */
+function profileValue(value, html = false) {
+  if (value && String(value).trim()) {
+    return html ? value : escapeHtml(value);
+  }
+  return '<span class="muted">Not provided</span>';
 }
 
 function renderProfile(user) {
   currentUser = user;
-  document.getElementById("welcomeName").textContent = `Hello, ${user.fullName}`;
+
+  // Nav bar updates
+  const initial = (user.fullName || "?").trim().slice(0, 1).toUpperCase();
+  document.getElementById("navAvatar").textContent   = initial;
+  document.getElementById("welcomeName").textContent = user.fullName || "Dashboard";
+
+  // Stat bar (totals will be set by renderListings)
+  document.getElementById("statSaved").textContent = String(savedListings.length);
+
   const skillTags = user.skills.length
-    ? user.skills.map(skill => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join("")
+    ? user.skills.map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join("")
     : '<span class="muted">Not provided</span>';
+
   profileContainer.innerHTML = `
-    <div class="profile-primary">
-      <div class="avatar">${escapeHtml((user.fullName || "?").trim().slice(0, 1).toUpperCase())}</div>
-      <div><h3>${escapeHtml(user.fullName)}</h3><p>${escapeHtml(user.email)}</p></div>
+    <div class="profile-top">
+      <div class="profile-avatar-wrap">
+        <div class="avatar">${escapeHtml(initial)}</div>
+      </div>
+      <div class="profile-name">${escapeHtml(user.fullName)}</div>
+      <div class="profile-email">${escapeHtml(user.email)}</div>
     </div>
-    <dl class="profile-list">
-      <div><dt>Phone</dt><dd>${profileValue(user.phone)}</dd></div>
-      <div><dt>Education</dt><dd>${profileValue(user.education)}</dd></div>
-      <div><dt>Graduation year</dt><dd>${profileValue(user.graduationYear)}</dd></div>
-      <div><dt>Experience</dt><dd>${profileValue(user.experience)}</dd></div>
-      <div><dt>Preferred location</dt><dd>${profileValue(user.preferredLocation)}</dd></div>
-      <div class="skills-field"><dt>Skills</dt><dd class="skill-list">${skillTags}</dd></div>
-    </dl>
-    <form id="profileEditForm" class="profile-edit-form" hidden>
-      <div class="profile-form-grid">
-        <div class="portal-field full-width">
+
+    <div class="profile-body">
+      <div class="profile-edit-btn-wrap">
+        <button class="dash-btn dash-btn-ghost" id="editProfileButton" type="button">✏️ Edit profile</button>
+      </div>
+
+      <ul class="profile-list">
+        <li class="profile-item">
+          <span class="profile-item-label">Phone</span>
+          <span class="profile-item-value">${profileValue(user.phone)}</span>
+        </li>
+        <li class="profile-item">
+          <span class="profile-item-label">Education</span>
+          <span class="profile-item-value">${profileValue(user.education)}</span>
+        </li>
+        <li class="profile-item">
+          <span class="profile-item-label">Graduation year</span>
+          <span class="profile-item-value">${profileValue(user.graduationYear)}</span>
+        </li>
+        <li class="profile-item">
+          <span class="profile-item-label">Experience</span>
+          <span class="profile-item-value">${profileValue(user.experience)}</span>
+        </li>
+        <li class="profile-item">
+          <span class="profile-item-label">Preferred location</span>
+          <span class="profile-item-value">${profileValue(user.preferredLocation)}</span>
+        </li>
+        <li class="profile-item">
+          <span class="profile-item-label">Skills</span>
+          <div class="skill-list">${skillTags}</div>
+        </li>
+      </ul>
+
+      <form id="profileEditForm" class="profile-edit-form" hidden>
+        <div class="portal-field">
           <label for="editFullName">Full name</label>
           <input id="editFullName" name="fullName" maxlength="160" required/>
         </div>
@@ -93,44 +156,48 @@ function renderProfile(user) {
           <label for="editPreferredLocation">Preferred location</label>
           <input id="editPreferredLocation" name="preferredLocation" maxlength="160"/>
         </div>
-      </div>
-      <div class="profile-edit-actions">
-        <button class="portal-button" id="saveProfileButton" type="submit">Save changes</button>
-        <button class="portal-button secondary" id="cancelProfileButton" type="button">Cancel</button>
-      </div>
-    </form>`;
-  document.getElementById("editProfileButton").hidden = false;
+        <div class="profile-edit-actions">
+          <button class="dash-btn dash-btn-primary" id="saveProfileButton" type="submit">Save</button>
+          <button class="dash-btn dash-btn-ghost"   id="cancelProfileButton" type="button">Cancel</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  // Hide skeleton, show content
+  if (profileSkeleton) profileSkeleton.hidden = true;
+  profileContainer.hidden = false;
+
+  document.getElementById("editProfileButton").addEventListener("click",   openProfileEditor);
   document.getElementById("cancelProfileButton").addEventListener("click", closeProfileEditor);
-  document.getElementById("profileEditForm").addEventListener("submit", saveProfile);
+  document.getElementById("profileEditForm").addEventListener("submit",    saveProfile);
 }
 
 function openProfileEditor() {
-  document.getElementById("editFullName").value = currentUser.fullName || "";
-  document.getElementById("editPhone").value = currentUser.phone || "";
-  document.getElementById("editEducation").value = currentUser.education || "";
-  document.getElementById("editGraduationYear").value = currentUser.graduationYear || "";
-  document.getElementById("editExperience").value = currentUser.experience || "";
-  document.getElementById("editSkills").value = currentUser.skills.join(", ");
+  document.getElementById("editFullName").value         = currentUser.fullName        || "";
+  document.getElementById("editPhone").value            = currentUser.phone           || "";
+  document.getElementById("editEducation").value        = currentUser.education       || "";
+  document.getElementById("editGraduationYear").value   = currentUser.graduationYear  || "";
+  document.getElementById("editExperience").value       = currentUser.experience      || "";
+  document.getElementById("editSkills").value           = currentUser.skills.join(", ");
   document.getElementById("editPreferredLocation").value = currentUser.preferredLocation || "";
-  document.getElementById("profileEditForm").hidden = false;
-  document.getElementById("editProfileButton").hidden = true;
+  document.getElementById("profileEditForm").hidden    = false;
+  document.getElementById("editProfileButton").hidden  = true;
 }
 
 function closeProfileEditor() {
-  document.getElementById("profileEditForm").hidden = true;
+  document.getElementById("profileEditForm").hidden   = true;
   document.getElementById("editProfileButton").hidden = false;
 }
 
-document.getElementById("editProfileButton").addEventListener("click", openProfileEditor);
-
 async function saveProfile(event) {
   event.preventDefault();
-  const form = event.currentTarget;
+  const form   = event.currentTarget;
   const button = document.getElementById("saveProfileButton");
   const values = new FormData(form);
   const profile = Object.fromEntries(values.entries());
-  profile.email = currentUser.email;
-  profile.skills = String(profile.skills).split(",").map(skill => skill.trim()).filter(Boolean);
+  profile.email  = currentUser.email;
+  profile.skills = String(profile.skills).split(",").map(s => s.trim()).filter(Boolean);
   button.disabled = true;
   try {
     const result = await apiRequest("/api/user/profile", {
@@ -140,122 +207,122 @@ async function saveProfile(event) {
     });
     renderProfile(result.user);
     renderListings(currentListings, currentUser, 1);
-    portalMessage.textContent = "Your profile has been updated.";
-    portalMessage.className = "portal-message show success";
+    showToast("Your profile has been updated.", "success");
   } catch (error) {
-    portalMessage.textContent = error.message;
-    portalMessage.className = "portal-message show error";
+    showToast(error.message, "error");
     button.disabled = false;
   }
 }
 
+/* ============================================================
+   Matching / Scoring
+   ============================================================ */
 function scoreListing(listing, user) {
   const searchText = [
-    listing.company,
-    listing.role,
-    listing.location,
-    listing.experience,
-    listing.description,
-    ...(listing.skills || [])
+    listing.company, listing.role, listing.location,
+    listing.experience, listing.description, ...(listing.skills || [])
   ].join(" ").toLowerCase();
   const matchedSkills = user.skills.filter(skill => skill && searchText.includes(skill.toLowerCase()));
   let score = matchedSkills.length;
   if (user.preferredLocation && searchText.includes(user.preferredLocation.toLowerCase())) score += 2;
-  if (user.education && searchText.includes(user.education.toLowerCase())) score += 1;
+  if (user.education          && searchText.includes(user.education.toLowerCase()))         score += 1;
   return { score, matchedSkills };
 }
 
-function formatDate(value) {
-  const date = new Date(`${value}T00:00:00`);
-  return Number.isNaN(date.getTime())
-    ? "Date not available"
-    : date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
-
+/* ============================================================
+   Job Card Markup
+   ============================================================ */
 function jobCardMarkup(listing, matchedSkills = []) {
-  const type = listing.type === "walkin" ? "Walk-in" : listing.type;
-  const skills = listing.skills.length
-    ? listing.skills.map(skill => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join("")
-    : '<span class="muted">See role details</span>';
-  const isSaved = savedListingIds.has(listing.id);
+  const type     = listing.type === "walkin" ? "Walk-in" : listing.type;
+  const isSaved  = savedListingIds.has(listing.id);
+
+  const skillsHtml = listing.skills.length
+    ? listing.skills.map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join("")
+    : '<span class="muted" style="font-size:.8rem">See role details</span>';
+
+  const matchBadge = matchedSkills.length
+    ? `<div class="matched-skills-row">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Matches your skills: ${escapeHtml(matchedSkills.join(", "))}
+       </div>`
+    : "";
+
   return `<article class="job-card">
-    <div class="job-card-heading">
-      <div><p class="company-name">${escapeHtml(listing.company)}</p><h3>${escapeHtml(listing.role)}</h3></div>
+    <div class="job-card-top">
+      <div>
+        <p class="job-card-company">${escapeHtml(listing.company)}</p>
+        <h3 class="job-card-role">${escapeHtml(listing.role)}</h3>
+      </div>
       <span class="type-pill">${escapeHtml(type)}</span>
     </div>
+
     <div class="job-meta">
-      <span>📅 ${escapeHtml(formatDate(listing.date))}</span>
-      <span>📍 ${escapeHtml(listing.location || "Location not specified")}</span>
-      <span>Experience: ${escapeHtml(listing.experience || "Not specified")}</span>
-      <span>Salary: ${escapeHtml(listing.salary || "Not specified")}</span>
+      <span class="job-meta-item"><span class="job-meta-icon">📅</span> ${escapeHtml(formatDate(listing.date))}</span>
+      <span class="job-meta-item"><span class="job-meta-icon">📍</span> ${escapeHtml(listing.location || "Location N/A")}</span>
+      <span class="job-meta-item"><span class="job-meta-icon">💼</span> ${escapeHtml(listing.experience || "Any experience")}</span>
+      <span class="job-meta-item"><span class="job-meta-icon">💰</span> ${escapeHtml(listing.salary || "Not specified")}</span>
     </div>
-    <div class="requirements"><h4>Skills / requirements</h4><div class="skill-list">${skills}</div></div>
-    <details class="job-description"><summary>Read role and eligibility details</summary><p>${escapeHtml(listing.description)}</p></details>
-    ${matchedSkills.length ? `<p class="matched-skills">Matches your skills: ${escapeHtml(matchedSkills.join(", "))}</p>` : ""}
+
+    <hr class="job-divider"/>
+
+    <p class="job-skills-label">Skills &amp; Requirements</p>
+    <div class="skill-list">${skillsHtml}</div>
+
+    <details class="job-description">
+      <summary>Role &amp; eligibility details</summary>
+      <p>${escapeHtml(listing.description)}</p>
+    </details>
+
+    ${matchBadge}
+
     <div class="job-actions">
-      <a class="apply-link" href="/detail?id=${encodeURIComponent(listing.id)}">Apply now</a>
-      <button class="save-job-button" type="button" data-listing-id="${escapeHtml(listing.id)}" aria-pressed="${isSaved}">
-        ${isSaved ? "Remove saved job" : "Save job"}
+      <a class="apply-btn" href="/detail?id=${encodeURIComponent(listing.id)}">Apply now →</a>
+      <button class="save-job-button ${isSaved ? "is-saved" : ""}"
+              type="button"
+              data-listing-id="${escapeHtml(listing.id)}"
+              aria-pressed="${isSaved}">
+        ${isSaved ? "🔖 Remove saved" : "🔖 Save job"}
       </button>
     </div>
   </article>`;
 }
 
-/* ----------------------------------------------------
+/* ============================================================
    Pagination Component
----------------------------------------------------- */
+   ============================================================ */
 function renderPagination(containerId, currentPage, totalPages, totalItems, startItem, endItem, onPageChange) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  if (totalPages <= 1) {
-    container.hidden = true;
-    container.innerHTML = "";
-    return;
-  }
-
+  if (totalPages <= 1) { container.hidden = true; container.innerHTML = ""; return; }
   container.hidden = false;
 
   let pageButtonsHtml = "";
   const maxButtons = 5;
   let startPage = Math.max(1, currentPage - 2);
-  let endPage = Math.min(totalPages, startPage + maxButtons - 1);
-  if (endPage - startPage < maxButtons - 1) {
-    startPage = Math.max(1, endPage - maxButtons + 1);
-  }
+  let endPage   = Math.min(totalPages, startPage + maxButtons - 1);
+  if (endPage - startPage < maxButtons - 1) startPage = Math.max(1, endPage - maxButtons + 1);
 
   if (startPage > 1) {
     pageButtonsHtml += `<button type="button" class="pagination-page-btn" data-page="1">1</button>`;
-    if (startPage > 2) {
-      pageButtonsHtml += `<span class="pagination-ellipsis">…</span>`;
-    }
+    if (startPage > 2) pageButtonsHtml += `<span class="pagination-ellipsis">…</span>`;
   }
-
   for (let p = startPage; p <= endPage; p++) {
-    const isActive = p === currentPage;
-    pageButtonsHtml += `<button type="button" class="pagination-page-btn ${isActive ? "active" : ""}" data-page="${p}" ${isActive ? 'aria-current="page"' : ""}>${p}</button>`;
+    const active = p === currentPage;
+    pageButtonsHtml += `<button type="button" class="pagination-page-btn ${active ? "active" : ""}" data-page="${p}" ${active ? 'aria-current="page"' : ""}>${p}</button>`;
   }
-
   if (endPage < totalPages) {
-    if (endPage < totalPages - 1) {
-      pageButtonsHtml += `<span class="pagination-ellipsis">…</span>`;
-    }
+    if (endPage < totalPages - 1) pageButtonsHtml += `<span class="pagination-ellipsis">…</span>`;
     pageButtonsHtml += `<button type="button" class="pagination-page-btn" data-page="${totalPages}">${totalPages}</button>`;
   }
 
   container.innerHTML = `
     <div class="pagination-container">
-      <div class="pagination-summary">Showing <strong>${startItem}–${endItem}</strong> of <strong>${totalItems}</strong> drives (Page ${currentPage} of ${totalPages})</div>
+      <div class="pagination-summary">Showing <strong>${startItem}–${endItem}</strong> of <strong>${totalItems}</strong></div>
       <div class="pagination-nav">
-        <button type="button" class="pagination-btn prev-btn" data-page="${currentPage - 1}" ${currentPage <= 1 ? "disabled" : ""}>
-          ← Previous
-        </button>
-        <div class="pagination-numbers">
-          ${pageButtonsHtml}
-        </div>
-        <button type="button" class="pagination-btn next-btn" data-page="${currentPage + 1}" ${currentPage >= totalPages ? "disabled" : ""}>
-          Next →
-        </button>
+        <button type="button" class="pagination-btn" data-page="${currentPage - 1}" ${currentPage <= 1 ? "disabled" : ""}>← Prev</button>
+        <div class="pagination-numbers">${pageButtonsHtml}</div>
+        <button type="button" class="pagination-btn" data-page="${currentPage + 1}" ${currentPage >= totalPages ? "disabled" : ""}>Next →</button>
       </div>
     </div>
   `;
@@ -270,40 +337,35 @@ function renderPagination(containerId, currentPage, totalPages, totalItems, star
   });
 }
 
-/* ----------------------------------------------------
-   Open Drives Render with 5-per-page Pagination
----------------------------------------------------- */
+/* ============================================================
+   Open Drives — render with pagination
+   ============================================================ */
 function renderJobPage(page) {
   const total = processedResults.length;
   if (!total) {
-    jobList.innerHTML = '<div class="empty-state">There are no upcoming interview drives right now. Please check back soon.</div>';
-    const paginationEl = document.getElementById("jobPagination");
-    if (paginationEl) paginationEl.hidden = true;
+    jobList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <p class="empty-state-title">No drives right now</p>
+        <p class="empty-state-sub">There are no upcoming interview drives at the moment. Check back soon!</p>
+      </div>`;
+    const pag = document.getElementById("jobPagination");
+    if (pag) pag.hidden = true;
     return;
   }
 
   const totalPages = Math.ceil(total / JOBS_PER_PAGE);
-  currentJobPage = Math.max(1, Math.min(page, totalPages));
-
+  currentJobPage   = Math.max(1, Math.min(page, totalPages));
   const startIndex = (currentJobPage - 1) * JOBS_PER_PAGE;
-  const endIndex = Math.min(startIndex + JOBS_PER_PAGE, total);
-  const pageItems = processedResults.slice(startIndex, endIndex);
+  const endIndex   = Math.min(startIndex + JOBS_PER_PAGE, total);
+  const pageItems  = processedResults.slice(startIndex, endIndex);
 
   jobList.innerHTML = pageItems.map(({ listing, matchedSkills }) => jobCardMarkup(listing, matchedSkills)).join("");
 
-  renderPagination(
-    "jobPagination",
-    currentJobPage,
-    totalPages,
-    total,
-    startIndex + 1,
-    endIndex,
-    (newPage) => {
-      renderJobPage(newPage);
-      const section = document.querySelector(".jobs-section");
-      if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  );
+  renderPagination("jobPagination", currentJobPage, totalPages, total, startIndex + 1, endIndex, newPage => {
+    renderJobPage(newPage);
+    document.querySelector(".dash-section").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
 function renderListings(listings, user, page = 1) {
@@ -311,87 +373,87 @@ function renderListings(listings, user, page = 1) {
   const hasPreferences = Boolean(user.skills.length || user.preferredLocation || user.education);
   const matches = hasPreferences ? scored.filter(item => item.score > 0) : [];
   processedResults = matches.length ? matches : scored;
-  processedResults.sort((first, second) => second.score - first.score);
+  processedResults.sort((a, b) => b.score - a.score);
 
   const total = processedResults.length;
-  document.getElementById("listingCount").textContent = String(total);
+  document.getElementById("listingCount").textContent  = String(total);
+  document.getElementById("statTotal").textContent     = String(total);
+  document.getElementById("statMatched").textContent   = String(matches.length || total);
+
   document.getElementById("matchNote").textContent = matches.length
     ? `${matches.length} drive${matches.length === 1 ? "" : "s"} matched your skills or location.`
-    : "No direct profile matches yet, so here are all current open drives.";
+    : "No direct profile matches yet — showing all current open drives.";
+
+  // Hide skeletons, show real list
+  if (jobSkeletonList) jobSkeletonList.hidden = true;
+  jobList.hidden = false;
 
   renderJobPage(page);
 }
 
-/* ----------------------------------------------------
-   Saved Jobs Render with 5-per-page Pagination
----------------------------------------------------- */
+/* ============================================================
+   Saved Jobs — render with pagination
+   ============================================================ */
 function renderSavedPage(page) {
   const total = savedListings.length;
   document.getElementById("savedListingCount").textContent = String(total);
-  document.getElementById("savedListingNote").textContent = total
+  document.getElementById("statSaved").textContent         = String(total);
+  document.getElementById("savedListingNote").textContent  = total
     ? "Your bookmarked interview drives are ready whenever you need them."
-    : "Save a drive to keep it handy here.";
+    : "Save a drive from the list above to bookmark it here.";
 
   if (!total) {
-    savedJobList.innerHTML = '<div class="empty-state">You have no saved jobs yet.</div>';
-    const paginationEl = document.getElementById("savedJobPagination");
-    if (paginationEl) paginationEl.hidden = true;
+    savedJobList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🔖</div>
+        <p class="empty-state-title">No saved jobs yet</p>
+        <p class="empty-state-sub">Click "Save job" on any drive to bookmark it here for quick access.</p>
+      </div>`;
+    const pag = document.getElementById("savedJobPagination");
+    if (pag) pag.hidden = true;
     return;
   }
 
   const totalPages = Math.ceil(total / SAVED_PER_PAGE);
   currentSavedPage = Math.max(1, Math.min(page, totalPages));
-
   const startIndex = (currentSavedPage - 1) * SAVED_PER_PAGE;
-  const endIndex = Math.min(startIndex + SAVED_PER_PAGE, total);
-  const pageItems = savedListings.slice(startIndex, endIndex);
+  const endIndex   = Math.min(startIndex + SAVED_PER_PAGE, total);
+  const pageItems  = savedListings.slice(startIndex, endIndex);
 
   savedJobList.innerHTML = pageItems.map(listing => jobCardMarkup(listing)).join("");
 
-  renderPagination(
-    "savedJobPagination",
-    currentSavedPage,
-    totalPages,
-    total,
-    startIndex + 1,
-    endIndex,
-    (newPage) => {
-      renderSavedPage(newPage);
-      const section = document.querySelector(".saved-section");
-      if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  );
+  renderPagination("savedJobPagination", currentSavedPage, totalPages, total, startIndex + 1, endIndex, newPage => {
+    renderSavedPage(newPage);
+    document.querySelector(".dash-section-saved").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
-function renderSavedListings(page = 1) {
-  renderSavedPage(page);
-}
+function renderSavedListings(page = 1) { renderSavedPage(page); }
 
-/* ----------------------------------------------------
+/* ============================================================
    Save / Unsave Action Handler
----------------------------------------------------- */
+   ============================================================ */
 async function toggleSavedListing(listingId, button) {
   button.disabled = true;
   try {
     if (savedListingIds.has(listingId)) {
       await apiRequest(`/api/user/saved-listings/${encodeURIComponent(listingId)}`, { method: "DELETE" });
       savedListingIds.delete(listingId);
-      savedListings = savedListings.filter(listing => listing.id !== listingId);
+      savedListings = savedListings.filter(l => l.id !== listingId);
     } else {
       await apiRequest("/api/user/saved-listings", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ listingId })
       });
-      const listing = currentListings.find(item => item.id === listingId);
-      if (listing) savedListings.unshift(listing);
+      const listing = currentListings.find(l => l.id === listingId);
+      if (listing) { savedListings.unshift(listing); }
       savedListingIds.add(listingId);
     }
     renderJobPage(currentJobPage);
     renderSavedPage(currentSavedPage);
   } catch (error) {
-    portalMessage.textContent = error.message;
-    portalMessage.className = "portal-message show error";
+    showToast(error.message, "error");
     button.disabled = false;
   }
 }
@@ -401,9 +463,9 @@ function handleSavedListingClick(event) {
   if (button) toggleSavedListing(button.dataset.listingId, button);
 }
 
-/* ----------------------------------------------------
+/* ============================================================
    Dashboard Initialization
----------------------------------------------------- */
+   ============================================================ */
 async function loadDashboard() {
   try {
     const [session, dashboard] = await Promise.all([
@@ -413,25 +475,30 @@ async function loadDashboard() {
     renderProfile(session.user);
     currentListings = dashboard.listings || [];
     renderListings(currentListings, currentUser, 1);
+
     try {
       const saved = await apiRequest("/api/user/saved-listings");
       savedListings = saved.listings || [];
       savedListingIds.clear();
-      savedListings.forEach(listing => savedListingIds.add(listing.id));
+      savedListings.forEach(l => savedListingIds.add(l.id));
+      // Re-render job page so save-button states update
       renderJobPage(currentJobPage);
       renderSavedListings(1);
+      // Update saved stat in profile
+      document.getElementById("statSaved").textContent = String(savedListings.length);
     } catch (error) {
-      document.getElementById("savedListingNote").textContent = "Could not load saved jobs. Please refresh to try again.";
-      savedJobList.innerHTML = '<div class="empty-state">Saved jobs are temporarily unavailable.</div>';
-      portalMessage.textContent = error.message;
-      portalMessage.className = "portal-message show error";
+      document.getElementById("savedListingNote").textContent = "Could not load saved jobs. Refresh to try again.";
+      savedJobList.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">⚠️</div>
+          <p class="empty-state-title">Saved jobs unavailable</p>
+          <p class="empty-state-sub">Refresh the page to try again.</p>
+        </div>`;
+      showToast(error.message, "error");
       console.error("Could not load saved jobs:", error);
     }
   } catch (error) {
-    if (error.message) {
-      portalMessage.textContent = error.message;
-      portalMessage.className = "portal-message show error";
-    }
+    if (error.message) showToast(error.message, "error");
   }
 }
 
@@ -445,8 +512,7 @@ document.getElementById("logoutButton").addEventListener("click", async event =>
     await apiRequest("/api/user/logout", { method: "POST" });
     window.location.replace("/user-login");
   } catch (error) {
-    portalMessage.textContent = error.message;
-    portalMessage.className = "portal-message show error";
+    showToast(error.message, "error");
     button.disabled = false;
   }
 });

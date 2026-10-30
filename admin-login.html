@@ -18,7 +18,10 @@
       <label class="auth-hint" for="username">Admin ID</label>
       <input id="username" name="username" type="text" autocomplete="username" required maxlength="128"/>
       <label class="auth-hint" for="password">Password</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="1024"/>
+      <div class="auth-password-field">
+        <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="1024"/>
+        <button class="password-toggle" id="passwordToggle" type="button" aria-controls="password" aria-label="Show password" aria-pressed="false">Show</button>
+      </div>
       <button class="btn-primary" id="loginButton" type="submit">🔓 Sign in</button>
       <div class="auth-hint">Secure server-side sign-in. Website data is stored in Cloud SQL.</div>
     </form>

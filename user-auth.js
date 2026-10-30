@@ -4,9 +4,21 @@ const form = document.getElementById("userAuthForm");
 const button = document.getElementById("submitButton");
 const message = document.getElementById("authMessage");
 const mode = form.dataset.mode;
+const passwordInput = document.getElementById("password");
+const passwordToggle = document.getElementById("passwordToggle");
 
 const graduationYear = document.getElementById("graduationYear");
 if (graduationYear) graduationYear.max = String(new Date().getFullYear() + 10);
+
+if (passwordToggle && passwordInput) {
+  passwordToggle.addEventListener("click", () => {
+    const showPassword = passwordInput.type === "password";
+    passwordInput.type = showPassword ? "text" : "password";
+    passwordToggle.textContent = showPassword ? "Hide" : "Show";
+    passwordToggle.setAttribute("aria-label", `${showPassword ? "Hide" : "Show"} password`);
+    passwordToggle.setAttribute("aria-pressed", String(showPassword));
+  });
+}
 
 function showMessage(text, success = false) {
   message.textContent = text;

@@ -14,7 +14,8 @@ const tabActivityCount = document.getElementById("tabActivityCount");
 const tabAdminsCount = document.getElementById("tabAdminsCount");
 
 // DOM Elements - Listings
-const tableBody = document.getElementById("tableBody");
+const jobsGrid = document.getElementById("jobsGrid");
+const jobsPagination = document.getElementById("jobsPagination");
 const saveButton = document.getElementById("saveBtn");
 const resetButton = document.getElementById("resetBtn");
 const adminSearch = document.getElementById("adminSearch");
@@ -53,6 +54,8 @@ let cachedAdmins = [];
 let currentAdminUsername = "admin";
 let skills = [];
 let currentTab = "listings";
+const LISTINGS_PER_PAGE = 8;
+let currentListingsPage = 1;
 
 /* ----------------------------------------------------
    Toast & Formatting Helpers
@@ -232,7 +235,7 @@ function renderListingsStats() {
 }
 
 function renderListingsTable() {
-  if (!tableBody) return;
+  if (!jobsGrid) return;
   const query = (adminSearch ? adminSearch.value : "").trim().toLowerCase();
   const results = cachedListings.filter(item =>
     !query
@@ -244,53 +247,90 @@ function renderListingsTable() {
     || (item.updatedBy || "").toLowerCase().includes(query)
   );
 
-  if (entryCount) entryCount.textContent = String(cachedListings.length);
+  if (entryCount) entryCount.textContent = String(results.length);
 
   if (!results.length) {
-    tableBody.innerHTML = `<tr class="empty-row"><td colspan="7">${query ? "No jobs found matching search." : "No jobs in the database yet."}</td></tr>`;
+    jobsGrid.innerHTML = `<div class="jobs-empty-state">${query ? "No jobs found matching search." : "No jobs in the database yet."}</div>`;
+    if (jobsPagination) jobsPagination.innerHTML = "";
     return;
   }
 
-  tableBody.innerHTML = results.map(item => {
+  const totalPages = Math.ceil(results.length / LISTINGS_PER_PAGE);
+  currentListingsPage = Math.max(1, Math.min(currentListingsPage, totalPages));
+  const startIndex = (currentListingsPage - 1) * LISTINGS_PER_PAGE;
+  const pageItems = results.slice(startIndex, startIndex + LISTINGS_PER_PAGE);
+
+  jobsGrid.innerHTML = pageItems.map(item => {
     const type = ["online", "offline", "walkin"].includes(item.type) ? item.type : "online";
     const typeLabel = type === "walkin" ? "Walk-in" : (type.charAt(0).toUpperCase() + type.slice(1));
     const createdBy = item.createdBy || "admin";
     const updatedBy = item.updatedBy;
 
-    return `<tr>
-      <td class="td-company">${escapeHtml(item.company)}</td>
-      <td class="td-role">${escapeHtml(item.role)}</td>
-      <td><span class="type-badge type-${type}">${escapeHtml(typeLabel)}</span></td>
-      <td>${formatDate(item.date)}</td>
-      <td>${escapeHtml(item.location || "-")}</td>
-      <td>
-        <div class="author-meta">
-          <span class="badge-creator" title="Added by admin: ${escapeHtml(createdBy)}">
-            <span>👤</span> ${escapeHtml(createdBy)}
-          </span>
-          ${updatedBy ? `<span class="badge-updater" title="Last modified by: ${escapeHtml(updatedBy)}">✎ ${escapeHtml(updatedBy)}</span>` : ""}
+    return `<article class="admin-job-card">
+      <div class="admin-job-card-header">
+        <div>
+          <div class="td-company">${escapeHtml(item.company)}</div>
+          <div class="td-role">${escapeHtml(item.role)}</div>
         </div>
-      </td>
-      <td>
-        <div class="action-btns">
-          <button class="btn-edit" type="button" data-action="edit" data-entry-id="${encodeURIComponent(item.id)}">✏️ Edit</button>
-          <button class="btn-delete" type="button" data-action="delete" data-entry-id="${encodeURIComponent(item.id)}">🗑 Delete</button>
-        </div>
-      </td>
-    </tr>`;
+        <span class="type-badge type-${type}">${escapeHtml(typeLabel)}</span>
+      </div>
+      <dl class="admin-job-meta">
+        <div><dt>Interview date</dt><dd>${formatDate(item.date)}</dd></div>
+        <div><dt>Location</dt><dd>${escapeHtml(item.location || "-")}</dd></div>
+      </dl>
+      <div class="author-meta">
+        <span class="badge-creator" title="Added by admin: ${escapeHtml(createdBy)}">
+          <span>👤</span> ${escapeHtml(createdBy)}
+        </span>
+        ${updatedBy ? `<span class="badge-updater" title="Last modified by: ${escapeHtml(updatedBy)}">✎ ${escapeHtml(updatedBy)}</span>` : ""}
+      </div>
+      <div class="action-btns">
+        <button class="btn-edit" type="button" data-action="edit" data-entry-id="${encodeURIComponent(item.id)}">✏️ Edit</button>
+        <button class="btn-delete" type="button" data-action="delete" data-entry-id="${encodeURIComponent(item.id)}">🗑 Delete</button>
+      </div>
+    </article>`;
   }).join("");
+
+  if (!jobsPagination) return;
+  const firstItem = startIndex + 1;
+  const lastItem = Math.min(startIndex + LISTINGS_PER_PAGE, results.length);
+  let pageButtons = "";
+  let firstPage = Math.max(1, currentListingsPage - 2);
+  let lastPage = Math.min(totalPages, firstPage + 4);
+  if (lastPage - firstPage < 4) firstPage = Math.max(1, lastPage - 4);
+
+  if (firstPage > 1) {
+    pageButtons += '<button class="jobs-page-btn" type="button" data-page="1">1</button>';
+    if (firstPage > 2) pageButtons += '<span class="jobs-page-ellipsis" aria-hidden="true">…</span>';
+  }
+  for (let page = firstPage; page <= lastPage; page++) {
+    pageButtons += `<button class="jobs-page-btn${page === currentListingsPage ? " active" : ""}" type="button" data-page="${page}" ${page === currentListingsPage ? 'aria-current="page"' : ""}>${page}</button>`;
+  }
+  if (lastPage < totalPages) {
+    if (lastPage < totalPages - 1) pageButtons += '<span class="jobs-page-ellipsis" aria-hidden="true">…</span>';
+    pageButtons += `<button class="jobs-page-btn" type="button" data-page="${totalPages}">${totalPages}</button>`;
+  }
+  jobsPagination.innerHTML = `
+    <span class="jobs-page-summary">Showing ${firstItem}–${lastItem} of ${results.length} jobs</span>
+    <div class="jobs-page-controls">
+      <button class="jobs-page-btn" type="button" data-page="${currentListingsPage - 1}" ${currentListingsPage === 1 ? "disabled" : ""}>← Prev</button>
+      ${pageButtons}
+      <button class="jobs-page-btn" type="button" data-page="${currentListingsPage + 1}" ${currentListingsPage === totalPages ? "disabled" : ""}>Next →</button>
+    </div>`;
 }
 
 async function loadListings() {
-  if (tableBody) tableBody.innerHTML = '<tr class="empty-row"><td colspan="7">Loading jobs from database...</td></tr>';
+  if (jobsGrid) jobsGrid.innerHTML = '<div class="jobs-empty-state">Loading jobs from database...</div>';
   try {
     const result = await apiRequest("/api/admin/listings");
     cachedListings = result.listings || [];
+    currentListingsPage = 1;
     renderListingsTable();
     renderListingsStats();
   } catch (error) {
     if (error.message) showToast(error.message);
-    if (tableBody) tableBody.innerHTML = '<tr class="empty-row"><td colspan="7">Could not retrieve jobs. Check MySQL connection.</td></tr>';
+    if (jobsGrid) jobsGrid.innerHTML = '<div class="jobs-empty-state">Could not retrieve jobs. Check MySQL connection.</div>';
+    if (jobsPagination) jobsPagination.innerHTML = "";
   }
 }
 
@@ -645,8 +685,8 @@ if (tagsWrap) {
   });
 }
 
-if (tableBody) {
-  tableBody.addEventListener("click", event => {
+if (jobsGrid) {
+  jobsGrid.addEventListener("click", event => {
     const button = event.target.closest("[data-action][data-entry-id]");
     if (!button) return;
     const id = decodeURIComponent(button.dataset.entryId);
@@ -665,7 +705,20 @@ if (adminsTableBody) {
   });
 }
 
-if (adminSearch) adminSearch.addEventListener("input", renderListingsTable);
+if (adminSearch) adminSearch.addEventListener("input", () => {
+  currentListingsPage = 1;
+  renderListingsTable();
+});
+if (jobsPagination) {
+  jobsPagination.addEventListener("click", event => {
+    const button = event.target.closest("[data-page]");
+    if (!button || button.disabled) return;
+    const page = Number(button.dataset.page);
+    if (!Number.isInteger(page)) return;
+    currentListingsPage = page;
+    renderListingsTable();
+  });
+}
 if (actSearch) actSearch.addEventListener("input", renderActivityTable);
 if (actActionFilter) actActionFilter.addEventListener("change", renderActivityTable);
 if (refreshActBtn) refreshActBtn.addEventListener("click", () => {

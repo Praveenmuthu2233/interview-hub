@@ -18,7 +18,10 @@
       <label for="email">Email address</label>
       <input id="email" name="email" type="email" autocomplete="email" required maxlength="254"/>
       <label for="password">Password</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="72"/>
+      <div class="auth-password-field">
+        <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="72"/>
+        <button class="password-toggle" id="passwordToggle" type="button" aria-controls="password" aria-label="Show password" aria-pressed="false">Show</button>
+      </div>
       <button class="portal-button" id="submitButton" type="submit">Sign in</button>
       <p class="auth-switch">New to Codeloop? <a href="/user-register">Create an account</a></p>
       <a class="site-link" href="/">← Browse interview drives</a>

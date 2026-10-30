@@ -154,24 +154,10 @@ $currentAdmin = getCurrentAdminUsername();
             <input type="text" id="adminSearch" placeholder="Search company, role..." aria-label="Search jobs"/>
           </div>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Company</th>
-                <th>Role</th>
-                <th>Type</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th>Added By / Updated By</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody">
-              <tr class="empty-row"><td colspan="7">Loading jobs from database...</td></tr>
-            </tbody>
-          </table>
+        <div class="current-jobs-grid" id="jobsGrid" aria-live="polite">
+          <div class="jobs-empty-state">Loading jobs from database...</div>
         </div>
+        <div class="jobs-pagination" id="jobsPagination" aria-label="Current jobs pages"></div>
       </div>
     </div>
   </div>
