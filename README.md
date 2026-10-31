@@ -1,8 +1,8 @@
-# InterviewEdge
+# Codeloop
 
-InterviewEdge is a responsive static website backed by a Node.js/Express API. Public pages load interview-drive listings from Cloud SQL for MySQL. Admin sign-in uses bcrypt-verified credentials and a short-lived JWT in an HttpOnly cookie. Cloud Run hosts the API and protected admin page; Firebase Hosting serves the public files and rewrites API/admin-page requests to Cloud Run so cookies stay same-origin.
+Codeloop is a responsive static website backed by a Node.js/Express API. Public pages load interview-drive listings from Cloud SQL for MySQL. Admin sign-in uses bcrypt-verified credentials and a short-lived JWT in an HttpOnly cookie. Cloud Run hosts the API and protected admin page; Firebase Hosting serves the public files and rewrites API/admin-page requests to Cloud Run so cookies stay same-origin.
 
-The existing site is a job/interview-drive portal. The migration preserves the listing fields and functionality, and adds Cloud SQL tables and APIs for interview questions, answers, and categories. Existing Firestore records are not copied; see the cutover notes below. No question-bank UI is present in the existing website; the new API supports building one without changing the current public design.
+The existing site is a job/interview-drive portal. The migration preserves the listing fields and functionality, and adds Cloud SQL tables and APIs for interview questions, answers, categories, and registered job seekers. Existing Firestore records are not copied; see the cutover notes below.
 
 ## Local installation and run
 
@@ -13,7 +13,7 @@ Requirements: Node.js 20+, MySQL 8+, and (for a GCP database) the Cloud SQL Auth
 3. Generate a bcrypt hash in a terminal with `npm run hash-admin-password`, then place the printed hash in `ADMIN_PASSWORD_HASH`.
 4. Create the MySQL database and user, then initialize the schema with `npm run db:init`.
 5. Start the app using `npm run dev` or `npm start`.
-6. Open `http://localhost:3000`. The admin sign-in is at `/admin-login.html`.
+6. Open `http://localhost:3000`. Job seekers can register at `/user-register.html`; admins sign in at `/admin-login.html`.
 
 For a local Cloud SQL instance, run the Cloud SQL Auth Proxy using your instance connection name, then set `DB_HOST=127.0.0.1` and `DB_PORT=3306`. Do not use a static-only server such as Live Server: the same-origin Express API is required.
 
@@ -53,6 +53,7 @@ The client does not receive the JWT, JWT secret, admin password/hash, or databas
 - `interviews`: the current website’s company, role, date, type, location, experience, salary, application URL, description, skills, and optional listing-category fields.
 - `categories`: categories for both listings and questions.
 - `questions`: question text, answer text, category, difficulty, publication status, and timestamps.
+- `users`: job-seeker profile and bcrypt password hash. Password hashes are never returned by the API.
 
 The schema command creates tables only. It does **not** export or import existing Firestore records. The old Firestore data is left unchanged; after cutover, the new site reads Cloud SQL, which will be empty until new listings are added or a separate data migration is performed.
 
@@ -63,12 +64,22 @@ Public endpoints:
 - `GET /api/questions?page=1&pageSize=20&categoryId=...` (published questions only)
 - `GET /api/questions/:id` (published questions only)
 
+Jobs with an interview date before today are automatically hidden from public, related, saved, and admin job lists. Expired records remain in the database; they are not permanently deleted.
+
 Admin endpoints require the JWT cookie:
 
 - `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/session`
 - `GET|POST /api/admin/listings`, `PUT|DELETE /api/admin/listings/:id`
 - `GET|POST /api/admin/questions`, `PUT|DELETE /api/admin/questions/:id`
 - `GET|POST /api/admin/categories`, `PUT|DELETE /api/admin/categories/:id`
+- `GET /api/admin/users` (registered job-seeker profiles)
+
+User endpoints use a separate short-lived HttpOnly JWT cookie:
+
+- `POST /api/user/register`, `POST /api/user/login`, `POST /api/user/logout`, `GET /api/user/session`
+- `GET /api/user/dashboard` (current interview drives for the user's matching dashboard)
+
+Job seekers register with their name, email, and password; phone, education, graduation year, skills, experience, and preferred location are optional profile fields. Users can view their own profile and relevant open interview drives at `/dashboard`; only admins can view all registered profiles at `/admin/users`.
 
 JSON fields for questions are `question`, `answer`, `categoryId`, `difficulty` (`beginner`, `intermediate`, or `advanced`), and optional boolean `isPublished`. Create a question category first using `POST /api/admin/categories` with `{ "name": "Java", "type": "question" }`.
 
@@ -156,7 +167,7 @@ Use the resulting Hosting domain (or attach a custom domain) for the website. Si
 
 ## Structure
 
-- Root HTML, CSS, and public JS: existing InterviewEdge website and responsive UI.
+- Root HTML, CSS, and public JS: existing Codeloop website and responsive UI.
 - `index.js`, `detail.js`, and `backup-index/`: public pages now call the JSON API instead of Firestore.
 - `admin.html`, `admin.css`, `admin.js`: protected existing listing dashboard.
 - `admin-login.html`, `admin-login.js`: separate login form; it sends credentials to the server and never handles a token in JavaScript.

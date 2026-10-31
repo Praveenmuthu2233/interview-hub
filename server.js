@@ -24,9 +24,11 @@ const PUBLIC_ORIGINS = (process.env.PUBLIC_ORIGINS || "")
   .map(origin => origin.trim())
   .filter(Boolean);
 const JWT_TTL_SECONDS = 60 * 60;
-const COOKIE_NAME = "interviewedge_admin";
+const ADMIN_COOKIE_NAME = "interviewedge_admin";
+const USER_COOKIE_NAME = "interviewedge_user";
 const JWT_ISSUER = "interviewedge";
-const JWT_AUDIENCE = "interviewedge-admin";
+const ADMIN_JWT_AUDIENCE = "interviewedge-admin";
+const USER_JWT_AUDIENCE = "interviewedge-user";
 const ROOT = __dirname;
 const BLOCKED_STATIC_PATHS = new Set([
   ".env",
@@ -65,6 +67,16 @@ if (
 const app = express();
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
+// Redirect Render hostname to canonical domain
+app.use((request, response, next) => {
+  const host = request.get("host") || "";
+  const fwdHost = request.get("x-forwarded-host") || "";
+  if (host.includes("interview-hub-1-kvh8.onrender.com") || fwdHost.includes("interview-hub-1-kvh8.onrender.com")) {
+    return response.redirect(302, "https://codeloopyt.site" + request.originalUrl);
+  }
+  next();
+});
+
 app.use(express.json({ limit: "50kb" }));
 app.use(cookieParser());
 app.use((request, response, next) => {
@@ -83,6 +95,13 @@ const loginLimiter = rateLimit({
   standardHeaders: "draft-7",
   legacyHeaders: false,
   message: { error: "Too many login attempts. Try again in 15 minutes." }
+});
+const userAuthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 8,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { error: "Too many account attempts. Try again in 15 minutes." }
 });
 
 function safeEqual(first, second) {
@@ -120,7 +139,7 @@ function checkSameOrigin(request, response, next) {
 }
 
 function requireAdmin(request, response, next) {
-  const token = request.cookies[COOKIE_NAME];
+  const token = request.cookies[ADMIN_COOKIE_NAME];
   if (!token) {
     response.status(401).json({ error: "Authentication required." });
     return;
@@ -129,7 +148,7 @@ function requireAdmin(request, response, next) {
     const payload = jwt.verify(token, JWT_SECRET, {
       algorithms: ["HS256"],
       issuer: JWT_ISSUER,
-      audience: JWT_AUDIENCE
+      audience: ADMIN_JWT_AUDIENCE
     });
     if (!payload.sub || payload.role !== "admin") {
       response.status(401).json({ error: "Authentication required." });
@@ -138,25 +157,66 @@ function requireAdmin(request, response, next) {
     request.admin = { username: payload.sub };
     next();
   } catch {
-    response.clearCookie(COOKIE_NAME, cookieOptions());
+    response.clearCookie(ADMIN_COOKIE_NAME, cookieOptions());
     response.status(401).json({ error: "Your admin session is invalid or has expired." });
   }
 }
 
 function requireAdminPage(request, response, next) {
-  const token = request.cookies[COOKIE_NAME];
+  const token = request.cookies[ADMIN_COOKIE_NAME];
   try {
     if (!token) throw new Error("Missing token");
     const payload = jwt.verify(token, JWT_SECRET, {
       algorithms: ["HS256"],
       issuer: JWT_ISSUER,
-      audience: JWT_AUDIENCE
+      audience: ADMIN_JWT_AUDIENCE
     });
     if (!payload.sub || payload.role !== "admin") throw new Error("Invalid subject");
     next();
   } catch {
-    response.clearCookie(COOKIE_NAME, cookieOptions());
-    response.redirect(302, "/admin-login.html");
+    response.clearCookie(ADMIN_COOKIE_NAME, cookieOptions());
+    response.redirect(302, "/admin-login");
+  }
+}
+
+function requireUser(request, response, next) {
+  const token = request.cookies[USER_COOKIE_NAME];
+  if (!token) {
+    response.status(401).json({ error: "Authentication required." });
+    return;
+  }
+  try {
+    const payload = jwt.verify(token, JWT_SECRET, {
+      algorithms: ["HS256"],
+      issuer: JWT_ISSUER,
+      audience: USER_JWT_AUDIENCE
+    });
+    if (!payload.sub || payload.role !== "user") {
+      response.status(401).json({ error: "Authentication required." });
+      return;
+    }
+    request.user = { id: payload.sub };
+    next();
+  } catch {
+    response.clearCookie(USER_COOKIE_NAME, cookieOptions());
+    response.status(401).json({ error: "Your user session is invalid or has expired." });
+  }
+}
+
+function requireUserPage(request, response, next) {
+  const token = request.cookies[USER_COOKIE_NAME];
+  try {
+    if (!token) throw new Error("Missing token");
+    const payload = jwt.verify(token, JWT_SECRET, {
+      algorithms: ["HS256"],
+      issuer: JWT_ISSUER,
+      audience: USER_JWT_AUDIENCE
+    });
+    if (!payload.sub || payload.role !== "user") throw new Error("Invalid subject");
+    next();
+  } catch {
+    response.clearCookie(USER_COOKIE_NAME, cookieOptions());
+    response.redirect(302, "/user-login");
   }
 }
 
@@ -178,6 +238,10 @@ function positiveId(value) {
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
+function isListingId(value) {
+  return typeof value === "string" && /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(value);
+}
+
 function validDate(value) {
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const date = new Date(`${value}T00:00:00Z`);
@@ -197,7 +261,7 @@ function cleanUrl(value) {
 
 function sanitizeListing(body) {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
-    return { error: "A listing object is required." };
+    return { error: "A job object is required." };
   }
   const type = ["online", "offline", "walkin"].includes(body.type) ? body.type : "";
   const listing = {
@@ -274,6 +338,68 @@ function sanitizeQuestion(body) {
   };
 }
 
+function sanitizeUser(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return { error: "A user profile is required." };
+  }
+  const fullName = text(body.fullName, 160);
+  const email = text(body.email, 254).toLowerCase();
+  const phone = text(body.phone, 40);
+  const education = text(body.education, 180);
+  const graduationYearText = text(body.graduationYear, 4);
+  const experience = text(body.experience, 240);
+  const preferredLocation = text(body.preferredLocation, 160);
+  const currentYear = new Date().getFullYear();
+  const graduationYear = graduationYearText ? Number(graduationYearText) : null;
+  const skills = Array.isArray(body.skills)
+    ? [...new Set(body.skills.filter(skill => typeof skill === "string").map(skill => text(skill, 80)).filter(Boolean))].slice(0, 30)
+    : [];
+
+  if (!fullName) return { error: "Full name is required." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Enter a valid email address." };
+  if (phone && !/^[+()\d.\-\s]{7,40}$/.test(phone)) return { error: "Enter a valid phone number." };
+  if (graduationYearText && (!Number.isInteger(graduationYear) || graduationYear < 1950 || graduationYear > currentYear + 10)) {
+    return { error: "Enter a valid graduation year." };
+  }
+  if (body.skills !== undefined && !Array.isArray(body.skills)) return { error: "Skills must be a list of text values." };
+
+  return {
+    user: {
+      fullName,
+      email,
+      phone,
+      education,
+      graduationYear,
+      skills,
+      experience,
+      preferredLocation
+    }
+  };
+}
+
+function mapUser(row) {
+  let skills = row.skills;
+  if (typeof skills === "string") {
+    try {
+      skills = JSON.parse(skills);
+    } catch {
+      skills = [];
+    }
+  }
+  return {
+    id: row.id,
+    fullName: row.full_name,
+    email: row.email,
+    phone: row.phone || "",
+    education: row.education || "",
+    graduationYear: row.graduation_year,
+    skills: Array.isArray(skills) ? skills : [],
+    experience: row.experience || "",
+    preferredLocation: row.preferred_location || "",
+    createdAt: row.created_at
+  };
+}
+
 async function hasCategory(categoryId, categoryType) {
   if (categoryId === null || categoryId === undefined) return categoryType === "listing";
   const [rows] = await pool.execute(
@@ -306,6 +432,8 @@ function mapListing(row) {
     skills: Array.isArray(skills) ? skills : [],
     categoryId: row.category_id,
     categoryName: row.category_name || null,
+    createdBy: row.created_by || "admin",
+    updatedBy: row.updated_by || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };
@@ -332,6 +460,271 @@ const LISTING_SELECT = `SELECT i.id, i.company, i.role, i.interview_type, DATE_F
 const QUESTION_SELECT = `SELECT q.id, q.category_id, q.question, q.answer, q.difficulty, q.is_published,
   q.created_at, q.updated_at, c.name AS category_name
   FROM questions q JOIN categories c ON c.id = q.category_id`;
+
+function signUserSession(response, userId) {
+  const token = jwt.sign({ sub: String(userId), role: "user" }, JWT_SECRET, {
+    algorithm: "HS256",
+    expiresIn: JWT_TTL_SECONDS,
+    issuer: JWT_ISSUER,
+    audience: USER_JWT_AUDIENCE
+  });
+  response.cookie(USER_COOKIE_NAME, token, {
+    ...cookieOptions(),
+    maxAge: JWT_TTL_SECONDS * 1000
+  });
+}
+
+app.post("/api/user/register", checkSameOrigin, userAuthLimiter, async (request, response, next) => {
+  const sanitized = sanitizeUser(request.body);
+  const password = request.body && request.body.password;
+  if (sanitized.error) {
+    response.status(400).json({ error: sanitized.error });
+    return;
+  }
+  if (typeof password !== "string" || password.length < 10 || Buffer.byteLength(password, "utf8") > 72) {
+    response.status(400).json({ error: "Password must be at least 10 characters and no more than 72 bytes." });
+    return;
+  }
+  try {
+    const passwordHash = await bcrypt.hash(password, 12);
+    const user = sanitized.user;
+    const [result] = await pool.execute(
+      `INSERT INTO users (full_name, email, password_hash, phone, education, graduation_year, skills, experience, preferred_location)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        user.fullName,
+        user.email,
+        passwordHash,
+        user.phone,
+        user.education,
+        user.graduationYear,
+        JSON.stringify(user.skills),
+        user.experience,
+        user.preferredLocation
+      ]
+    );
+    signUserSession(response, result.insertId);
+    response.status(201).json({ authenticated: true });
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      response.status(409).json({ error: "An account with this email already exists." });
+      return;
+    }
+    next(error);
+  }
+});
+
+app.post("/api/user/login", checkSameOrigin, userAuthLimiter, async (request, response, next) => {
+  const email = text(request.body && request.body.email, 254).toLowerCase();
+  const password = request.body && request.body.password;
+  if (
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    || typeof password !== "string"
+    || Buffer.byteLength(password, "utf8") > 72
+  ) {
+    response.status(400).json({ error: "A valid email and password are required." });
+    return;
+  }
+  try {
+    const [rows] = await pool.execute(
+      "SELECT id, password_hash FROM users WHERE email = ? LIMIT 1",
+      [email]
+    );
+    if (!rows.length || !(await bcrypt.compare(password, rows[0].password_hash))) {
+      response.status(401).json({ error: "Invalid email or password." });
+      return;
+    }
+    signUserSession(response, rows[0].id);
+    response.json({ authenticated: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/user/logout", checkSameOrigin, (request, response) => {
+  response.clearCookie(USER_COOKIE_NAME, cookieOptions());
+  response.status(204).end();
+});
+
+app.get("/api/user/session", requireUser, async (request, response, next) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT id, full_name, email, phone, education, graduation_year, skills, experience, preferred_location, created_at
+       FROM users WHERE id = ? LIMIT 1`,
+      [request.user.id]
+    );
+    if (!rows.length) {
+      response.clearCookie(USER_COOKIE_NAME, cookieOptions());
+      response.status(401).json({ error: "This user account is no longer available." });
+      return;
+    }
+    response.json({ authenticated: true, user: mapUser(rows[0]) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.put("/api/user/profile", checkSameOrigin, requireUser, async (request, response, next) => {
+  const sanitized = sanitizeUser(request.body);
+  if (sanitized.error) {
+    response.status(400).json({ error: sanitized.error });
+    return;
+  }
+  const user = sanitized.user;
+  try {
+    await pool.execute(
+      `UPDATE users
+       SET full_name = ?, phone = ?, education = ?, graduation_year = ?, skills = ?, experience = ?, preferred_location = ?
+       WHERE id = ?`,
+      [
+        user.fullName,
+        user.phone,
+        user.education,
+        user.graduationYear,
+        JSON.stringify(user.skills),
+        user.experience,
+        user.preferredLocation,
+        request.user.id
+      ]
+    );
+    const [rows] = await pool.execute(
+      `SELECT id, full_name, email, phone, education, graduation_year, skills, experience, preferred_location, created_at
+       FROM users WHERE id = ? LIMIT 1`,
+      [request.user.id]
+    );
+    if (!rows.length) {
+      response.clearCookie(USER_COOKIE_NAME, cookieOptions());
+      response.status(401).json({ error: "This user account is no longer available." });
+      return;
+    }
+    response.json({ user: mapUser(rows[0]) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/user/dashboard", requireUser, async (request, response, next) => {
+  try {
+    const [rows] = await pool.execute(
+      `${LISTING_SELECT} WHERE i.interview_date >= CURDATE() ORDER BY i.interview_date ASC LIMIT 100`
+    );
+    response.json({ listings: rows.map(mapListing) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/user/saved-listings", requireUser, async (request, response, next) => {
+  try {
+    const [rows] = await pool.execute(
+      `${LISTING_SELECT}
+       JOIN user_saved_listings saved ON saved.listing_id = i.id
+       WHERE saved.user_id = ? AND i.interview_date >= CURDATE()
+       ORDER BY saved.saved_at DESC`,
+      [request.user.id]
+    );
+    response.json({ listings: rows.map(mapListing) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/user/saved-listings", checkSameOrigin, requireUser, async (request, response, next) => {
+  const listingId = typeof request.body?.listingId === "string" ? request.body.listingId : "";
+  if (!isListingId(listingId)) {
+    response.status(400).json({ error: "A valid job ID is required." });
+    return;
+  }
+  try {
+    const [rows] = await pool.execute(
+      "SELECT id FROM interviews WHERE id = ? AND interview_date >= CURDATE() LIMIT 1",
+      [listingId]
+    );
+    if (!rows.length) {
+      response.status(404).json({ error: "Job not found." });
+      return;
+    }
+    await pool.execute(
+      `INSERT INTO user_saved_listings (user_id, listing_id) VALUES (?, ?)
+       ON DUPLICATE KEY UPDATE saved_at = CURRENT_TIMESTAMP`,
+      [request.user.id, listingId]
+    );
+    response.json({ saved: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete("/api/user/saved-listings/:id", checkSameOrigin, requireUser, async (request, response, next) => {
+  const listingId = request.params.id;
+  if (!isListingId(listingId)) {
+    response.status(400).json({ error: "A valid job ID is required." });
+    return;
+  }
+  try {
+    await pool.execute(
+      "DELETE FROM user_saved_listings WHERE user_id = ? AND listing_id = ?",
+      [request.user.id, listingId]
+    );
+    response.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+async function ensureAdminTables() {
+  try {
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS admin_activity_logs (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        admin_username VARCHAR(100) NOT NULL,
+        action_type VARCHAR(50) NOT NULL,
+        entity_type VARCHAR(50) NOT NULL DEFAULT 'listing',
+        entity_id VARCHAR(100) DEFAULT NULL,
+        item_title VARCHAR(255) DEFAULT '',
+        details TEXT DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_activity_created (created_at DESC),
+        KEY idx_activity_admin (admin_username)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    try {
+      const [cols] = await pool.query("SHOW COLUMNS FROM interviews");
+      const colNames = cols.map(c => c.Field);
+      if (!colNames.includes("created_by")) {
+        await pool.query("ALTER TABLE interviews ADD COLUMN created_by VARCHAR(100) NOT NULL DEFAULT 'admin'");
+      }
+      if (!colNames.includes("updated_by")) {
+        await pool.query("ALTER TABLE interviews ADD COLUMN updated_by VARCHAR(100) NULL DEFAULT NULL");
+      }
+    } catch (e) {}
+
+    try {
+      const [cols] = await pool.query("SHOW COLUMNS FROM admins");
+      const colNames = cols.map(c => c.Field);
+      if (!colNames.includes("created_by")) {
+        await pool.query("ALTER TABLE admins ADD COLUMN created_by VARCHAR(100) NOT NULL DEFAULT 'system'");
+      }
+    } catch (e) {}
+  } catch (err) {
+    console.warn("Auto-migration notice:", err.message);
+  }
+}
+ensureAdminTables().catch(() => {});
+
+async function logAdminActivity(adminUsername, actionType, entityType, entityId, itemTitle, details = "") {
+  try {
+    await pool.execute(
+      `INSERT INTO admin_activity_logs (admin_username, action_type, entity_type, entity_id, item_title, details, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+      [adminUsername || "admin", actionType, entityType, entityId ? String(entityId) : null, (itemTitle || "").slice(0, 255), details || ""]
+    );
+  } catch (err) {
+    console.warn("Failed to log admin activity:", err.message);
+  }
+}
 
 app.post("/api/admin/login", checkSameOrigin, loginLimiter, async (request, response, next) => {
   const { username, password } = request.body || {};
@@ -375,9 +768,9 @@ app.post("/api/admin/login", checkSameOrigin, loginLimiter, async (request, resp
       algorithm: "HS256",
       expiresIn: JWT_TTL_SECONDS,
       issuer: JWT_ISSUER,
-      audience: JWT_AUDIENCE
+      audience: ADMIN_JWT_AUDIENCE
     });
-    response.cookie(COOKIE_NAME, token, {
+    response.cookie(ADMIN_COOKIE_NAME, token, {
       ...cookieOptions(),
       maxAge: JWT_TTL_SECONDS * 1000
     });
@@ -388,7 +781,7 @@ app.post("/api/admin/login", checkSameOrigin, loginLimiter, async (request, resp
 });
 
 app.post("/api/admin/logout", checkSameOrigin, (request, response) => {
-  response.clearCookie(COOKIE_NAME, cookieOptions());
+  response.clearCookie(ADMIN_COOKIE_NAME, cookieOptions());
   response.status(204).end();
 });
 
@@ -396,9 +789,23 @@ app.get("/api/admin/session", requireAdmin, (request, response) => {
   response.json({ authenticated: true, username: request.admin.username });
 });
 
+app.get("/api/admin/users", requireAdmin, async (request, response, next) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT id, full_name, email, phone, education, graduation_year, skills, experience, preferred_location, created_at
+       FROM users ORDER BY created_at DESC`
+    );
+    response.json({ users: rows.map(mapUser) });
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.get("/api/listings", async (request, response, next) => {
   try {
-    const [rows] = await pool.execute(`${LISTING_SELECT} ORDER BY i.created_at DESC`);
+    const [rows] = await pool.execute(
+      `${LISTING_SELECT} WHERE i.interview_date >= CURDATE() ORDER BY i.created_at DESC`
+    );
     response.json({ listings: rows.map(mapListing) });
   } catch (error) {
     next(error);
@@ -407,9 +814,12 @@ app.get("/api/listings", async (request, response, next) => {
 
 app.get("/api/listings/:id", async (request, response, next) => {
   try {
-    const [rows] = await pool.execute(`${LISTING_SELECT} WHERE i.id = ? LIMIT 1`, [request.params.id]);
+    const [rows] = await pool.execute(
+      `${LISTING_SELECT} WHERE i.id = ? AND i.interview_date >= CURDATE() LIMIT 1`,
+      [request.params.id]
+    );
     if (!rows.length) {
-      response.status(404).json({ error: "Listing not found." });
+      response.status(404).json({ error: "Job not found." });
       return;
     }
     response.json({ listing: mapListing(rows[0]) });
@@ -421,7 +831,7 @@ app.get("/api/listings/:id", async (request, response, next) => {
 app.get("/api/listings/:id/related", async (request, response, next) => {
   try {
     const [rows] = await pool.execute(
-      `${LISTING_SELECT} WHERE i.id <> ? ORDER BY i.interview_date DESC LIMIT 6`,
+      `${LISTING_SELECT} WHERE i.id <> ? AND i.interview_date >= CURDATE() ORDER BY i.interview_date DESC LIMIT 6`,
       [request.params.id]
     );
     response.json({ listings: rows.map(mapListing) });
@@ -490,11 +900,20 @@ app.get("/api/questions/:id", async (request, response, next) => {
 
 app.get("/api/admin/listings", requireAdmin, async (request, response, next) => {
   try {
+    let extraCols = "";
+    try {
+      const [cols] = await pool.query("SHOW COLUMNS FROM interviews");
+      const names = cols.map(c => c.Field);
+      if (names.includes("created_by")) extraCols += ", i.created_by";
+      if (names.includes("updated_by")) extraCols += ", i.updated_by";
+    } catch (e) {}
+
     const [rows] = await pool.execute(
       `SELECT i.id, i.company, i.role, i.interview_type, DATE_FORMAT(i.interview_date, '%Y-%m-%d') AS interview_date,
-        i.location, i.experience, i.salary, i.apply_link, i.description, i.skills, i.category_id,
+        i.location, i.experience, i.salary, i.apply_link, i.description, i.skills, i.category_id${extraCols},
         i.created_at, i.updated_at
        FROM interviews i
+       WHERE i.interview_date >= CURDATE()
        ORDER BY i.interview_date DESC, i.created_at DESC`
     );
     response.json({ listings: rows.map(mapListing) });
@@ -509,6 +928,7 @@ app.post("/api/admin/listings", checkSameOrigin, requireAdmin, async (request, r
     response.status(400).json({ error: result.error });
     return;
   }
+  const adminUser = request.admin?.username || "admin";
   try {
     const id = crypto.randomUUID();
     const listing = result.listing;
@@ -516,13 +936,34 @@ app.post("/api/admin/listings", checkSameOrigin, requireAdmin, async (request, r
       response.status(400).json({ error: "The selected listing category does not exist." });
       return;
     }
-    await pool.execute(
-      `INSERT INTO interviews
-        (id, company, role, interview_type, interview_date, location, experience, salary, apply_link, description, skills, category_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [id, listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
-        listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId]
+
+    try {
+      await pool.execute(
+        `INSERT INTO interviews
+          (id, company, role, interview_type, interview_date, location, experience, salary, apply_link, description, skills, category_id, created_by)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
+          listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId, adminUser]
+      );
+    } catch (insertErr) {
+      await pool.execute(
+        `INSERT INTO interviews
+          (id, company, role, interview_type, interview_date, location, experience, salary, apply_link, description, skills, category_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
+          listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId]
+      );
+    }
+
+    await logAdminActivity(
+      adminUser,
+      "INSERT_JOB",
+      "listing",
+      id,
+      `${listing.company} - ${listing.role}`,
+      `Added ${listing.type} listing at ${listing.company} for ${listing.role}. Location: ${listing.location || 'N/A'}, Salary: ${listing.salary || 'N/A'}`
     );
+
     response.status(201).json({ id });
   } catch (error) {
     next(error);
@@ -535,18 +976,31 @@ app.put("/api/admin/listings/:id", checkSameOrigin, requireAdmin, async (request
     response.status(400).json({ error: result.error });
     return;
   }
+  const adminUser = request.admin?.username || "admin";
   try {
     const listing = result.listing;
     if (listing.categoryId && !await hasCategory(listing.categoryId, "listing")) {
       response.status(400).json({ error: "The selected listing category does not exist." });
       return;
     }
-    const [resultSet] = await pool.execute(
-      `UPDATE interviews SET company = ?, role = ?, interview_type = ?, interview_date = ?, location = ?,
-       experience = ?, salary = ?, apply_link = ?, description = ?, skills = ?, category_id = ? WHERE id = ?`,
-      [listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
-        listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId, request.params.id]
-    );
+
+    let resultSet;
+    try {
+      [resultSet] = await pool.execute(
+        `UPDATE interviews SET company = ?, role = ?, interview_type = ?, interview_date = ?, location = ?,
+         experience = ?, salary = ?, apply_link = ?, description = ?, skills = ?, category_id = ?, updated_by = ? WHERE id = ?`,
+        [listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
+          listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId, adminUser, request.params.id]
+      );
+    } catch (updateErr) {
+      [resultSet] = await pool.execute(
+        `UPDATE interviews SET company = ?, role = ?, interview_type = ?, interview_date = ?, location = ?,
+         experience = ?, salary = ?, apply_link = ?, description = ?, skills = ?, category_id = ? WHERE id = ?`,
+        [listing.company, listing.role, listing.type, listing.date, listing.location, listing.experience, listing.salary,
+          listing.applyLink, listing.description, JSON.stringify(listing.skills), listing.categoryId, request.params.id]
+      );
+    }
+
     if (!resultSet.affectedRows) {
       const [rows] = await pool.execute("SELECT id FROM interviews WHERE id = ? LIMIT 1", [request.params.id]);
       if (!rows.length) {
@@ -554,6 +1008,16 @@ app.put("/api/admin/listings/:id", checkSameOrigin, requireAdmin, async (request
         return;
       }
     }
+
+    await logAdminActivity(
+      adminUser,
+      "UPDATE_JOB",
+      "listing",
+      request.params.id,
+      `${listing.company} - ${listing.role}`,
+      `Updated ${listing.type} listing at ${listing.company} for ${listing.role}. Location: ${listing.location || 'N/A'}, Salary: ${listing.salary || 'N/A'}`
+    );
+
     response.status(204).end();
   } catch (error) {
     next(error);
@@ -561,13 +1025,232 @@ app.put("/api/admin/listings/:id", checkSameOrigin, requireAdmin, async (request
 });
 
 app.delete("/api/admin/listings/:id", checkSameOrigin, requireAdmin, async (request, response, next) => {
+  const adminUser = request.admin?.username || "admin";
   try {
+    let targetTitle = `Listing ID: ${request.params.id}`;
+    let details = `Deleted job listing ID: ${request.params.id}`;
+    try {
+      const [existing] = await pool.execute("SELECT company, role, location, salary FROM interviews WHERE id = ? LIMIT 1", [request.params.id]);
+      if (existing.length) {
+        targetTitle = `${existing[0].company} - ${existing[0].role}`;
+        details = `Deleted job listing: ${existing[0].company} - ${existing[0].role} (Location: ${existing[0].location || 'N/A'}, Salary: ${existing[0].salary || 'N/A'})`;
+      }
+    } catch (e) {}
+
     const [result] = await pool.execute("DELETE FROM interviews WHERE id = ?", [request.params.id]);
     if (!result.affectedRows) {
       response.status(404).json({ error: "Listing not found." });
       return;
     }
+
+    await logAdminActivity(adminUser, "DELETE_JOB", "listing", request.params.id, targetTitle, details);
     response.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ---------- Admin Management & Activity Log Endpoints ----------
+app.get("/api/admin/admins", requireAdmin, async (request, response, next) => {
+  try {
+    let createdByCol = "'system' AS created_by";
+    try {
+      const [cols] = await pool.query("SHOW COLUMNS FROM admins");
+      if (cols.some(c => c.Field === "created_by")) {
+        createdByCol = "created_by";
+      }
+    } catch (e) {}
+
+    const [rows] = await pool.execute(`SELECT id, username, email, ${createdByCol}, created_at FROM admins ORDER BY id ASC`);
+    const currentAdmin = request.admin?.username || "admin";
+
+    response.json({
+      admins: rows.map(r => ({
+        id: r.id,
+        username: r.username,
+        email: r.email || "",
+        createdBy: r.created_by || "system",
+        createdAt: r.created_at,
+        isCurrent: r.username.toLowerCase() === currentAdmin.toLowerCase()
+      })),
+      currentAdmin,
+      total: rows.length
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/admin/admins", checkSameOrigin, requireAdmin, async (request, response, next) => {
+  const { username, password, email } = request.body || {};
+  const trimmedUser = typeof username === "string" ? username.trim() : "";
+  const trimmedEmail = typeof email === "string" ? email.trim() : "";
+  const currentAdmin = request.admin?.username || "admin";
+
+  if (!trimmedUser || trimmedUser.length < 3 || trimmedUser.length > 50) {
+    response.status(400).json({ error: "Username must be between 3 and 50 characters." });
+    return;
+  }
+  if (!/^[a-zA-Z0-9_\-\.]+$/.test(trimmedUser)) {
+    response.status(400).json({ error: "Username may only contain letters, numbers, hyphens, and underscores." });
+    return;
+  }
+  if (typeof password !== "string" || password.length < 6) {
+    response.status(400).json({ error: "Password must be at least 6 characters long." });
+    return;
+  }
+  if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    response.status(400).json({ error: "Please provide a valid email address." });
+    return;
+  }
+
+  try {
+    const [existing] = await pool.execute("SELECT id FROM admins WHERE LOWER(username) = LOWER(?) LIMIT 1", [trimmedUser]);
+    if (existing.length > 0) {
+      response.status(409).json({ error: `An admin with username '${trimmedUser}' already exists.` });
+      return;
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    let newId;
+    try {
+      const [insertRes] = await pool.execute(
+        "INSERT INTO admins (username, password_hash, email, created_by, created_at) VALUES (?, ?, ?, ?, NOW())",
+        [trimmedUser, passwordHash, trimmedEmail, currentAdmin]
+      );
+      newId = insertRes.insertId;
+    } catch (insertErr) {
+      const [insertRes] = await pool.execute(
+        "INSERT INTO admins (username, password_hash, email, created_at) VALUES (?, ?, ?, NOW())",
+        [trimmedUser, passwordHash, trimmedEmail]
+      );
+      newId = insertRes.insertId;
+    }
+
+    await logAdminActivity(
+      currentAdmin,
+      "CREATE_ADMIN",
+      "admin",
+      newId,
+      trimmedUser,
+      `Added new admin user: '${trimmedUser}'` + (trimmedEmail ? ` (${trimmedEmail})` : "")
+    );
+
+    response.status(201).json({
+      id: newId,
+      username: trimmedUser,
+      email: trimmedEmail,
+      message: `Admin user '${trimmedUser}' created successfully.`
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete("/api/admin/admins/:id", checkSameOrigin, requireAdmin, async (request, response, next) => {
+  const currentAdmin = request.admin?.username || "admin";
+  const id = request.params.id;
+
+  try {
+    const [target] = await pool.execute("SELECT id, username FROM admins WHERE id = ? LIMIT 1", [id]);
+    if (!target.length) {
+      response.status(404).json({ error: "Admin not found." });
+      return;
+    }
+
+    if (target[0].username.toLowerCase() === currentAdmin.toLowerCase()) {
+      response.status(400).json({ error: "You cannot delete your own active admin account." });
+      return;
+    }
+
+    const [totalRows] = await pool.query("SELECT COUNT(*) AS total FROM admins");
+    if ((totalRows[0]?.total || 0) <= 1) {
+      response.status(400).json({ error: "Cannot delete the only remaining admin account." });
+      return;
+    }
+
+    await pool.execute("DELETE FROM admins WHERE id = ?", [id]);
+    await logAdminActivity(currentAdmin, "DELETE_ADMIN", "admin", id, target[0].username, `Deleted admin account: '${target[0].username}'`);
+
+    response.json({ message: `Admin '${target[0].username}' deleted successfully.` });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/admin/activity", requireAdmin, async (request, response, next) => {
+  const search = typeof request.query.search === "string" ? request.query.search.trim() : "";
+  const adminFilter = typeof request.query.admin === "string" ? request.query.admin.trim() : "";
+  const actionFilter = typeof request.query.action === "string" ? request.query.action.trim() : "";
+  const limit = Math.min(Math.max(Number(request.query.limit) || 100, 10), 300);
+  const currentAdmin = request.admin?.username || "admin";
+
+  try {
+    let whereClauses = [];
+    let params = [];
+
+    if (search) {
+      whereClauses.push("(admin_username LIKE ? OR item_title LIKE ? OR details LIKE ?)");
+      const term = `%${search}%`;
+      params.push(term, term, term);
+    }
+    if (adminFilter) {
+      whereClauses.push("admin_username = ?");
+      params.push(adminFilter);
+    }
+    if (actionFilter) {
+      whereClauses.push("action_type = ?");
+      params.push(actionFilter);
+    }
+
+    const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
+    let logs = [];
+    try {
+      const [rows] = await pool.execute(
+        `SELECT id, admin_username, action_type, entity_type, entity_id, item_title, details, created_at
+         FROM admin_activity_logs
+         ${whereSql}
+         ORDER BY created_at DESC, id DESC
+         LIMIT ${limit}`,
+        params
+      );
+      logs = rows.map(r => ({
+        id: r.id,
+        adminUsername: r.admin_username,
+        actionType: r.action_type,
+        entityType: r.entity_type,
+        entityId: r.entity_id,
+        itemTitle: r.item_title || "",
+        details: r.details || "",
+        createdAt: r.created_at
+      }));
+    } catch (tblErr) {
+      // Table might not exist yet
+    }
+
+    let stats = { total: 0, inserted: 0, updated: 0, deleted: 0, admins: 0 };
+    try {
+      const [counts] = await pool.query(`
+        SELECT
+          COUNT(*) AS total,
+          SUM(action_type = 'INSERT_JOB') AS inserted,
+          SUM(action_type = 'UPDATE_JOB') AS updated,
+          SUM(action_type = 'DELETE_JOB') AS deleted,
+          SUM(action_type IN ('CREATE_ADMIN', 'DELETE_ADMIN')) AS admins
+        FROM admin_activity_logs
+      `);
+      if (counts.length) {
+        stats = {
+          total: Number(counts[0].total) || 0,
+          inserted: Number(counts[0].inserted) || 0,
+          updated: Number(counts[0].updated) || 0,
+          deleted: Number(counts[0].deleted) || 0,
+          admins: Number(counts[0].admins) || 0
+        };
+      }
+    } catch (e) {}
+
+    response.json({ logs, stats, currentAdmin });
   } catch (error) {
     next(error);
   }
@@ -753,9 +1436,80 @@ app.get(["/admin", "/admin.html", "/admin.php"], requireAdminPage, (request, res
   response.sendFile(path.join(ROOT, "admin.html"));
 });
 
-app.get(["/admin-login", "/admin-login.html", "/admin-login.php"], (request, response) => {
+app.get(["/admin/users", "/admin-users.html"], requireAdminPage, (request, response) => {
+  response.set("Cache-Control", "no-store");
+  response.sendFile(path.join(ROOT, "admin-users.html"));
+});
+
+app.get(["/admin/login.php", "/admin/login", "/admin-login", "/admin-login.html", "/admin-login.php"], (request, response) => {
   response.sendFile(path.join(ROOT, "admin-login.html"));
 });
+
+app.get(["/user-login", "/user-login.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "user-login.html"));
+});
+
+app.get(["/user-register", "/user-register.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "user-register.html"));
+});
+
+app.get(["/dashboard", "/user-dashboard.html"], requireUserPage, (request, response) => {
+  response.set("Cache-Control", "no-store");
+  response.sendFile(path.join(ROOT, "user-dashboard.html"));
+});
+
+app.get(["/about", "/about.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "about.html"));
+});
+
+app.get(["/privacy", "/privacy.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "privacy.html"));
+});
+
+app.get(["/terms", "/terms.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "terms.html"));
+});
+
+app.get(["/disclaimer", "/disclaimer.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "disclaimer.html"));
+});
+
+app.get(["/blog", "/blog.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog.html"));
+});
+
+app.get(["/contact", "/contact.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "contact.html"));
+});
+
+app.get(["/detail", "/detail.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "detail.html"));
+});
+
+app.get(["/blog/hr-interview-questions", "/blog-hr-interview-questions.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-hr-interview-questions.html"));
+});
+
+app.get(["/blog/crack-technical-interview", "/blog-crack-technical-interview.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-crack-technical-interview.html"));
+});
+
+app.get(["/blog/fresher-resume-tips", "/blog-fresher-resume-tips.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-fresher-resume-tips.html"));
+});
+
+app.get(["/blog/java-interview-questions", "/blog-java-interview-questions.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-java-interview-questions.html"));
+});
+
+app.get(["/blog/walk-in-interview-tips", "/blog-walk-in-interview-tips.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-walk-in-interview-tips.html"));
+});
+
+app.get(["/blog/aptitude-test-tips", "/blog-aptitude-test-tips.html"], (request, response) => {
+  response.sendFile(path.join(ROOT, "blog-aptitude-test-tips.html"));
+});
+
 
 app.use("/api", (request, response) => {
   response.status(404).json({ error: "API endpoint not found." });
@@ -781,6 +1535,8 @@ app.use((request, response, next) => {
   next();
 });
 
+app.use("/blog", express.static(ROOT, { dotfiles: "deny" }));
+app.use("/admin", express.static(ROOT, { dotfiles: "deny" }));
 app.use(express.static(ROOT, { dotfiles: "deny", index: "index.html" }));
 
 app.use((error, request, response, next) => {
@@ -794,7 +1550,7 @@ app.use((error, request, response, next) => {
 
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`InterviewEdge is running at http://localhost:${PORT}`);
+    console.log(`Codeloop is running at http://localhost:${PORT}`);
   });
 }
 

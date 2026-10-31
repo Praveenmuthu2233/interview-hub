@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="favicon.png"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="color-scheme" content="light"/>
+  <title>Job Seeker Sign In – Codeloop</title>
+  <link rel="stylesheet" href="user-portal.css"/>
+  <script src="user-auth.js" defer></script>
+</head>
+<body>
+  <main class="auth-shell">
+    <form class="auth-card" id="userAuthForm" data-mode="login">
+      <a class="portal-logo" href="/">Code<span style="color: #ff5e00;">Loop</span></a>
+      <h1>Welcome back</h1>
+      <p class="auth-intro">Sign in to view your profile and job matches.</p>
+      <label for="email">Email address</label>
+      <input id="email" name="email" type="email" autocomplete="email" required maxlength="254"/>
+      <label for="password">Password</label>
+      <div class="auth-password-field">
+        <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="72"/>
+        <button class="password-toggle" id="passwordToggle" type="button" aria-controls="password" aria-label="Show password" aria-pressed="false">Show</button>
+      </div>
+      <button class="portal-button" id="submitButton" type="submit">Sign in</button>
+      <p class="auth-switch">New to Codeloop? <a href="/user-register">Create an account</a></p>
+      <a class="site-link" href="/">← Browse interview drives</a>
+      <div class="portal-message" id="authMessage" role="status" aria-live="polite"></div>
+    </form>
+  </main>
+</body>
+</html>

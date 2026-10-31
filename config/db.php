@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Database Connection & Auto-Setup
+ * Codeloop - Database Connection & Auto-Setup
  * Configured for XAMPP Apache & MySQL
  */
 
@@ -143,6 +143,46 @@ function syncInterviewsSchema($pdo) {
         if (!isset($colMap['updated_at'])) {
             $pdo->exec("ALTER TABLE `interviews` ADD COLUMN `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
         }
+
+        // 7. Ensure created_by & updated_by exist on interviews
+        if (!isset($colMap['created_by'])) {
+            $pdo->exec("ALTER TABLE `interviews` ADD COLUMN `created_by` VARCHAR(100) NOT NULL DEFAULT 'admin'");
+        }
+        if (!isset($colMap['updated_by'])) {
+            $pdo->exec("ALTER TABLE `interviews` ADD COLUMN `updated_by` VARCHAR(100) NULL DEFAULT NULL");
+        }
+
+        // 8. Ensure admins table has account metadata
+        try {
+            $adminCols = array_flip($pdo->query("SHOW COLUMNS FROM `admins`")->fetchAll(PDO::FETCH_COLUMN, 0));
+            if (!isset($adminCols['created_by'])) {
+                $pdo->exec("ALTER TABLE `admins` ADD COLUMN `created_by` VARCHAR(100) NOT NULL DEFAULT 'system'");
+            }
+            if (!isset($adminCols['last_seen_at'])) {
+                $pdo->exec("ALTER TABLE `admins` ADD COLUMN `last_seen_at` DATETIME NULL DEFAULT NULL");
+            }
+        } catch (Exception $e) {
+            error_log("Failed to synchronize admin metadata schema: " . $e->getMessage());
+        }
+
+        // 9. Ensure admin_activity_logs table exists
+        try {
+            $pdo->exec("
+                CREATE TABLE IF NOT EXISTS `admin_activity_logs` (
+                  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                  `admin_username` VARCHAR(100) NOT NULL,
+                  `action_type` VARCHAR(50) NOT NULL,
+                  `entity_type` VARCHAR(50) NOT NULL DEFAULT 'listing',
+                  `entity_id` VARCHAR(100) DEFAULT NULL,
+                  `item_title` VARCHAR(255) DEFAULT '',
+                  `details` TEXT DEFAULT NULL,
+                  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  KEY `idx_activity_created` (`created_at` DESC),
+                  KEY `idx_activity_admin` (`admin_username`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            ");
+        } catch (Exception $e) {}
     } catch (Exception $e) {
         // Silently continue if ALTER operations fail due to permissions
     }
@@ -206,7 +246,23 @@ function initializeDatabaseSchema($pdo) {
       username VARCHAR(100) NOT NULL UNIQUE,
       password_hash VARCHAR(255) NOT NULL,
       email VARCHAR(200) DEFAULT '',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      created_by VARCHAR(100) NOT NULL DEFAULT 'system',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      last_seen_at DATETIME NULL DEFAULT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+    CREATE TABLE IF NOT EXISTS admin_activity_logs (
+      id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+      admin_username VARCHAR(100) NOT NULL,
+      action_type VARCHAR(50) NOT NULL,
+      entity_type VARCHAR(50) NOT NULL DEFAULT 'listing',
+      entity_id VARCHAR(100) DEFAULT NULL,
+      item_title VARCHAR(255) DEFAULT '',
+      details TEXT DEFAULT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      KEY idx_activity_created (created_at DESC),
+      KEY idx_activity_admin (admin_username)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ";
 

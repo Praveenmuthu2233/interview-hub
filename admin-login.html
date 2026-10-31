@@ -1,23 +1,27 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/png" href="/favicon.png"/>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="color-scheme" content="light"/>
-  <title>Admin Sign In – InterviewEdge</title>
+  <title>Admin Sign In – Codeloop</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="admin.css"/>
-  <script src="admin-login.js" defer></script>
+  <link rel="stylesheet" href="/admin.css"/>
+  <script src="/admin-login.js" defer></script>
 </head>
 <body>
   <main class="auth-overlay">
     <form class="auth-box" id="loginForm">
-      <div class="auth-logo">Interview<span>Edge</span></div>
+      <div class="auth-logo">Code<span style="color: #ff5e00;">Loop</span></div>
       <div class="auth-sub">Sign in to the authorized admin account</div>
       <label class="auth-hint" for="username">Admin ID</label>
       <input id="username" name="username" type="text" autocomplete="username" required maxlength="128"/>
       <label class="auth-hint" for="password">Password</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="1024"/>
+      <div class="auth-password-field">
+        <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="1024"/>
+        <button class="password-toggle" id="passwordToggle" type="button" aria-controls="password" aria-label="Show password" aria-pressed="false">Show</button>
+      </div>
       <button class="btn-primary" id="loginButton" type="submit">🔓 Sign in</button>
       <div class="auth-hint">Secure server-side sign-in. Website data is stored in Cloud SQL.</div>
     </form>

@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Authentication Helper
+ * Codeloop - Authentication Helper
  * Handles session-based and cookie-based authentication for Admin Panel
  */
 
@@ -27,14 +27,32 @@ function isAdminLoggedIn() {
     // Check cookie fallback
     if (!empty($_COOKIE[ADMIN_COOKIE_NAME])) {
         $token = $_COOKIE[ADMIN_COOKIE_NAME];
-        if (verifyAdminToken($token)) {
+        $username = verifyAdminToken($token);
+        if ($username) {
             $_SESSION['admin_logged_in'] = true;
-            $_SESSION['admin_user'] = DEFAULT_ADMIN_USER;
+            $_SESSION['admin_user'] = $username;
             return true;
         }
     }
 
     return false;
+}
+
+/**
+ * Returns the username of currently logged-in admin.
+ */
+function getCurrentAdminUsername() {
+    if (!empty($_SESSION['admin_user'])) {
+        return $_SESSION['admin_user'];
+    }
+    if (!empty($_COOKIE[ADMIN_COOKIE_NAME])) {
+        $username = verifyAdminToken($_COOKIE[ADMIN_COOKIE_NAME]);
+        if ($username) {
+            $_SESSION['admin_user'] = $username;
+            return $username;
+        }
+    }
+    return DEFAULT_ADMIN_USER;
 }
 
 /**
@@ -47,6 +65,7 @@ function generateAdminToken($username) {
 
 /**
  * Verifies the authentication cookie token.
+ * Returns the admin username if valid, false otherwise.
  */
 function verifyAdminToken($token) {
     $decoded = base64_decode($token);
@@ -56,7 +75,7 @@ function verifyAdminToken($token) {
     list($username, $hash) = explode(':', $decoded, 2);
     $secret = 'interviewedge_secret_salt_' . date('Y-m');
     $expectedHash = hash_hmac('sha256', $username, $secret);
-    return hash_equals($expectedHash, $hash);
+    return hash_equals($expectedHash, $hash) ? $username : false;
 }
 
 /**
@@ -104,6 +123,7 @@ function verifyAdminCredentials($username, $password) {
 function loginAdmin($username) {
     $_SESSION['admin_logged_in'] = true;
     $_SESSION['admin_user'] = $username;
+    recordAdminLastSeen($username);
 
     $token = generateAdminToken($username);
     setcookie(ADMIN_COOKIE_NAME, $token, [
@@ -112,6 +132,22 @@ function loginAdmin($username) {
         'httponly' => true,
         'samesite' => 'Lax'
     ]);
+}
+
+/**
+ * Updates the last activity timestamp for admins stored in the admins table.
+ */
+function recordAdminLastSeen($username) {
+    if (!$username) {
+        return;
+    }
+
+    try {
+        $stmt = getDB()->prepare("UPDATE `admins` SET `last_seen_at` = NOW() WHERE `username` = ?");
+        $stmt->execute([$username]);
+    } catch (PDOException $e) {
+        error_log("Failed to update admin last seen timestamp: " . $e->getMessage());
+    }
 }
 
 /**
@@ -135,7 +171,7 @@ function logoutAdmin() {
  */
 function requireAdminPage() {
     if (!isAdminLoggedIn()) {
-        header('Location: admin-login.php');
+        header('Location: /admin-login');
         exit;
     }
 }
@@ -150,4 +186,6 @@ function requireAdminApi() {
         echo json_encode(['error' => 'Authentication required. Your admin session may have expired.']);
         exit;
     }
+
+    recordAdminLastSeen(getCurrentAdminUsername());
 }

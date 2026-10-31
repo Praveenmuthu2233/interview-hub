@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="color-scheme" content="light"/>
+  <title>Dashboard – CodeLoop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="user-portal.css"/>
+  <script src="user-dashboard.js" defer></script>
+</head>
+<body class="portal-page">
+
+  <!-- ── TOP NAV ── -->
+  <header class="dash-nav">
+    <a class="dash-logo" href="/">Code<span>Loop</span></a>
+    <nav class="dash-nav-links">
+      <a href="/" class="dash-nav-link">Browse Jobs</a>
+    </nav>
+    <div class="dash-nav-user">
+      <div class="dash-nav-avatar" id="navAvatar">?</div>
+      <span class="dash-nav-name" id="welcomeName">Dashboard</span>
+      <button class="dash-btn dash-btn-ghost" id="logoutButton" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <main class="dash-main">
+
+    <!-- ── HERO STRIP ── -->
+    <div class="dash-hero">
+      <div class="dash-hero-inner">
+        <div class="dash-hero-text">
+          <p class="dash-eyebrow">Job Seeker Space</p>
+          <h1 class="dash-hero-title">Your career dashboard</h1>
+          <p class="dash-hero-sub">Personalised interview drives matched to your skills &amp; location.</p>
+        </div>
+        <div class="dash-stats" id="dashStats">
+          <div class="dash-stat">
+            <span class="dash-stat-num" id="statTotal">—</span>
+            <span class="dash-stat-label">Open Drives</span>
+          </div>
+          <div class="dash-stat-sep"></div>
+          <div class="dash-stat">
+            <span class="dash-stat-num" id="statMatched">—</span>
+            <span class="dash-stat-label">Matched</span>
+          </div>
+          <div class="dash-stat-sep"></div>
+          <div class="dash-stat">
+            <span class="dash-stat-num" id="statSaved">—</span>
+            <span class="dash-stat-label">Saved</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BODY GRID ── -->
+    <div class="dash-body">
+
+      <!-- LEFT: Profile sidebar -->
+      <aside class="dash-sidebar">
+        <div class="sidebar-card" id="profileCard">
+          <!-- Loading skeleton -->
+          <div class="sidebar-skeleton" id="profileSkeleton">
+            <div class="skel skel-avatar"></div>
+            <div class="skel skel-line skel-lg"></div>
+            <div class="skel skel-line skel-sm"></div>
+            <div class="skel skel-line"></div>
+            <div class="skel skel-line"></div>
+          </div>
+          <div id="profileDetails" hidden></div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: Job listings -->
+      <div class="dash-content">
+
+        <!-- Open Drives -->
+        <section class="dash-section">
+          <div class="dash-section-header">
+            <div>
+              <p class="dash-eyebrow">Based on your profile</p>
+              <h2 class="dash-section-title">Open interview drives</h2>
+            </div>
+            <span class="dash-badge" id="listingCount">0</span>
+          </div>
+          <p class="dash-match-note" id="matchNote">Loading available drives…</p>
+
+          <!-- Skeleton cards -->
+          <div class="job-list" id="jobSkeletonList">
+            <div class="job-card-skeleton"><div class="skel skel-line skel-sm"></div><div class="skel skel-line skel-lg"></div><div class="skel skel-line"></div></div>
+            <div class="job-card-skeleton"><div class="skel skel-line skel-sm"></div><div class="skel skel-line skel-lg"></div><div class="skel skel-line"></div></div>
+            <div class="job-card-skeleton"><div class="skel skel-line skel-sm"></div><div class="skel skel-line skel-lg"></div><div class="skel skel-line"></div></div>
+          </div>
+
+          <div class="job-list" id="jobList" hidden></div>
+          <div class="pagination-bar" id="jobPagination" hidden></div>
+        </section>
+
+        <!-- Saved Jobs -->
+        <section class="dash-section dash-section-saved">
+          <div class="dash-section-header">
+            <div>
+              <p class="dash-eyebrow">Your Bookmarks</p>
+              <h2 class="dash-section-title">Saved jobs</h2>
+            </div>
+            <span class="dash-badge dash-badge-alt" id="savedListingCount">0</span>
+          </div>
+          <p class="dash-match-note" id="savedListingNote">Loading saved jobs…</p>
+          <div class="job-list" id="savedJobList"></div>
+          <div class="pagination-bar" id="savedJobPagination" hidden></div>
+        </section>
+
+      </div><!-- /dash-content -->
+    </div><!-- /dash-body -->
+  </main>
+
+  <!-- Toast notification -->
+  <div class="dash-toast" id="portalMessage" role="status" aria-live="polite"></div>
+
+</body>
+</html>

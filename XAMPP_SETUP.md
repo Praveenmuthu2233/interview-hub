@@ -1,4 +1,4 @@
-# InterviewEdge - XAMPP Apache & MySQL Setup Guide
+# Codeloop - XAMPP Apache & MySQL Setup Guide
 
 This project has been completely converted to **HTML, CSS, PHP, and MySQL** running natively on **XAMPP Apache Server**. The frontend is fully connected to the MySQL backend database through PHP PDO and RESTful APIs.
 

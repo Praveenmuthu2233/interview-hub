@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Master API Router
+ * Codeloop - Master API Router
  * Handles all requests routed through /api/*
  */
 
@@ -29,7 +29,7 @@ $segments = $apiPath !== '' ? explode('/', $apiPath) : [];
 
 // Route dispatching
 if (empty($segments)) {
-    sendJsonResponse(['status' => 'InterviewEdge API v1.0', 'endpoints' => ['/api/listings', '/api/categories', '/api/admin/listings']]);
+    sendJsonResponse(['status' => 'Codeloop API v1.0', 'endpoints' => ['/api/listings', '/api/categories', '/api/admin/listings', '/api/admin/admins', '/api/admin/activity']]);
 }
 
 $resource = $segments[0] ?? '';
@@ -79,6 +79,24 @@ if ($resource === 'admin') {
             $_GET['id'] = $id;
         }
         require __DIR__ . '/admin_listings.php';
+        exit;
+    }
+
+    if ($sub === 'admins') {
+        if ($id) {
+            $_GET['id'] = $id;
+        }
+        require __DIR__ . '/admin_admins.php';
+        exit;
+    }
+
+    if ($sub === 'activity' || $sub === 'logs') {
+        require __DIR__ . '/admin_activity.php';
+        exit;
+    }
+
+    if ($sub === 'users') {
+        require __DIR__ . '/admin_users.php';
         exit;
     }
 

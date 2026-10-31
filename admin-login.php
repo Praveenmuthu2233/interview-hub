@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 /**
- * InterviewEdge - Admin Login Page (PHP + MySQL + Apache)
+ * Codeloop - Admin Login Page (PHP + MySQL + Apache)
  */
 require_once __DIR__ . '/config/auth.php';
 
@@ -8,7 +8,7 @@ $error = '';
 
 // If already logged in, go straight to admin dashboard
 if (isAdminLoggedIn()) {
-    header('Location: admin.php');
+    header('Location: /admin');
     exit;
 }
 
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         if (verifyAdminCredentials($username, $password)) {
             loginAdmin($username);
-            header('Location: admin.php');
+            header('Location: /admin');
             exit;
         } else {
             $error = 'Invalid admin ID or password.';
@@ -36,14 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="color-scheme" content="light"/>
-  <title>Admin Sign In – InterviewEdge</title>
+  <title>Admin Sign In – Codeloop</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="admin.css"/>
   <script src="admin-login.js" defer></script>
 </head>
 <body>
   <main class="auth-overlay">
-    <form class="auth-box" id="loginForm" method="POST" action="admin-login.php">
+    <form class="auth-box" id="loginForm" method="POST" action="/admin-login">
       <div class="auth-logo">Interview<span>Edge</span></div>
       <div class="auth-sub">Sign in to the authorized admin account</div>
 
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         Connected to XAMPP MySQL database.
       </div>
       <div style="margin-top: 1.2rem;">
-        <a href="index.php" style="color: var(--muted); text-decoration: none; font-size: 0.8rem;">← Back to Public Website</a>
+        <a href="/" style="color: var(--muted); text-decoration: none; font-size: 0.8rem;">← Back to Public Website</a>
       </div>
     </form>
   </main>

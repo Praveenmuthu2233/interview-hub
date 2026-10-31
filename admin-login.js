@@ -1,8 +1,18 @@
-"use strict";
+﻿"use strict";
 
 const form = document.getElementById("loginForm");
 const loginButton = document.getElementById("loginButton");
 const toast = document.getElementById("toast");
+const passwordInput = document.getElementById("password");
+const passwordToggle = document.getElementById("passwordToggle");
+
+passwordToggle.addEventListener("click", () => {
+  const showPassword = passwordInput.type === "password";
+  passwordInput.type = showPassword ? "text" : "password";
+  passwordToggle.textContent = showPassword ? "Hide" : "Show";
+  passwordToggle.setAttribute("aria-label", `${showPassword ? "Hide" : "Show"} password`);
+  passwordToggle.setAttribute("aria-pressed", String(showPassword));
+});
 
 function showMessage(message, success = false) {
   toast.textContent = message;
@@ -17,7 +27,7 @@ async function checkExistingSession() {
     });
 
     if (response.ok) {
-      window.location.replace("admin.html");
+      window.location.replace("/admin");
     }
   } catch {
     showMessage("Cannot connect to the admin server. Please try again.");
@@ -55,7 +65,7 @@ form.addEventListener("submit", async (event) => {
     }
 
     document.getElementById("password").value = "";
-    window.location.assign("admin.html");
+    window.location.assign("/admin");
 
   } catch {
     showMessage("Cannot connect to the admin server. Check your connection.");

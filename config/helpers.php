@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Data Mapping & Utility Helpers
+ * Codeloop - Data Mapping & Utility Helpers
  */
 
 /**
@@ -70,6 +70,8 @@ function getListingQueryParts($pdo) {
     $createdField = isset($cols['created_at']) ? "i.created_at" : "NOW() AS created_at";
     $updatedField = isset($cols['updated_at']) ? "i.updated_at" : "NOW() AS updated_at";
     $createdCol = isset($cols['created_at']) ? "i.created_at" : "i.id";
+    $createdByField = isset($cols['created_by']) ? "i.created_by" : "'admin' AS created_by";
+    $updatedByField = isset($cols['updated_by']) ? "i.updated_by" : "NULL AS updated_by";
 
     // Check if categories table exists
     $hasCategories = false;
@@ -80,7 +82,7 @@ function getListingQueryParts($pdo) {
     $catJoin = ($hasCategories && isset($cols['category_id'])) ? "LEFT JOIN categories c ON c.id = i.category_id" : "";
     $catNameField = $hasCategories ? "c.name AS category_name" : "NULL AS category_name";
 
-    $select = "SELECT i.id, i.company, i.role, {$typeField}, {$dateField}, {$locField}, {$expField}, {$salField}, {$linkField}, {$descField}, {$skillsField}, {$catIdField}, {$catNameField}, {$createdField}, {$updatedField}";
+    $select = "SELECT i.id, i.company, i.role, {$typeField}, {$dateField}, {$locField}, {$expField}, {$salField}, {$linkField}, {$descField}, {$skillsField}, {$catIdField}, {$catNameField}, {$createdField}, {$updatedField}, {$createdByField}, {$updatedByField}";
     $from = "FROM interviews i {$catJoin}";
 
     $parts = [
@@ -129,6 +131,8 @@ function mapListingRow($row) {
         'skills'       => $skills,
         'categoryId'   => !empty($row['category_id']) ? (int)$row['category_id'] : null,
         'categoryName' => $row['category_name'] ?? null,
+        'createdBy'    => $row['created_by'] ?? 'admin',
+        'updatedBy'    => $row['updated_by'] ?? null,
         'createdAt'    => $row['created_at'] ?? null,
         'updatedAt'    => $row['updated_at'] ?? null
     ];
@@ -182,4 +186,28 @@ function sendJsonResponse($data, $statusCode = 200) {
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode($data);
     exit;
+}
+
+/**
+ * Logs an admin action in the audit trail.
+ */
+function logAdminActivity($pdo, $adminUsername, $actionType, $entityType, $entityId, $itemTitle, $details = '') {
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO admin_activity_logs (admin_username, action_type, entity_type, entity_id, item_title, details, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, NOW())
+        ");
+        $stmt->execute([
+            $adminUsername ?: 'admin',
+            $actionType,
+            $entityType,
+            $entityId ? (string)$entityId : null,
+            mb_substr($itemTitle, 0, 255),
+            $details
+        ]);
+        return true;
+    } catch (Exception $e) {
+        error_log("Failed to log admin activity: " . $e->getMessage());
+        return false;
+    }
 }

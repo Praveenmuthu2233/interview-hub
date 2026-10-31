@@ -1,4 +1,4 @@
--- InterviewEdge Database Schema and Seed Data
+-- Codeloop Database Schema and Seed Data
 -- Compatible with XAMPP Apache, MySQL & MariaDB
 -- Character set: utf8mb4
 
@@ -62,7 +62,39 @@ CREATE TABLE IF NOT EXISTS `admins` (
   `username` VARCHAR(100) NOT NULL UNIQUE,
   `password_hash` VARCHAR(255) NOT NULL,
   `email` VARCHAR(200) DEFAULT '',
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `last_seen_at` DATETIME NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `full_name` VARCHAR(160) NOT NULL,
+  `email` VARCHAR(254) NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `phone` VARCHAR(40) NOT NULL DEFAULT '',
+  `education` VARCHAR(180) NOT NULL DEFAULT '',
+  `graduation_year` SMALLINT UNSIGNED NULL,
+  `skills` JSON NOT NULL,
+  `experience` VARCHAR(240) NOT NULL DEFAULT '',
+  `preferred_location` VARCHAR(160) NOT NULL DEFAULT '',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_users_email` (`email`),
+  KEY `idx_users_created` (`created_at` DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `user_saved_listings` (
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `listing_id` CHAR(36) NOT NULL,
+  `saved_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`user_id`, `listing_id`),
+  KEY `idx_saved_listings_listing` (`listing_id`),
+  CONSTRAINT `fk_saved_listings_user`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_saved_listings_listing`
+    FOREIGN KEY (`listing_id`) REFERENCES `interviews` (`id`)
+    ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Seed Categories

@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 const mainContent = document.getElementById("mainContent");
 const relatedList = document.getElementById("relatedList");
@@ -38,13 +38,62 @@ function formatType(type) {
 }
 
 function backToHomeLink() {
-  return '<a class="back-home" href="index.html">← Back to Home</a>';
+  return '<a class="back-home" href="/">← Back to Home</a>';
+}
+
+function renderSaveAction(isSaved) {
+  const saveAction = document.getElementById("detailSaveAction");
+  saveAction.innerHTML = `
+    <button class="btn-save" id="saveJobButton" type="button" aria-pressed="${isSaved}">
+      ${isSaved ? "Remove saved job" : "Save job"}
+    </button>`;
+  document.getElementById("saveJobButton").addEventListener("click", async event => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      const response = isSaved
+        ? await fetch(`/api/user/saved-listings/${encodeURIComponent(listingId)}`, { method: "DELETE" })
+        : await fetch("/api/user/saved-listings", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ listingId })
+        });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.error || `Could not update saved job (status ${response.status}).`);
+      }
+      renderSaveAction(!isSaved);
+    } catch (error) {
+      const status = document.getElementById("saveJobStatus");
+      status.textContent = error.message;
+      console.error("Could not update saved listing:", error);
+      button.disabled = false;
+    }
+  });
+}
+
+async function loadSaveAction() {
+  try {
+    const response = await fetch("/api/user/saved-listings");
+    const saveAction = document.getElementById("detailSaveAction");
+    if (response.status === 401) {
+      saveAction.innerHTML = '<a class="save-sign-in" href="/user-login">Sign in to save this job</a>';
+      return;
+    }
+    if (!response.ok) throw new Error(`Saved listings request failed with status ${response.status}`);
+    const result = await response.json();
+    renderSaveAction(result.listings.some(listing => listing.id === listingId));
+  } catch (error) {
+    const status = document.getElementById("saveJobStatus");
+    if (status) status.textContent = "Saved jobs are temporarily unavailable.";
+    console.error("Could not load saved listing status:", error);
+  }
 }
 
 relatedList.addEventListener("click", event => {
   const relatedItem = event.target.closest(".related-item[data-id]");
   if (relatedItem) {
-    window.location.href = `detail.html?id=${encodeURIComponent(relatedItem.dataset.id)}`;
+    window.location.href = `/detail?id=${encodeURIComponent(relatedItem.dataset.id)}`;
   }
 });
 
@@ -60,9 +109,9 @@ async function loadRelated() {
           <div class="related-role">${escapeHtml(item.role)}</div>
           <div class="related-date">${formatDate(item.date)}</div>
         </div>`).join("")
-      : '<p class="empty-related">No related listings.</p>';
+      : '<p class="empty-related">No related jobs.</p>';
   } catch (error) {
-    relatedList.innerHTML = '<p class="empty-related">Could not load related listings.</p>';
+    relatedList.innerHTML = '<p class="empty-related">Could not load related jobs.</p>';
     console.error("Related listing API request failed:", error);
   }
 }
@@ -71,8 +120,8 @@ async function loadListing() {
   try {
     const response = await fetch(`/api/listings/${encodeURIComponent(listingId)}`);
     if (response.status === 404) {
-      mainContent.innerHTML = `<div class="not-found"><h2>Listing Not Found</h2><p>This interview listing may have been removed or the link is incorrect.</p>${backToHomeLink()}</div>`;
-      relatedList.innerHTML = '<p class="empty-related">No related listings.</p>';
+      mainContent.innerHTML = `<div class="not-found"><h2>Job Not Found</h2><p>This job may have expired or the link is incorrect.</p>${backToHomeLink()}</div>`;
+      relatedList.innerHTML = '<p class="empty-related">No related jobs.</p>';
       return;
     }
     if (!response.ok) throw new Error(`Listing request failed with status ${response.status}`);
@@ -80,17 +129,17 @@ async function loadListing() {
     const { listing } = await response.json();
     const type = normalizedType(listing.type);
     const applyLink = safeExternalUrl(listing.applyLink);
-    document.title = `${listing.role} at ${listing.company} – InterviewEdge`;
+    document.title = `${listing.role} at ${listing.company} – Codeloop`;
 
     mainContent.innerHTML = `
       <div class="breadcrumb">
-        <a href="index.html">Home</a><span>›</span>
-        <a href="index.html">Listings</a><span>›</span>
+        <a href="/">Home</a><span>›</span>
+        <a href="/">Jobs</a><span>›</span>
         <span>${escapeHtml(listing.company)}</span>
       </div>
       <div class="ad-banner">
         <div class="ad-label">Advertisement</div>
-        <ins class="adsbygoogle" data-ad-client="ca-pub-2328429365429845" data-ad-slot="2233445566" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" data-ad-client="ca-pub-4688273676746522" data-ad-slot="2233445566" data-ad-format="auto" data-full-width-responsive="true"></ins>
       </div>
       <div class="detail-card">
         <div class="detail-hero">
@@ -121,7 +170,9 @@ async function loadListing() {
           <div class="apply-box">
             <h3>Ready to Apply?</h3>
             <p>Click below to visit the official application page for this position at ${escapeHtml(listing.company)}.</p>
+            <div id="detailSaveAction"></div>
             ${applyLink ? `<a class="btn-apply" href="${applyLink}" target="_blank" rel="noopener">🚀 Apply Now on Official Site</a>` : '<span class="apply-unavailable">No direct link available. Contact the company directly.</span>'}
+            <p class="save-job-status" id="saveJobStatus" role="status" aria-live="polite"></p>
             <button class="btn-share" id="shareJobButton" type="button">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               Share this Job
@@ -130,9 +181,22 @@ async function loadListing() {
         </div>
       </div>`;
 
-    window.adsbygoogle = window.adsbygoogle || [];
-    window.adsbygoogle.push({});
+    const listingAd = mainContent.querySelector(".adsbygoogle");
+    window.requestAnimationFrame(() => {
+      if (!listingAd || listingAd.getBoundingClientRect().width === 0) {
+        console.warn("Listing ad was not initialized because its container has no available width.");
+        return;
+      }
+
+      try {
+        window.adsbygoogle = window.adsbygoogle || [];
+        window.adsbygoogle.push({});
+      } catch (error) {
+        console.error("Listing ad initialization failed:", error);
+      }
+    });
     loadRelated();
+    loadSaveAction();
 
     document.getElementById("shareJobButton").addEventListener("click", async () => {
       try {
@@ -153,8 +217,8 @@ async function loadListing() {
 }
 
 if (!listingId) {
-  mainContent.innerHTML = `<div class="not-found"><h2>No Listing ID</h2><p>Please navigate from the home page.</p>${backToHomeLink()}</div>`;
-  relatedList.innerHTML = '<p class="empty-related">No related listings.</p>';
+  mainContent.innerHTML = `<div class="not-found"><h2>No Job ID</h2><p>Please navigate from the home page.</p>${backToHomeLink()}</div>`;
+  relatedList.innerHTML = '<p class="empty-related">No related jobs.</p>';
 } else {
   loadListing();
 }

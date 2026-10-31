@@ -1,6 +1,6 @@
 <?php
 /**
- * InterviewEdge - Admin Session Check API
+ * Codeloop - Admin Session Check API
  */
 
 header('Content-Type: application/json; charset=utf-8');
